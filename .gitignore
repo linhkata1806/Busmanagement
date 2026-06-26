@@ -1,3 +1,19 @@
-/bus-management-system/nbproject/private/
-/bus-management-system/build/
-/bus-management-system/dist/
+# ==========================================
+# NetBeans Ant Project Git Ignore Template
+# ==========================================
+
+# --- Thư mục sinh ra do Biên dịch (Build Artifacts) ---
+**/build/
+**/dist/
+**/nbproject/private/
+
+# --- Loại bỏ các file log và file tạm của Hệ điều hành ---
+**/.netbeans_automatic_build
+**/.netbeans_update_resources
+*.class
+*.war
+.DS_Store
+Thumbs.db
+
+# --- Chỉ định giữ lại tài liệu và dữ liệu thô ---
+!/docs/
