@@ -1,3 +1,26 @@
-/bus-management-system/nbproject/private/
-/bus-management-system/build/
-/bus-management-system/dist/
+# ==========================================
+# NetBeans Ant Project Git Ignore Template
+# ==========================================
+
+# ----- Build Artifacts -----
+**/build/
+**/dist/
+**/nbproject/private/
+
+# ----- Compiled Files -----
+*.class
+*.war
+
+# ----- NetBeans Cache -----
+**/.netbeans_automatic_build
+**/.netbeans_update_resources
+
+# ----- Operating System -----
+.DS_Store
+Thumbs.db
+
+# ----- Local Database Configuration -----
+busmanagement/web/WEB-INF/ConnectDB.properties
+
+# ----- Keep Documentation -----
+!/docs/
