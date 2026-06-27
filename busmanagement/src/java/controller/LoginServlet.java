@@ -2,12 +2,11 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
  */
-<<<<<<< HEAD:src/java/Controller/LoginServlet.java
-package Controller;
-=======
 
 package controller;
->>>>>>> 3d3f58d1f21338b807adc056a67a778f245f4cfe:busmanagement/src/java/controller/LoginServlet.java
+
+
+
 
 import service.AuthService;
 import java.io.IOException;

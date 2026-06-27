@@ -3,7 +3,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
  */
 
-package Controller.customer;
+package controller.customer;
 
 import java.io.IOException;
 import java.io.PrintWriter;

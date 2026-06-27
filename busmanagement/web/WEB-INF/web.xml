@@ -58,31 +58,31 @@
     </servlet>
     <servlet>
         <servlet-name>DashboardServlet</servlet-name>
-        <servlet-class>Controller.customer.DashboardServlet</servlet-class>
+        <servlet-class>controller.customer.DashboardServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>ProfileServlet</servlet-name>
-        <servlet-class>Controller.customer.ProfileServlet</servlet-class>
+        <servlet-class>controller.customer.ProfileServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>ChangePasswordServlet</servlet-name>
-        <servlet-class>Controller.customer.ChangePasswordServlet</servlet-class>
+        <servlet-class>controller.customer.ChangePasswordServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>FavoriteServlet</servlet-name>
-        <servlet-class>Controller.customer.FavoriteServlet</servlet-class>
+        <servlet-class>controller.customer.FavoriteServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>TicketServlet</servlet-name>
-        <servlet-class>Controller.customer.TicketServlet</servlet-class>
+        <servlet-class>controller.customer.TicketServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>MonthlyPassServlet</servlet-name>
-        <servlet-class>Controller.customer.MonthlyPassServlet</servlet-class>
+        <servlet-class>controller.customer.MonthlyPassServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>NotificationServlet</servlet-name>
-        <servlet-class>Controller.customer.NotificationServlet</servlet-class>
+        <servlet-class>controller.customer.NotificationServlet</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>LoginServlet</servlet-name>
@@ -144,4 +144,7 @@
         <servlet-name>NotificationServlet</servlet-name>
         <url-pattern>/customer/notification</url-pattern>
     </servlet-mapping>
+    <welcome-file-list>
+        <welcome-file>home</welcome-file>
+    </welcome-file-list>
 </web-app>
