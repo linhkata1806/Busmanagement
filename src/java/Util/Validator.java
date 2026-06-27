@@ -3,7 +3,8 @@ package Util;
 import model.Account;
 
 public class Validator {
-
+    
+    
     public static boolean isValidRegisterInfo(Account account) {
 
         if (account.getUsername() == null
@@ -36,10 +37,17 @@ public class Validator {
     }
 
     public static boolean isValidEmail(String email) {
+        if (email == null || email.trim().isEmpty()) {
+            return false;
+        }
         return email.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$");
     }
 
     public static boolean isValidPhone(String phone) {
+        if (phone == null || phone.trim().isEmpty()) {
+            return false; 
+            
+        }
         return phone.matches("^0\\d{9}$");
     }
 

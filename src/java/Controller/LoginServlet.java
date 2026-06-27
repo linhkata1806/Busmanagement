@@ -2,7 +2,6 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
  */
-
 package Controller;
 
 import Service.AuthService;
@@ -20,18 +19,18 @@ import model.Account;
  * @author Administrator
  */
 public class LoginServlet extends HttpServlet {
-   
-   private AuthService authService;
+
+    private AuthService authService;
 
     @Override
     public void init() throws ServletException {
         authService = new AuthService();
     }
-    
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
-    /** 
+    /**
      * Handles the HTTP <code>GET</code> method.
+     *
      * @param request servlet request
      * @param response servlet response
      * @throws ServletException if a servlet-specific error occurs
@@ -39,18 +38,19 @@ public class LoginServlet extends HttpServlet {
      */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
-    throws ServletException, IOException {
-      HttpSession session = request.getSession(false);
-      //check if session has not existed attribute  user is null
-      if(session==null|| session.getAttribute("USER")!=null){
-          response.sendRedirect("home");
-          return;
-      }
-      request.getRequestDispatcher("view/login.jsp").forward(request, response);
-    } 
+            throws ServletException, IOException {
+        HttpSession session = request.getSession(false);
+        //check if session has not existed attribute  user is null
+        if (session == null || session.getAttribute("USER") != null) {
+            response.sendRedirect("home");
+            return;
+        }
+        request.getRequestDispatcher("view/login.jsp").forward(request, response);
+    }
 
-    /** 
+    /**
      * Handles the HTTP <code>POST</code> method.
+     *
      * @param request servlet request
      * @param response servlet response
      * @throws ServletException if a servlet-specific error occurs
@@ -58,10 +58,10 @@ public class LoginServlet extends HttpServlet {
      */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
-    throws ServletException, IOException {
+            throws ServletException, IOException {
         String user = request.getParameter("username");
         String pass = request.getParameter("password");
-       
+
         Account account = authService.login(user, pass);
 
         if (account != null) {
@@ -70,39 +70,43 @@ public class LoginServlet extends HttpServlet {
             if (oldSession != null) {
                 oldSession.invalidate();
             }
-            
+
             // start a new session
             HttpSession newSession = request.getSession(true);
             newSession.setAttribute("USER", account);
-            
+
             // perfomed navigation base on role
             switch (account.getRoleName()) {
                 case "ADMIN":
-                    response.sendRedirect("admin-dashboard");
+                    response.sendRedirect("admin/dashboard");
                     break;
                 case "STAFF":
-                    response.sendRedirect("staff-dashboard");
+                    response.sendRedirect("staff/dashboard");
                     break;
                 case "DRIVER":
-                    response.sendRedirect("driver-dashboard");
+                    response.sendRedirect("driver/dashboard");
                     break;
                 case "ASSISTANT":
-                    response.sendRedirect("assistant-dashboard");
+                    response.sendRedirect("assistant/dashboard");
                     break;
-                default:
-                    response.sendRedirect("home");
+                case "CUSTOMER":
+                  
+                    response.sendRedirect(request.getContextPath() + "/customer/dashboard");
+                    break;
+                default:                  
+                    response.sendRedirect(request.getContextPath() + "/home");
                     break;
             }
         } else {
             request.setAttribute("error", "Tên đăng nhập, mật khẩu không đúng hoặc tài khoản bị khóa!");
-            request.setAttribute("username", user); 
+            request.setAttribute("username", user);
             request.getRequestDispatcher("view/login.jsp").forward(request, response);
         }
     }
-    
 
-    /** 
+    /**
      * Returns a short description of the servlet.
+     *
      * @return a String containing servlet description
      */
     @Override
@@ -111,4 +115,3 @@ public class LoginServlet extends HttpServlet {
     }// </editor-fold>
 
 }
-

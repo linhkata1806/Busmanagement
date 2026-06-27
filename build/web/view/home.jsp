@@ -244,7 +244,7 @@
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end">
                                 <li>
-                                    <a class="dropdown-item" href="${pageContext.request.contextPath}/profile">
+                                    <a class="dropdown-item" href="${pageContext.request.contextPath}/customer/profile">
                                         <i class="fas fa-user me-2 text-primary"></i>Hồ sơ
                                     </a>
                                 </li>

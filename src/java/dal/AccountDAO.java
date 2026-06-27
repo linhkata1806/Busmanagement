@@ -122,4 +122,63 @@ public class AccountDAO extends DBContext {
         return false;
     }
 
+    public boolean updateProfile(int accountID, String fullName, String email, String phone, String avatar) {
+        String sql = "UPDATE Accounts SET FullName = ?, Email = ?, Phone = ?, Avatar = ?, UpdatedAt = GETDATE() WHERE AccountID = ?";
+        
+        try  {
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ps.setString(1, fullName);
+            ps.setString(2, email);
+            ps.setString(3, phone);
+            ps.setString(4, avatar);
+            ps.setInt(5, accountID);
+            
+            // executeUpdate() trả về số dòng bị ảnh hưởng. Nếu > 0 nghĩa là update thành công.
+            int rowsAffected = ps.executeUpdate();
+            return rowsAffected > 0;
+            
+        } catch (Exception e) {
+            System.out.println("Lỗi tại updateProfile: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public Account getAccountById(int accountID) {
+        String sql = "SELECT * FROM Accounts WHERE AccountID = ?";
+        
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, accountID);
+            
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    Account account = new Account();
+                    
+                    // Lấy dữ liệu từ ResultSet nhét vào Object
+                    account.setAccountID(rs.getInt("AccountID"));
+                    account.setUsername(rs.getString("Username"));
+                    account.setPassword(rs.getString("Password"));
+                    account.setFullName(rs.getString("FullName"));
+                    account.setEmail(rs.getString("Email"));
+                    account.setPhone(rs.getString("Phone"));
+                    account.setAvatar(rs.getString("Avatar"));
+                    account.setRoleID(rs.getInt("RoleID"));
+                    account.setActive(rs.getBoolean("IsActive"));
+                    
+                   
+                    
+//                     account.setCreatedAt(rs.getTimestamp("CreatedAt"));
+//                     account.setUpdatedAt(rs.getTimestamp("UpdatedAt"));
+                     account.setRoleName(rs.getString("RoleName")); // (Nếu có JOIN với bảng Roles)
+                    
+                    return account;
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("Lỗi tại getAccountById: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return null;
+    }
+
 }

@@ -128,10 +128,6 @@ public class AuthFilter implements Filter {
         if(path.startsWith("/admin")&&!"ADMIN".equals(role)){
             res.sendRedirect(req.getContextPath()+"/home");
         }
-        //admin
-        if(path.startsWith("/admin")&&!"ADMIN".equals(role)){
-            res.sendRedirect(req.getContextPath()+"/home");
-        }
         //staff
         if(path.startsWith("/staff")&&!"STAFF".equals(role)){
             res.sendRedirect(req.getContextPath()+"/home");

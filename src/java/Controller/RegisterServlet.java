@@ -22,6 +22,12 @@ public class RegisterServlet extends HttpServlet {
 
     private AuthService AuthService;
 
+    @Override
+    public void init() throws ServletException {
+        AuthService = new AuthService();
+    }
+    
+    
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
      * methods.
