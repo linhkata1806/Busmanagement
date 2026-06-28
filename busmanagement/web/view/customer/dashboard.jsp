@@ -274,7 +274,7 @@
         <div class="row g-4">
             
             <div class="col-lg-3 col-md-6">
-                <a href="${pageContext.request.contextPath}/customer/my-ticket" class="stat-link d-block h-100">
+                <a href="${pageContext.request.contextPath}/customer/ticket?tab=ticket"" class="stat-link d-block h-100">
                     <div class="stat-card">
                         <div class="d-flex align-items-center">
                             <div class="stat-icon bg-ticket"><i class="fas fa-ticket-alt"></i></div>
@@ -288,7 +288,7 @@
             </div>
 
             <div class="col-lg-3 col-md-6">
-                <a href="${pageContext.request.contextPath}/customer/my-pass" class="stat-link d-block h-100">
+                <a href="${pageContext.request.contextPath}/customer/ticket?tab=pass" class="stat-link d-block h-100">
                     <div class="stat-card">
                         <div class="d-flex align-items-center">
                             <div class="stat-icon bg-pass"><i class="fas fa-id-card"></i></div>

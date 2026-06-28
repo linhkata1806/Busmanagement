@@ -3,14 +3,24 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package dal;
+
+import dto.TicketDTO;
+import enums.SaleChannel;
+import enums.TicketStatus;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Types;
+import model.Ticket;
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  *
  * @author Administrator
  */
-public class TicketDAO extends DBContext{
+public class TicketDAO extends DBContext {
 
     public int countUnusedTickets(int accountId) {
         String sql = "SELECT COUNT(*) FROM Tickets WHERE AccountID = ? AND Status = 'UNUSED'";
@@ -26,5 +36,87 @@ public class TicketDAO extends DBContext{
         }
         return 0;
     }
+
+    public boolean insert(Ticket ticket) {
+        String sql = "INSERT INTO Tickets (AccountID, TripID, RouteID, TicketCode, Price, SaleChannel, Status, PurchasedAt) "
+                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+
+            ps.setInt(1, ticket.getAccountID());
+
+            // Xử lý Null cho TripID vì SQL cho phép NULL
+            if (ticket.getTripID() != null) {
+                ps.setInt(2, ticket.getTripID());
+            } else {
+                ps.setNull(2, Types.INTEGER);
+            }
+
+            ps.setInt(3, ticket.getRouteID());
+            ps.setString(4, ticket.getTicketCode());
+            ps.setDouble(5, ticket.getPrice());
+
+            // Map Enum sang String (đúng chuẩn SQL)
+            ps.setString(6, ticket.getSaleChannel().name());
+            ps.setString(7, ticket.getStatus().name());
+
+            // Map LocalDateTime sang SQL Timestamp
+            ps.setTimestamp(8, Timestamp.valueOf(ticket.getPurchasedAt()));
+
+            return ps.executeUpdate() > 0;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public List<TicketDTO> getTicketsByAccount(int accountID) {
+        List<TicketDTO> list = new ArrayList<>();
+        String sql = "SELECT t.TicketCode, t.Price, t.Status, t.PurchasedAt, "
+                + "r.RouteNumber, r.RouteName "
+                + "FROM Tickets t "
+                + "JOIN Routes r ON t.RouteID = r.RouteID "
+                + "WHERE t.AccountID = ? ORDER BY t.PurchasedAt DESC";
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, accountID);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    TicketDTO dto = new TicketDTO();
+                    dto.setTicketCode(rs.getString("TicketCode"));
+                    dto.setPrice(rs.getLong("Price"));
+                    dto.setStatus(enums.TicketStatus.valueOf(rs.getString("Status")));
+                    dto.setPurchasedAt(rs.getTimestamp("PurchasedAt").toLocalDateTime());
+                    dto.setRouteNumber(rs.getString("RouteNumber"));
+                    dto.setRouteName(rs.getString("RouteName"));
+                    list.add(dto);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return list;
+
+    }
+
+    private Ticket mapRowToTicket(ResultSet rs) throws SQLException {
+        Ticket t = new Ticket();
+        t.setTicketID(rs.getInt("TicketID"));
+        t.setAccountID(rs.getInt("AccountID") == 0 ? null : rs.getInt("AccountID")); // Xử lý null chuẩn
+        t.setTripID(rs.getInt("TripID") == 0 ? null : rs.getInt("TripID"));
+        t.setRouteID(rs.getInt("RouteID"));
+        t.setTicketCode(rs.getString("TicketCode"));
+        t.setPrice(rs.getLong("Price"));
+        t.setSaleChannel(SaleChannel.valueOf(rs.getString("SaleChannel")));
+        t.setStatus(TicketStatus.valueOf(rs.getString("Status")));
+        t.setPurchasedAt(rs.getTimestamp("PurchasedAt").toLocalDateTime());
+
+        Timestamp usedAt = rs.getTimestamp("UsedAt");
+        if (usedAt != null) {
+            t.setUsedAt(usedAt.toLocalDateTime());
+        }
+        return t;
+    }
     
+
 }
