@@ -21,6 +21,11 @@ public class MonthlyPassDTO {
     private String routeNumber;
     private String routeName;
     private String typeName;
+    
+    //cac truong cho staff quan ly
+    private int passID;
+    private int accountID;
+    private String fullName;
 
     public MonthlyPassDTO() {
     }
@@ -89,6 +94,30 @@ public class MonthlyPassDTO {
 
     public void setTypeName(String typeName) {
         this.typeName = typeName;
+    }
+
+    public int getPassID() {
+        return passID;
+    }
+
+    public void setPassID(int passID) {
+        this.passID = passID;
+    }
+
+    public int getAccountID() {
+        return accountID;
+    }
+
+    public void setAccountID(int accountID) {
+        this.accountID = accountID;
+    }
+
+    public String getFullName() {
+        return fullName;
+    }
+
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
     }
     
     

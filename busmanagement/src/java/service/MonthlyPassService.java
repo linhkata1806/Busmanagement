@@ -2,6 +2,7 @@ package service;
 
 import dal.MonthlyPassDAO;
 import dal.MonthlyPassTypeDAO;
+import dal.NotificationDAO;
 import dto.MonthlyPassDTO;
 import enums.PassStatus;
 import model.MonthlyPass;
@@ -9,12 +10,16 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import model.MonthlyPassType;
+import model.Notification;
 
 public class MonthlyPassService {
 
-    private MonthlyPassDAO monthlyPassDAO = new MonthlyPassDAO();
+    private MonthlyPassDAO monthlyPassDAO;
+    private NotificationDAO notificationDAO;
 
     public MonthlyPassService() {
+        monthlyPassDAO = new MonthlyPassDAO();
+        notificationDAO = new NotificationDAO();
     }
 
     public void registerRoutePass(int accountID, int routeId, int passTypeID) {
@@ -56,7 +61,7 @@ public class MonthlyPassService {
 
         // Lưu ý: hàm tính giá cần truyền đúng tham số (null cho routeId vì là liên tuyến)
         // Nếu hàm calculatePassPrice yêu cầu int routeId, bạn cần xử lý trường hợp null này
-        pass.setPrice(calculatePassPrice(0, passTypeID)); // Cần kiểm tra lại hàm tính giá của bạn
+        pass.setPrice(calculatePassPrice(null, passTypeID)); // Cần kiểm tra lại hàm tính giá của bạn
 
         pass.setStatus(PassStatus.PENDING);
 
@@ -70,7 +75,7 @@ public class MonthlyPassService {
 
     private long calculatePassPrice(Integer routeId, int passTypeID) {
         MonthlyPassTypeDAO monthlyPassType = new MonthlyPassTypeDAO();
-        double basePrice = (routeId == null) ? 200000 : 100000;
+        long basePrice = (routeId == null) ? 200000 : 100000;
 
         MonthlyPassType passType = monthlyPassType.getById(passTypeID);
 
@@ -80,16 +85,74 @@ public class MonthlyPassService {
 
         double discount = passType.getDiscountPercentage();
 
-        return (long) (basePrice * (100 - discount) / 100);
+        return Math.round(basePrice * (100 - discount) / 100.0);
     }
-    
-    // HÀM MỚI 1: Lấy danh sách vé tháng đơn tuyến dạng DTO
+
+    // Lấy danh sách vé tháng đơn tuyến dạng DTO
     public List<MonthlyPassDTO> getRoutePasses(int accountID) {
         return monthlyPassDAO.getRoutePasses(accountID);
     }
 
-    // HÀM MỚI 2: Lấy danh sách vé tháng liên tuyến dạng DTO
+    // Lấy danh sách vé tháng liên tuyến dạng DTO
     public List<MonthlyPassDTO> getAllRoutePasses(int accountID) {
         return monthlyPassDAO.getAllRoutePasses(accountID);
     }
+
+    public int countPendingPasses() {
+        return monthlyPassDAO.countByStaTus("PENDING");
+    }
+
+    // 2. Lấy danh sách tất cả vé tháng (Giao diện Staff)
+    public List<MonthlyPassDTO> getAllPassesForStaff() {
+        return monthlyPassDAO.getAllPasses();
+    }
+
+    // 3. Lấy danh sách vé tháng theo trạng thái lọc
+    public List<MonthlyPassDTO> getPassesByStatusForStaff(String status) {
+        return monthlyPassDAO.getPassesByStatus(status);
+    }
+
+    public boolean approvePass(int passID, int staffID) {
+        MonthlyPass pass = monthlyPassDAO.getPassByID(passID);
+        if (pass == null || PassStatus.PENDING != pass.getStatus()) {
+            return false;
+        }
+        boolean updated = monthlyPassDAO.updateStatus(passID, PassStatus.APPROVED, staffID);
+        if (updated) {
+            sendNotification(pass.getAccountID(),
+                    "PASS_APPROVED",
+                     "Vé tháng được duyệt",
+                    "Đăng ký vé tháng thành công vé tháng mã: "
+                    + pass.getPassCode() + " của bạn đã được phê duyệt hành công");
+
+        }
+        return updated;
+    }
+
+    public boolean rejectPass(int PassID, int staffID) {
+        MonthlyPass pass = monthlyPassDAO.getPassByID(PassID);
+        if (pass == null || PassStatus.PENDING != pass.getStatus()) {
+            return false;
+        }
+        boolean updated = monthlyPassDAO.updateStatus(PassID, PassStatus.REJECTED, staffID);
+        if (updated) {
+            sendNotification(pass.getAccountID(),
+                    "PASS_REJECTED",
+                     "Vé tháng bị từ chối",
+                    "Đăng ký vé tháng thất bại vé tháng mã: "
+                    + pass.getPassCode() + " của bạn bị từ chối");
+
+        }
+        return updated;
+    }
+
+    private void sendNotification(int accountID, String type, String title, String content) {
+        Notification notif = new Notification();
+        notif.setAccountID(accountID);
+        notif.setNotificationType(type);
+        notif.setTitle(title);
+        notif.setContent(content);
+        notificationDAO.insert(notif);
+    }
+
 }

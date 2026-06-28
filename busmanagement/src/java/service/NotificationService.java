@@ -51,5 +51,9 @@ public class NotificationService {
     public int countUnreadNotifications(int accountID) {
         return notificationDAO.countUnreadNotifications(accountID);
     }
+
+    public int countNotifications() {
+        return notificationDAO.countNotifications();
+    }
     
 }

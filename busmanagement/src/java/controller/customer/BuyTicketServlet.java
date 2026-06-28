@@ -69,12 +69,28 @@ public class BuyTicketServlet extends HttpServlet {
                 return;
             }
 
-            // check nếu type khác 3 type quy ước nhe
-            if (ticketType == null || (!ticketType.equals("luot") && !ticketType.equals("thang") && !ticketType.equals("lien_chuyen"))) {
-                ticketType = "luot";
+            long displayPrice;
+
+            switch (ticketType) {
+
+                case "luot":
+                    displayPrice = (long) route.getTicketPrice();
+                    break;
+
+                case "thang":
+                    displayPrice = 100_000L;
+                    break;
+
+                case "lien_chuyen":
+                    displayPrice = 200_000L;
+                    break;
+
+                default:
+                    displayPrice = (long) route.getTicketPrice();
             }
 
-            request.setAttribute("ticketType", ticketType);
+            request.setAttribute("ticketType", ticketType);     // loại vé
+            request.setAttribute("displayPrice", displayPrice);
 
             //day qua trang hoa don
             request.setAttribute("route", route);

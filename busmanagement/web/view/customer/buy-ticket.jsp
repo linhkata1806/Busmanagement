@@ -188,7 +188,7 @@
                     <div class="info-row align-items-center mt-4 pt-3 border-top border-2">
                         <span class="info-label fw-bold text-dark fs-6">Tổng chi phí:</span>
                         <span class="info-value text-success fs-3 fw-bold">
-                            <fmt:formatNumber value="${route.ticketPrice}" pattern="#,###"/> đ
+                            <fmt:formatNumber value="${displayPrice}" pattern="#,###"/> đ
                         </span>
                     </div>
 

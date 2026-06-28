@@ -105,4 +105,18 @@ public class NotificationDAO extends DBContext {
         return false;
     }
 
+    public int countNotifications() {
+        String sql = "SELECT COUNT(*) FROM Notifications";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("Lỗi countNotifications: " + e.getMessage());
+        }
+        return 0;
+    }
+
 }
