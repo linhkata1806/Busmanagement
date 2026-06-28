@@ -150,9 +150,20 @@
 </nav>
 
 <div class="page-header">
-    <div class="container text-center text-md-start">
-        <h3 class="fw-bold m-0"><i class="fas fa-list-ul me-2"></i>Danh mục tuyến xe Bus</h3>
-        <p class="m-0 mt-1 opacity-75">Tra cứu thông tin, giờ hoạt động và giá vé các tuyến xe vận hành trong thành phố</p>
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-md-5 text-center text-md-start mb-3 mb-md-0">
+                <h3 class="fw-bold m-0"><i class="fas fa-list-ul me-2"></i>Danh mục tuyến xe Bus</h3>
+            </div>
+            <div class="col-md-7 col-lg-6 ms-auto">
+                <form action="${pageContext.request.contextPath}/search-route" method="GET" class="d-flex shadow-sm">
+                    <input type="text" name="keyword" class="form-control border-0 px-3 py-2 bg-white" placeholder="Tìm kiếm nhanh số tuyến hoặc tên tuyến..." style="font-size: 0.9rem; border-radius: 8px 0 0 8px;" required>
+                    <button type="submit" class="btn btn-warning border-0 px-4 fw-semibold text-white d-flex align-items-center" style="background: var(--accent); border-radius: 0 8px 8px 0; font-size: 0.9rem;">
+                        <i class="fas fa-search me-2"></i>Tìm kiếm
+                    </button>
+                </form>
+            </div>
+        </div>
     </div>
 </div>
 
