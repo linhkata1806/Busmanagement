@@ -73,7 +73,7 @@ CREATE TABLE Routes (
     StartPoint    NVARCHAR(150) NOT NULL,
     EndPoint      NVARCHAR(150) NOT NULL,
     OperatingHours VARCHAR(50)  NOT NULL,
-    Frequency     VARCHAR(50),
+    Frequency     NVARCHAR(50),
     TicketPrice   DECIMAL(10,0) NOT NULL,
     TotalDistance DECIMAL(6,2),
     IsActive      BIT           NOT NULL DEFAULT 1,
@@ -271,10 +271,10 @@ INSERT INTO Stops (StopName, Address, Latitude, Longitude) VALUES
 
 -- 4. THÊM ROUTES (Tuyến xe)
 INSERT INTO Routes (RouteNumber, RouteName, StartPoint, EndPoint, OperatingHours, Frequency, TicketPrice, TotalDistance) VALUES
-('32', N'Nhổn - Giáp Bát', N'Nhổn', N'Bến xe Giáp Bát', '05:00 - 22:30', '10-15 phút/chuyến', 7000, 18.5),
-('01', N'Bến xe Gia Lâm - Bến xe Yên Nghĩa', N'Bến xe Gia Lâm', N'Bến xe Yên Nghĩa', '05:00 - 21:00', '15 phút/chuyến', 8000, 22.0),
-('21A', N'Bến xe Giáp Bát - Bến xe Yên Nghĩa', N'Bến xe Giáp Bát', N'Bến xe Yên Nghĩa', '05:00 - 21:00', '15-20 phút/chuyến', 7000, 16.0),
-('26', N'Mai Động - Sân vận động Quốc Gia', N'Bến xe Giáp Bát', N'Đại học Quốc Gia', '05:00 - 22:30', '10 phút/chuyến', 7000, 15.0);
+('32', N'Nhổn - Giáp Bát', N'Nhổn', N'Bến xe Giáp Bát', '05:00 - 22:30', N'10-15 phút/chuyến', 7000, 18.5),
+('01', N'Bến xe Gia Lâm - Bến xe Yên Nghĩa', N'Bến xe Gia Lâm', N'Bến xe Yên Nghĩa', '05:00 - 21:00', N'15 phút/chuyến', 8000, 22.0),
+('21A', N'Bến xe Giáp Bát - Bến xe Yên Nghĩa', N'Bến xe Giáp Bát', N'Bến xe Yên Nghĩa', '05:00 - 21:00', N'15-20 phút/chuyến', 7000, 16.0),
+('26', N'Mai Động - Sân vận động Quốc Gia', N'Bến xe Giáp Bát', N'Đại học Quốc Gia', '05:00 - 22:30', N'10 phút/chuyến', 7000, 15.0);
 
 -- 5. THÊM ROUTE_STOP (MAPPING TUYẾN - TRẠM) -> Test thuật toán chuyển tuyến
 -- Tuyến 32: Nhổn(1) -> Cầu Diễn(2) -> ĐH Quốc Gia(3) -> Cầu Giấy(4) -> Kim Mã(5) -> Giáp Bát(7)
