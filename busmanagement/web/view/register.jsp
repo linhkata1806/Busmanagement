@@ -136,6 +136,19 @@
                 color: var(--primary-hover);
                 text-decoration: underline;
             }
+
+            .link-home {
+                color: #6c757d;
+                text-decoration: none;
+                font-weight: 500;
+                font-size: 0.9rem;
+                transition: all 0.2s;
+            }
+            
+            .link-home:hover {
+                color: var(--primary);
+                text-decoration: underline;
+            }
             
             .password-toggle {
                 cursor: pointer;
@@ -253,8 +266,9 @@
                     </button>
                 </form>
 
-                <div class="text-center mt-4">
+                <div class="text-center mt-4 d-flex flex-column gap-2 align-items-center">
                     <a href="login" class="link-login">Đã có tài khoản? Quay lại Đăng nhập</a>
+                    <a href="home" class="link-home"><i class="fas fa-arrow-left me-1"></i> Trở về menu chính</a>
                 </div>
             </div>
         </div>
