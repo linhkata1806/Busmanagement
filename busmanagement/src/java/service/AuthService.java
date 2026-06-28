@@ -90,5 +90,28 @@ public class AuthService {
 
         return accountDAO.insertAccount(account);
     }
+    
+    public void changePassword(int accountId, String oldPassword, String newPassword) throws IllegalArgumentException, Exception {
+        
+        // 1. Lấy thông tin tài khoản hiện tại từ DB
+        Account account = accountDAO.getAccountById(accountId);
+        if (account == null) {
+            throw new Exception("Tài khoản không tồn tại trong hệ thống.");
+        }
+
+        // 2. Kiểm tra mật khẩu cũ (Ném lỗi IllegalArgumentException nếu sai)
+        if (!PasswordEncoder.checkPassword(oldPassword, account.getPassword())) {
+            throw new IllegalArgumentException("Mật khẩu hiện tại không chính xác.");
+        }
+
+        // 3. Hash mật khẩu mới
+        String hash = PasswordEncoder.hashPassword(newPassword);
+
+        // 4. Update xuống Database (Ném lỗi Exception chung nếu DB lỗi)
+        boolean isSuccess = accountDAO.changePassword(accountId, hash);
+        if (!isSuccess) {
+            throw new Exception("không thể cập nhật mật khẩu lúc này.");
+        }
+    }
 
 }

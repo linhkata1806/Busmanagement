@@ -127,22 +127,27 @@ public class AuthFilter implements Filter {
         //admin
         if(path.startsWith("/admin")&&!"ADMIN".equals(role)){
             res.sendRedirect(req.getContextPath()+"/home");
+            return;
         }
         //staff
         if(path.startsWith("/staff")&&!"STAFF".equals(role)){
             res.sendRedirect(req.getContextPath()+"/home");
+            return;
         }
         //driver
         if(path.startsWith("/driver")&&!"DRIVER".equals(role)){
             res.sendRedirect(req.getContextPath()+"/home");
+            return;
         }
         //assistant
         if(path.startsWith("/assistant")&&!"ASSISTANT".equals(role)){
             res.sendRedirect(req.getContextPath()+"/home");
+            return;
         }
         //customer
         if(path.startsWith("/customer")&&!"CUSTOMER".equals(role)){
             res.sendRedirect(req.getContextPath()+"/home");
+            return;
         }
         
         //If valid then continue access to other page

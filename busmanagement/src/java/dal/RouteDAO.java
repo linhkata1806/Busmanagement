@@ -144,7 +144,7 @@ public class RouteDAO extends DBContext {
 
     public List<Route> findRoutesBetweenStops(int fromStopID, int toStopID) {
         List<Route> list = new ArrayList<>();
-        String sql = "SELECT r.* FROM Route r "
+        String sql = "SELECT r.* FROM Routes r "
                 + "JOIN Route_Stop rs1 ON r.RouteID = rs1.RouteID "
                 + "JOIN Route_Stop rs2 ON r.RouteID = rs2.RouteID "
                 + "WHERE rs1.StopID = ? "

@@ -6,7 +6,7 @@ package model;
 
 import enums.PassStatus;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
+import model.MonthlyPass;
 
 /**
  *
@@ -25,13 +25,13 @@ public class MonthlyPass {
     private PassStatus status; // Enum: PENDING, APPROVED, REJECTED, EXPIRED
     private String imageProof;
     private Integer approvedBy;
-    private LocalDateTime approvedAt;
-    private LocalDateTime createdAt;
+    private LocalDate approvedAt;
+    private LocalDate createdAt;
 
     public MonthlyPass() {
     }
 
-    public MonthlyPass(int passID, int accountID, Integer routeID, int passTypeID, String passCode, LocalDate startDate, LocalDate endDate, long price, PassStatus status, String imageProof, Integer approvedBy, LocalDateTime approvedAt, LocalDateTime createdAt) {
+    public MonthlyPass(int passID, int accountID, Integer routeID, int passTypeID, String passCode, LocalDate startDate, LocalDate endDate, long price, PassStatus status, String imageProof, Integer approvedBy, LocalDate approvedAt, LocalDate createdAt) {
         this.passID = passID;
         this.accountID = accountID;
         this.routeID = routeID;
@@ -135,19 +135,19 @@ public class MonthlyPass {
         this.approvedBy = approvedBy;
     }
 
-    public LocalDateTime getApprovedAt() {
+    public LocalDate getApprovedAt() {
         return approvedAt;
     }
 
-    public void setApprovedAt(LocalDateTime approvedAt) {
+    public void setApprovedAt(LocalDate approvedAt) {
         this.approvedAt = approvedAt;
     }
 
-    public LocalDateTime getCreatedAt() {
+    public LocalDate getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(LocalDateTime createdAt) {
+    public void setCreatedAt(LocalDate createdAt) {
         this.createdAt = createdAt;
     }
 

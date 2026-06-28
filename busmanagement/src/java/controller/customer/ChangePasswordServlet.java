@@ -2,80 +2,98 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
  */
-
 package controller.customer;
 
+import dal.AccountDAO;
 import java.io.IOException;
 import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+import model.Account;
+import service.AuthService;
+import util.Validator;
 
 /**
  *
  * @author Administrator
  */
 public class ChangePasswordServlet extends HttpServlet {
-   
-    /** 
-     * Processes requests for both HTTP <code>GET</code> and <code>POST</code> methods.
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
-    protected void processRequest(HttpServletRequest request, HttpServletResponse response)
-    throws ServletException, IOException {
-        response.setContentType("text/html;charset=UTF-8");
-        try (PrintWriter out = response.getWriter()) {
-            /* TODO output your page here. You may use following sample code. */
-            out.println("<!DOCTYPE html>");
-            out.println("<html>");
-            out.println("<head>");
-            out.println("<title>Servlet ChangePasswordServlet</title>");  
-            out.println("</head>");
-            out.println("<body>");
-            out.println("<h1>Servlet ChangePasswordServlet at " + request.getContextPath () + "</h1>");
-            out.println("</body>");
-            out.println("</html>");
-        }
-    } 
 
-    // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
-    /** 
-     * Handles the HTTP <code>GET</code> method.
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
-    @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
-    throws ServletException, IOException {
-        processRequest(request, response);
-    } 
+    private AccountDAO accountDAO;
+    private AuthService authService;
 
-    /** 
-     * Handles the HTTP <code>POST</code> method.
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
-    throws ServletException, IOException {
-        processRequest(request, response);
+    public void init() throws ServletException {
+        accountDAO = new AccountDAO();
+        authService = new AuthService();
     }
 
-    /** 
-     * Returns a short description of the servlet.
-     * @return a String containing servlet description
-     */
+    // ==========================================
+    // GET: CHỈ HIỂN THỊ FORM
+    // ==========================================
     @Override
-    public String getServletInfo() {
-        return "Short description";
-    }// </editor-fold>
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        request.getRequestDispatcher("/view/customer/change-password.jsp").forward(request, response);
+    }
 
+    // ==========================================
+    // POST: XỬ LÝ ĐỔI MẬT KHẨU
+    // ==========================================
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+
+        request.setCharacterEncoding("UTF-8");
+
+        // B2. Lấy Account từ Session
+        HttpSession session = request.getSession(false);
+
+        Account user = (Account) session.getAttribute("USER");
+
+        // B1. Lấy dữ liệu
+        String oldPassword = request.getParameter("oldPassword");
+        String newPassword = request.getParameter("newPassword");
+        String confirmPassword = request.getParameter("confirmPassword");
+
+        // B2. Validate cơ bản (Chỉ check định dạng)
+        if (!Validator.isValidPassword(oldPassword) || !Validator.isValidPassword(newPassword)) {
+            request.setAttribute("errorMsg", "Mật khẩu phải từ 6 đến 50 ký tự và không được để trống.");
+            doGet(request, response);
+            return;
+        }
+
+        if (!newPassword.equals(confirmPassword)) {
+            request.setAttribute("errorMsg", "Mật khẩu xác nhận không khớp với mật khẩu mới.");
+            doGet(request, response);
+            return;
+        }
+
+        if (newPassword.equals(oldPassword)) {
+            request.setAttribute("errorMsg", "Mật khẩu mới không được trùng với mật khẩu hiện tại.");
+            doGet(request, response);
+            return;
+        }
+
+        try {
+            authService.changePassword(user.getAccountID(), oldPassword, newPassword);
+
+            // Nếu code chạy được đến đây nghĩa là KHÔNG CÓ LỖI NÀO BỊ NÉM RA -> THÀNH CÔNG
+            session.setAttribute("successMsg", "Đổi mật khẩu thành công. Hãy dùng mật khẩu mới cho lần đăng nhập sau!");
+            response.sendRedirect(request.getContextPath() + "/customer/profile");
+
+        } catch (IllegalArgumentException e) {
+            // Lỗi do người dùng nhập sai mật khẩu cũ
+            request.setAttribute("errorMsg", e.getMessage());
+            doGet(request, response);
+
+        } catch (Exception e) {
+            // Lỗi do hệ thống (Database sập, Không tìm thấy Account...)
+            request.setAttribute("errorMsg", e.getMessage());
+            doGet(request, response);
+        }
+    }
 }
