@@ -38,10 +38,18 @@
 
         /* PAGE HEADER */
         .page-header {
-            background: linear-gradient(135deg, var(--primary) 0%, #0d47a1 100%);
-            padding: 40px 0;
+            background: linear-gradient(135deg, var(--primary) 0%, #1565c0 100%);
+            padding: 20px 0;
             color: white;
-            margin-bottom: 40px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+        .page-header h3 {
+            font-size: 1.45rem;
+            letter-spacing: -0.3px;
+        }
+        .page-header p {
+            font-size: 0.88rem;
         }
 
         /* TABLE STYLING */
@@ -111,9 +119,8 @@
         </button>
         <div class="collapse navbar-collapse" id="navMenu">
             <ul class="navbar-nav me-auto">
-                <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/home">Trang chủ</a></li>
+                <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/guide">Hướng dẫn</a></li>
                 <li class="nav-item"><a class="nav-link active" href="${pageContext.request.contextPath}/route-list">Tuyến xe</a></li>
-                 <li class="nav-item"><a class="nav-link active" href="${pageContext.request.contextPath}/customer/dashboard">Dashboard</a></li>
             </ul>
             <ul class="navbar-nav ms-auto align-items-center">
                 <c:choose>
@@ -144,8 +151,8 @@
 
 <div class="page-header">
     <div class="container text-center text-md-start">
-        <h2 class="fw-bold m-0"><i class="fas fa-list-ul me-2"></i>Danh mục tuyến xe Bus</h2>
-        <p class="lead m-0 mt-1 opacity-75">Tra cứu thông tin, giờ hoạt động và giá vé các tuyến xe vận hành trong thành phố</p>
+        <h3 class="fw-bold m-0"><i class="fas fa-list-ul me-2"></i>Danh mục tuyến xe Bus</h3>
+        <p class="m-0 mt-1 opacity-75">Tra cứu thông tin, giờ hoạt động và giá vé các tuyến xe vận hành trong thành phố</p>
     </div>
 </div>
 

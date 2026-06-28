@@ -209,6 +209,129 @@
         }
         footer a { color: rgba(255,255,255,0.7); text-decoration: none; }
         footer a:hover { color: white; }
+
+        /* ===== BUS MAP & NEWS SECTION ===== */
+        .news-section {
+            background-color: #ffffff;
+            padding: 60px 0;
+            border-top: 1px solid #eaeaea;
+        }
+        
+        .info-card-custom {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 24px;
+            transition: all 0.3s ease;
+            height: 100%;
+        }
+        
+        .info-card-custom:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+            border-color: var(--primary);
+        }
+        
+        .info-icon-wrapper {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            background: rgba(26, 115, 232, 0.1);
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-bottom: 16px;
+        }
+        
+        .article-card {
+            display: flex;
+            gap: 20px;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            margin-bottom: 20px;
+            height: 100%;
+        }
+        
+        .article-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+            border-color: var(--primary);
+        }
+        
+        .article-img {
+            width: 150px;
+            height: 100%;
+            object-fit: cover;
+            flex-shrink: 0;
+        }
+        
+        .article-content {
+            padding: 16px 20px 16px 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        
+        .article-badge {
+            background: #fff2e8;
+            color: #ff5500;
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 4px;
+            align-self: flex-start;
+            margin-bottom: 8px;
+        }
+        
+        .article-title {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 6px;
+            line-height: 1.4;
+        }
+        
+        .article-desc {
+            font-size: 0.85rem;
+            color: #64748b;
+            margin-bottom: 12px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        
+        .article-meta {
+            font-size: 0.8rem;
+            color: #94a3b8;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            width: 100%;
+        }
+        
+        .read-more-btn {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.85rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            transition: gap 0.2s;
+            margin-left: auto;
+        }
+        
+        .read-more-btn:hover {
+            gap: 8px;
+            color: var(--primary-dark);
+            text-decoration: underline;
+        }
     </style>
 </head>
 <body>
@@ -226,7 +349,7 @@
         <div class="collapse navbar-collapse" id="navMenu">
             <ul class="navbar-nav me-auto">
                 <li class="nav-item">
-                    <a class="nav-link" href="${pageContext.request.contextPath}/home">Trang chủ</a>
+                    <a class="nav-link" href="${pageContext.request.contextPath}/guide">Hướng dẫn</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="${pageContext.request.contextPath}/route-list">Tuyến xe</a>
@@ -432,6 +555,104 @@
             </div>
         </c:otherwise>
     </c:choose>
+</div>
+
+<!-- ===== BUS MAP & LATEST NEWS SECTION ===== -->
+<div class="container mt-5 pt-4 pb-5">
+    <hr class="mb-5" style="border-color: #eaeaea;">
+    
+    <div class="row g-5">
+        <!-- Left Column: Smart Bus Map Info -->
+        <div class="col-lg-5">
+            <div class="section-title mb-1"><i class="fas fa-map-marked-alt text-primary me-2"></i> Bản đồ xe buýt thông minh</div>
+            <div class="section-subtitle mb-4">Giải pháp chuyển đổi số giao thông công cộng Thủ đô</div>
+            
+            <div class="d-flex flex-column gap-4">
+                <div class="info-card-custom">
+                    <div class="info-icon-wrapper">
+                        <i class="fas fa-satellite-dish"></i>
+                    </div>
+                    <h6 class="fw-bold text-dark">Định vị thời gian thực</h6>
+                    <p class="small text-muted mb-0">Theo dõi trực quan lịch trình xe chạy, thời gian xe đến trạm dừng theo thời gian thực giúp bạn chủ động thời gian.</p>
+                </div>
+                
+                <div class="info-card-custom">
+                    <div class="info-icon-wrapper">
+                        <i class="fas fa-route"></i>
+                    </div>
+                    <h6 class="fw-bold text-dark">Tối ưu hóa lộ trình</h6>
+                    <p class="small text-muted mb-0">Thuật toán tìm đường thông minh tự động đề xuất phương án đi xe buýt ngắn nhất, tốn ít chi phí nhất và ít phải chuyển tuyến nhất.</p>
+                </div>
+                
+                <div class="info-card-custom">
+                    <div class="info-icon-wrapper">
+                        <i class="fas fa-leaf"></i>
+                    </div>
+                    <h6 class="fw-bold text-dark">Giao thông xanh bền vững</h6>
+                    <p class="small text-muted mb-0">Khuyến khích người dân sử dụng phương tiện công cộng thông qua hệ thống quản lý vé điện tử, góp phần giảm tải ùn tắc và bảo vệ môi trường.</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Right Column: Hot News & Articles -->
+        <div class="col-lg-7">
+            <div class="section-title mb-1"><i class="fas fa-fire text-danger me-2"></i> Tin tức & Sự kiện nóng hổi</div>
+            <div class="section-subtitle mb-4">Các tin bài mới nhất về chủ đề Bus Map & Đô thị thông minh</div>
+            
+            <div class="d-flex flex-column gap-3">
+                <!-- Article 1 -->
+                <div class="article-card">
+                    <img src="https://images.unsplash.com/photo-1570125909232-eb263c188f7e?w=300&auto=format&fit=crop&q=60" alt="Hanoi Bus" class="article-img">
+                    <div class="article-content flex-grow-1">
+                        <div>
+                            <span class="article-badge">HOT NEWS</span>
+                            <h6 class="article-title">Hà Nội ra mắt bản đồ số xe buýt thông minh tích hợp định vị GPS</h6>
+                            <p class="article-desc">Hành khách giờ đây có thể theo dõi vị trí thực tế của xe buýt qua bản đồ số trực quan, hạn chế tối đa thời gian chờ đợi tại trạm.</p>
+                        </div>
+                        <div class="article-meta">
+                            <span><i class="far fa-newspaper me-1"></i> VnExpress</span>
+                            <span><i class="far fa-clock me-1"></i> Hôm qua</span>
+                            <a href="https://vnexpress.net" target="_blank" class="read-more-btn">Đọc báo <i class="fas fa-chevron-right"></i></a>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Article 2 -->
+                <div class="article-card">
+                    <img src="https://images.unsplash.com/photo-1524661135-423995f22d0b?w=300&auto=format&fit=crop&q=60" alt="Bus Map App" class="article-img">
+                    <div class="article-content flex-grow-1">
+                        <div>
+                            <span class="article-badge" style="background:#e6f7ff; color:#1890ff;">XU HƯỚNG</span>
+                            <h6 class="article-title">Ứng dụng Bus Map giúp giảm 30% tình trạng trễ giờ của hành khách</h6>
+                            <p class="article-desc">Khảo sát mới đây cho thấy hệ thống tìm đường thông minh trên bản đồ số giúp người dân tiếp cận giao thông công cộng dễ dàng hơn.</p>
+                        </div>
+                        <div class="article-meta">
+                            <span><i class="far fa-newspaper me-1"></i> Tuổi Trẻ</span>
+                            <span><i class="far fa-clock me-1"></i> 2 ngày trước</span>
+                            <a href="https://tuoitre.vn" target="_blank" class="read-more-btn">Đọc báo <i class="fas fa-chevron-right"></i></a>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Article 3 -->
+                <div class="article-card">
+                    <img src="https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?w=300&auto=format&fit=crop&q=60" alt="Eco Transportation" class="article-img">
+                    <div class="article-content flex-grow-1">
+                        <div>
+                            <span class="article-badge" style="background:#f6ffed; color:#52c41a;">MỚI</span>
+                            <h6 class="article-title">Phát triển hệ thống giao thông công cộng Hà Nội hướng tới đô thị xanh</h6>
+                            <p class="article-desc">Đẩy mạnh tích hợp các giải pháp thẻ vé thông minh và bản đồ số cho toàn bộ mạng lưới xe buýt và đường sắt đô thị trong năm 2026.</p>
+                        </div>
+                        <div class="article-meta">
+                            <span><i class="far fa-newspaper me-1"></i> Thanh Niên</span>
+                            <span><i class="far fa-clock me-1"></i> 3 ngày trước</span>
+                            <a href="https://thanhnien.vn" target="_blank" class="read-more-btn">Đọc báo <i class="fas fa-chevron-right"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <!-- ===== FOOTER ===== -->

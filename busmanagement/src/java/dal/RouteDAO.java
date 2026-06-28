@@ -92,6 +92,20 @@ public class RouteDAO extends DBContext {
         return list;
     }
 
+    //get all suspended routes
+    public List<Route> getSuspendedRoutes() {
+        List<Route> list = new ArrayList<>();
+        String sql = "SELECT * FROM Routes WHERE IsActive = 0 ORDER BY RouteNumber ASC";
+        try (PreparedStatement ps = connection.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                list.add(mapRoute(rs));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
     //get route by id
     public Route getRouteById(int routeId) {
         String sql = "SELECT * FROM Routes WHERE RouteID = ? AND IsActive = 1";

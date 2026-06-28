@@ -93,10 +93,7 @@ public class LoginServlet extends HttpServlet {
                 case "ASSISTANT":
                     response.sendRedirect("assistant/dashboard");
                     break;
-                case "CUSTOMER":
-                  
-                    response.sendRedirect(request.getContextPath() + "/customer/dashboard");
-                    break;
+
                 default:                  
                     response.sendRedirect(request.getContextPath() + "/home");
                     break;
