@@ -150,6 +150,15 @@
     </div>
 
     <div class="container profile-layout">
+        <c:if test="${not empty sessionScope.successMsg}">
+            <div class="alert alert-success alert-dismissible fade show d-flex align-items-center mb-4" role="alert">
+                <i class="fas fa-check-circle me-2 fs-5"></i>
+                <div>${sessionScope.successMsg}</div>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            <c:remove var="successMsg" scope="session" />
+        </c:if>
+        
         <div class="row">
             
             <div class="col-lg-4">

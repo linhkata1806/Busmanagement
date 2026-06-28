@@ -50,7 +50,7 @@
             
             .card-header-custom {
                 background: #fff;
-                padding: 40px 40px 20px 40px;
+                padding: 40px 40px 0 40px;
                 border-bottom: none;
                 text-align: center;
             }
@@ -69,7 +69,7 @@
             }
             
             .card-body-custom {
-                padding: 0 40px 40px 40px;
+                padding: 25px 40px 40px 40px;
             }
             
             .form-label {
@@ -149,6 +149,35 @@
                 color: var(--primary);
                 text-decoration: underline;
             }
+
+            .card-header-tabs-custom {
+                display: flex;
+                border-bottom: 2px solid #e0e0e0;
+                margin-top: 20px;
+                padding: 0;
+                list-style: none;
+            }
+            
+            .nav-link-custom {
+                display: block;
+                padding: 10px;
+                text-align: center;
+                color: #6c757d;
+                font-weight: 600;
+                font-size: 0.95rem;
+                text-decoration: none;
+                border-bottom: 3px solid transparent;
+                transition: all 0.2s;
+            }
+            
+            .nav-link-custom:hover {
+                color: var(--primary);
+            }
+            
+            .nav-link-custom.active {
+                color: var(--primary);
+                border-bottom-color: var(--primary);
+            }
             
             .password-toggle {
                 cursor: pointer;
@@ -178,7 +207,17 @@
                     <i class="fas fa-bus-alt"></i>
                 </div>
                 <h3 class="fw-bold text-dark mb-1">HANOI BUS</h3>
-                <p class="text-muted small">Hệ thống quản lý xe buýt thông minh thủ đô</p>
+                <p class="text-muted small mb-0">Hệ thống quản lý xe buýt thông minh thủ đô</p>
+                
+                <!-- Nav tabs to switch between Login & Register -->
+                <ul class="nav nav-tabs card-header-tabs-custom justify-content-center">
+                    <li class="nav-item w-50">
+                        <a class="nav-link-custom active" href="login">ĐĂNG NHẬP</a>
+                    </li>
+                    <li class="nav-item w-50">
+                        <a class="nav-link-custom" href="register">ĐĂNG KÝ</a>
+                    </li>
+                </ul>
             </div>
             
             <div class="card-body-custom">
@@ -233,8 +272,7 @@
                     </button>
                 </form>
 
-                <div class="text-center mt-4 d-flex flex-column gap-2 align-items-center">
-                    <a href="register" class="link-register">Chưa có tài khoản? Đăng ký ngay</a>
+                <div class="text-center mt-4">
                     <a href="home" class="link-home"><i class="fas fa-arrow-left me-1"></i> Trở về menu chính</a>
                 </div>
             </div>

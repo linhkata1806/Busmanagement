@@ -28,7 +28,7 @@
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                padding: 30px 20px;
+                padding: 20px;
                 color: #333;
             }
             
@@ -40,7 +40,7 @@
                 border: 1px solid rgba(255, 255, 255, 0.25);
                 overflow: hidden;
                 width: 100%;
-                max-width: 650px;
+                max-width: 450px;
                 transition: transform 0.3s ease;
             }
             
@@ -50,33 +50,33 @@
             
             .card-header-custom {
                 background: #fff;
-                padding: 35px 40px 15px 40px;
+                padding: 40px 40px 0 40px;
                 border-bottom: none;
                 text-align: center;
             }
             
             .logo-icon {
-                font-size: 2.8rem;
+                font-size: 3rem;
                 color: var(--primary);
-                margin-bottom: 10px;
+                margin-bottom: 15px;
                 animation: float 3s ease-in-out infinite;
             }
             
             @keyframes float {
                 0% { transform: translateY(0px); }
-                50% { transform: translateY(-8px); }
+                50% { transform: translateY(-10px); }
                 100% { transform: translateY(0px); }
             }
             
             .card-body-custom {
-                padding: 0 40px 35px 40px;
+                padding: 25px 40px 40px 40px;
             }
             
             .form-label {
                 font-weight: 600;
-                font-size: 0.82rem;
+                font-size: 0.85rem;
                 color: #555;
-                margin-bottom: 6px;
+                margin-bottom: 8px;
             }
             
             .input-group-text-custom {
@@ -87,8 +87,8 @@
             
             .form-control-custom {
                 border-left: none;
-                padding: 10px 12px;
-                font-size: 0.9rem;
+                padding: 11px 12px;
+                font-size: 0.95rem;
             }
             
             .form-control-custom:focus {
@@ -116,7 +116,7 @@
                 font-size: 0.95rem;
                 width: 100%;
                 transition: all 0.2s;
-                margin-top: 10px;
+                margin-top: 15px;
             }
             
             .btn-submit:hover {
@@ -149,6 +149,35 @@
                 color: var(--primary);
                 text-decoration: underline;
             }
+
+            .card-header-tabs-custom {
+                display: flex;
+                border-bottom: 2px solid #e0e0e0;
+                margin-top: 20px;
+                padding: 0;
+                list-style: none;
+            }
+            
+            .nav-link-custom {
+                display: block;
+                padding: 10px;
+                text-align: center;
+                color: #6c757d;
+                font-weight: 600;
+                font-size: 0.95rem;
+                text-decoration: none;
+                border-bottom: 3px solid transparent;
+                transition: all 0.2s;
+            }
+            
+            .nav-link-custom:hover {
+                color: var(--primary);
+            }
+            
+            .nav-link-custom.active {
+                color: var(--primary);
+                border-bottom-color: var(--primary);
+            }
             
             .password-toggle {
                 cursor: pointer;
@@ -177,8 +206,18 @@
                 <div class="logo-icon">
                     <i class="fas fa-bus-alt"></i>
                 </div>
-                <h3 class="fw-bold text-dark mb-1">ĐĂNG KÝ TÀI KHOẢN</h3>
-                <p class="text-muted small mb-0">Tạo tài khoản để trải nghiệm đầy đủ tính năng xe buýt</p>
+                <h3 class="fw-bold text-dark mb-1">HANOI BUS</h3>
+                <p class="text-muted small mb-0">Hệ thống quản lý xe buýt thông minh thủ đô</p>
+                
+                <!-- Nav tabs to switch between Login & Register -->
+                <ul class="nav nav-tabs card-header-tabs-custom justify-content-center">
+                    <li class="nav-item w-50">
+                        <a class="nav-link-custom" href="login">ĐĂNG NHẬP</a>
+                    </li>
+                    <li class="nav-item w-50">
+                        <a class="nav-link-custom active" href="register">ĐĂNG KÝ</a>
+                    </li>
+                </ul>
             </div>
             
             <div class="card-body-custom">
@@ -194,68 +233,66 @@
                 </div>
 
                 <form id="registerForm" action="register" method="POST" class="needs-validation" novalidate>
-                    <div class="row">
-                        <!-- Full Name -->
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">HỌ VÀ TÊN</label>
-                            <div class="input-group">
-                                <span class="input-group-text input-group-text-custom"><i class="fas fa-id-card"></i></span>
-                                <input type="text" name="fullName" class="form-control form-control-custom"
-                                       value="${requestScope.fullName}" required placeholder="Vd: Nguyễn Văn A">
-                            </div>
+                    <!-- Full Name -->
+                    <div class="mb-3">
+                        <label class="form-label">HỌ VÀ TÊN</label>
+                        <div class="input-group">
+                            <span class="input-group-text input-group-text-custom"><i class="fas fa-id-card"></i></span>
+                            <input type="text" name="fullName" class="form-control form-control-custom"
+                                   value="${requestScope.fullName}" required placeholder="Vd: Nguyễn Văn A">
                         </div>
+                    </div>
 
-                        <!-- Username -->
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">TÊN ĐĂNG NHẬP</label>
-                            <div class="input-group">
-                                <span class="input-group-text input-group-text-custom"><i class="fas fa-user"></i></span>
-                                <input type="text" name="username" class="form-control form-control-custom"
-                                       minlength="4" maxlength="50"
-                                       value="${requestScope.username}" required placeholder="Nhập username...">
-                            </div>
+                    <!-- Username -->
+                    <div class="mb-3">
+                        <label class="form-label">TÊN ĐĂNG NHẬP</label>
+                        <div class="input-group">
+                            <span class="input-group-text input-group-text-custom"><i class="fas fa-user"></i></span>
+                            <input type="text" name="username" class="form-control form-control-custom"
+                                   minlength="4" maxlength="50"
+                                   value="${requestScope.username}" required placeholder="Nhập username...">
                         </div>
+                    </div>
 
-                        <!-- Password -->
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">MẬT KHẨU</label>
-                            <div class="input-group">
-                                <span class="input-group-text input-group-text-custom"><i class="fas fa-lock"></i></span>
-                                <input type="password" id="password" name="password" class="form-control form-control-custom border-end-0" 
-                                       minlength="6" autocomplete="new-password" required placeholder="Tối thiểu 6 ký tự...">
-                                <span class="input-group-text password-toggle" id="togglePassword"><i class="fas fa-eye"></i></span>
-                            </div>
+                    <!-- Password -->
+                    <div class="mb-3">
+                        <label class="form-label">MẬT KHẨU</label>
+                        <div class="input-group">
+                            <span class="input-group-text input-group-text-custom"><i class="fas fa-lock"></i></span>
+                            <input type="password" id="password" name="password" class="form-control form-control-custom border-end-0" 
+                                   minlength="6" autocomplete="new-password" required placeholder="Tối thiểu 6 ký tự...">
+                            <span class="input-group-text password-toggle" id="togglePassword"><i class="fas fa-eye"></i></span>
                         </div>
+                    </div>
 
-                        <!-- Re-password -->
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">NHẬP LẠI MẬT KHẨU</label>
-                            <div class="input-group">
-                                <span class="input-group-text input-group-text-custom"><i class="fas fa-key"></i></span>
-                                <input type="password" id="repassword" name="repassword" class="form-control form-control-custom border-end-0" 
-                                       minlength="6" required placeholder="Nhập lại mật khẩu trên...">
-                                <span class="input-group-text password-toggle" id="toggleRePassword"><i class="fas fa-eye"></i></span>
-                            </div>
+                    <!-- Re-password -->
+                    <div class="mb-3">
+                        <label class="form-label">NHẬP LẠI MẬT KHẨU</label>
+                        <div class="input-group">
+                            <span class="input-group-text input-group-text-custom"><i class="fas fa-key"></i></span>
+                            <input type="password" id="repassword" name="repassword" class="form-control form-control-custom border-end-0" 
+                                   minlength="6" required placeholder="Nhập lại mật khẩu trên...">
+                            <span class="input-group-text password-toggle" id="toggleRePassword"><i class="fas fa-eye"></i></span>
                         </div>
+                    </div>
 
-                        <!-- Email -->
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">EMAIL</label>
-                            <div class="input-group">
-                                <span class="input-group-text input-group-text-custom"><i class="fas fa-envelope"></i></span>
-                                <input type="email" name="email" class="form-control form-control-custom"
-                                       value="${requestScope.email}" required placeholder="Vd: email@domain.com">
-                            </div>
+                    <!-- Email -->
+                    <div class="mb-3">
+                        <label class="form-label">EMAIL</label>
+                        <div class="input-group">
+                            <span class="input-group-text input-group-text-custom"><i class="fas fa-envelope"></i></span>
+                            <input type="email" name="email" class="form-control form-control-custom"
+                                   value="${requestScope.email}" required placeholder="Vd: email@domain.com">
                         </div>
+                    </div>
 
-                        <!-- Phone -->
-                        <div class="col-md-6 mb-4">
-                            <label class="form-label">SỐ ĐIỆN THOẠI</label>
-                            <div class="input-group">
-                                <span class="input-group-text input-group-text-custom"><i class="fas fa-phone"></i></span>
-                                <input type="text" name="phone" class="form-control form-control-custom"
-                                       pattern="0[0-9]{9}" value="${requestScope.phone}" required placeholder="Vd: 0987654321">
-                            </div>
+                    <!-- Phone -->
+                    <div class="mb-4">
+                        <label class="form-label">SỐ ĐIỆN THOẠI</label>
+                        <div class="input-group">
+                            <span class="input-group-text input-group-text-custom"><i class="fas fa-phone"></i></span>
+                            <input type="text" name="phone" class="form-control form-control-custom"
+                                   pattern="0[0-9]{9}" value="${requestScope.phone}" required placeholder="Vd: 0987654321">
                         </div>
                     </div>
 
@@ -266,8 +303,7 @@
                     </button>
                 </form>
 
-                <div class="text-center mt-4 d-flex flex-column gap-2 align-items-center">
-                    <a href="login" class="link-login">Đã có tài khoản? Quay lại Đăng nhập</a>
+                <div class="text-center mt-4">
                     <a href="home" class="link-home"><i class="fas fa-arrow-left me-1"></i> Trở về menu chính</a>
                 </div>
             </div>

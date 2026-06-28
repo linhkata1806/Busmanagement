@@ -250,7 +250,7 @@
                                 </li>
                                 <c:if test="${USER.roleName == 'CUSTOMER'}">
                                     <li>
-                                        <a class="dropdown-item" href="${pageContext.request.contextPath}/my-tickets">
+                                        <a class="dropdown-item" href="${pageContext.request.contextPath}/customer/ticket">
                                             <i class="fas fa-ticket-alt me-2 text-primary"></i>Vé của tôi
                                         </a>
                                     </li>

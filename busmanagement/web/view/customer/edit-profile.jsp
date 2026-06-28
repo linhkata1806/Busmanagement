@@ -132,7 +132,7 @@
                         </div>
                     </c:if>
 
-                    <form action="${pageContext.request.contextPath}/customer/edit-profile" method="POST">
+                    <form action="${pageContext.request.contextPath}/customer/editProfile" method="POST">
                         
                         <div class="row">
                             <div class="col-md-6 mb-3">
