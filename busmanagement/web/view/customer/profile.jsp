@@ -170,21 +170,29 @@
                         <c:when test="${not empty activeMonthlyPass}">
                             <div class="p-3 bg-light rounded border-start border-success border-4">
                                 <div class="fw-bold text-success mb-1">Vé tháng xe bus</div>
-                                <div class="small text-muted mb-1">Loại đối tượng: ${activeMonthlyPass.type}</div>
-                                <div class="small text-muted mb-1">Tuyến đăng ký: ${activeMonthlyPass.routeName}</div>
-                                <div class="small text-muted mb-2">Hiệu lực: ${activeMonthlyPass.expiryDate}</div>
+                                <div class="small text-muted mb-1">Đối tượng: <strong>${activeMonthlyPass.typeName}</strong></div>
+                                <div class="small text-muted mb-1">Phạm vi: 
+                                    <strong>
+                                        <c:choose>
+                                            <c:when test="${empty activeMonthlyPass.routeNumber}">
+                                                Liên tuyến toàn mạng lưới
+                                            </c:when>
+                                            <c:otherwise>
+                                                Tuyến ${activeMonthlyPass.routeNumber}
+                                            </c:otherwise>
+                                        </c:choose>
+                                    </strong>
+                                </div>
+                                <div class="small text-muted mb-2">Hạn sử dụng: <strong>${activeMonthlyPass.endDate}</strong></div>
                                 <span class="badge bg-success">Đang hoạt động</span>
                             </div>
                         </c:when>
                         <c:otherwise>
-                            <div class="p-3 bg-light rounded border-start border-primary border-4 mb-2">
-                                <div class="fw-bold text-primary mb-1">Vé Tháng Mẫu</div>
-                                <div class="small mb-1"><strong>Loại:</strong> Sinh viên</div>
-                                <div class="small mb-1"><strong>Tuyến:</strong> 32 (Nhổn - Giáp Bát)</div>
-                                <div class="small mb-2"><strong>Hiệu lực:</strong> 01/12/2025 - 31/12/2025</div>
-                                <span class="badge bg-success">Đang hoạt động</span>
+                            <div class="text-center py-3 text-muted">
+                                <i class="fas fa-id-card fa-2x mb-2 opacity-50"></i>
+                                <p class="small mb-0">Bạn chưa đăng ký vé tháng nào đang có hiệu lực.</p>
+                                <a href="${pageContext.request.contextPath}/route-list" class="btn btn-sm btn-outline-primary mt-2">Đăng ký ngay</a>
                             </div>
-                            <p class="text-muted small text-center mb-0 mt-2">Bạn chưa sở hữu thêm vé tháng nào khác.</p>
                         </c:otherwise>
                     </c:choose>
                 </div>
@@ -306,18 +314,10 @@
                                     </c:when>
                                     <c:otherwise>
                                         <tr>
-                                            <td>15/12/2025</td>
-                                            <td><span class="badge bg-primary px-2">01</span></td>
-                                            <td>29B-12345</td>
-                                            <td class="text-start text-truncate" style="max-width: 130px;">Bến xe Gia Lâm</td>
-                                            <td class="text-start text-truncate" style="max-width: 130px;">Bờ Hồ</td>
-                                        </tr>
-                                        <tr>
-                                            <td>14/12/2025</td>
-                                            <td><span class="badge bg-primary px-2">32</span></td>
-                                            <td>30H-56789</td>
-                                            <td class="text-start text-truncate" style="max-width: 130px;">Bến xe Cầu Giấy</td>
-                                            <td class="text-start text-truncate" style="max-width: 130px;">Bến xe Mỹ Đình</td>
+                                            <td colspan="5" class="text-center py-4 text-muted">
+                                                <i class="fas fa-history fa-2x mb-2 d-block opacity-50"></i>
+                                                Chưa ghi nhận lịch sử chuyến đi nào của bạn.
+                                            </td>
                                         </tr>
                                     </c:otherwise>
                                 </c:choose>

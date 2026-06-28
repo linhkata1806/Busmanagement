@@ -73,16 +73,13 @@ public class ProfileServlet extends HttpServlet {
         request.setAttribute("totalFavorites", totalFavorites);
         request.setAttribute("unreadNotifications", unreadNotifications);
 
-        // 3. Lấy dữ liệu Vé Tháng đang sử dụng (Nếu có) để check hiển thị ở mục 4
-        // (Sau này bạn viết hàm lấy vé hoạt động mới nhất của User trong MonthlyPassDAO)
-        // Hiện tại giả lập object hoặc để trống để test giao diện
-        Object activeMonthlyPass = null; 
-        // activeMonthlyPass = monthlyPassDAO.getActivePassByAccountId(accountId);
+        // 3. Lấy dữ liệu Vé Tháng đang sử dụng thực tế
+        dto.MonthlyPassDTO activeMonthlyPass = monthlyPassDAO.getActivePassByAccountId(accountId);
         request.setAttribute("activeMonthlyPass", activeMonthlyPass);
 
-        // 4. Lấy danh sách lịch sử chuyến đi gần đây (Giả lập List dữ liệu)
-        // Sau này bạn có thể tạo TripHistoryDAO để lấy List<Trip> thực tế
-        request.setAttribute("recentTrips", null); 
+        // 4. Lấy danh sách lịch sử chuyến đi thực tế của khách hàng
+        List<dto.TripHistoryDTO> recentTrips = ticketDAO.getRecentTripsByAccount(accountId);
+        request.setAttribute("recentTrips", recentTrips);
 
         request.getRequestDispatcher("/view/customer/profile.jsp").forward(request, response);
     }

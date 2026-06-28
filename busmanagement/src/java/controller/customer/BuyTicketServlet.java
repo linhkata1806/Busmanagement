@@ -107,7 +107,14 @@ public class BuyTicketServlet extends HttpServlet {
 
         String routeIdRaw = request.getParameter("routeId");
         String ticketType = request.getParameter("ticketType");
-        int passTypeID = 1;
+        
+        String passTypeIdRaw = request.getParameter("passTypeId");
+        int passTypeID = (passTypeIdRaw != null && !passTypeIdRaw.isEmpty()) ? Integer.parseInt(passTypeIdRaw) : 1;
+        
+        String imageProof = request.getParameter("imageProof");
+        if (imageProof == null) {
+            imageProof = "";
+        }
 
         if (routeIdRaw == null || routeIdRaw.isEmpty()) {
             response.sendRedirect(request.getContextPath() + "/route-list");
@@ -149,7 +156,8 @@ public class BuyTicketServlet extends HttpServlet {
                     monthlyPassService.registerRoutePass(
                             user.getAccountID(),
                             routeId,
-                            passTypeID
+                            passTypeID,
+                            imageProof
                     );
 
                     notiTitle = "Đăng ký vé tháng thành công";
@@ -164,7 +172,8 @@ public class BuyTicketServlet extends HttpServlet {
 
                     monthlyPassService.registerAllRoutePass(
                             user.getAccountID(),
-                            passTypeID
+                            passTypeID,
+                            imageProof
                     );
 
                     notiTitle = "Đăng ký vé liên tuyến thành công";

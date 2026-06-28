@@ -185,16 +185,48 @@
                         </span>
                     </div>
 
+                    <c:set var="basePrice" value="${ticketType == 'luot' ? route.ticketPrice : (ticketType == 'thang' ? 100000 : 200000)}" />
                     <div class="info-row align-items-center mt-4 pt-3 border-top border-2">
                         <span class="info-label fw-bold text-dark fs-6">Tổng chi phí:</span>
-                        <span class="info-value text-success fs-3 fw-bold">
-                            <fmt:formatNumber value="${route.ticketPrice}" pattern="#,###"/> đ
+                        <span class="info-value text-success fs-3 fw-bold" id="priceDisplay">
+                            <fmt:formatNumber value="${basePrice}" pattern="#,###"/> đ
                         </span>
                     </div>
 
-                    <form action="${pageContext.request.contextPath}/customer/buy-ticket" method="POST" class="mt-4">
-                        <input type="hidden" name="routeId" value="${route.routeID}">
+                    <form action="${pageContext.request.contextPath}/customer/buy-ticket" method="POST" class="mt-4 needs-validation" novalidate>
+                        <input type="hidden" name="routeId" value="${route.routeID != null ? route.routeID : 0}">
                         <input type="hidden" name="ticketType" value="${ticketType}">
+                        
+                        <c:if test="${ticketType == 'thang' || ticketType == 'lien_chuyen'}">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold text-secondary small">ĐỐI TƯỢNG ĐĂNG KÝ VÉ THÁNG</label>
+                                <select name="passTypeId" class="form-select rounded-3" id="passTypeSelect" onchange="updatePrice()">
+                                    <c:choose>
+                                        <c:when test="${ticketType == 'thang'}">
+                                            <option value="1" data-discount="50">Học sinh / Sinh viên (1 Tuyến) - Giảm 50%</option>
+                                            <option value="3" data-discount="100">Người cao tuổi - Miễn phí 100%</option>
+                                            <option value="4" data-discount="0">Đối tượng khác (Phổ thông) - Nguyên giá</option>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <option value="2" data-discount="50">Học sinh / Sinh viên (Liên Tuyến) - Giảm 50%</option>
+                                            <option value="3" data-discount="100">Người cao tuổi - Miễn phí 100%</option>
+                                            <option value="4" data-discount="0">Đối tượng khác (Phổ thông) - Nguyên giá</option>
+                                        </c:otherwise>
+                                    </c:choose>
+                                </select>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label fw-bold text-secondary small">MÃ HSSV / SỐ CCCD</label>
+                                <input type="text" name="cardNumber" class="form-control rounded-3" placeholder="Nhập mã thẻ hoặc số định danh..." required>
+                            </div>
+                            
+                            <div class="mb-3" id="proofUploadSection">
+                                <label class="form-label fw-bold text-secondary small">ẢNH THẺ HSSV / CCCD (MINH CHỨNG ƯU TIÊN)</label>
+                                <input type="text" name="imageProof" class="form-control rounded-3" placeholder="Dán link ảnh thẻ/minh chứng ưu tiên..." required value="https://hanoibus.vn/images/proof_default.jpg">
+                                <div class="form-text small text-muted">Nhập link ảnh thẻ để nhân viên quầy kiểm tra duyệt trước khi cấp vé.</div>
+                            </div>
+                        </c:if>
                         
                         <div class="d-grid gap-2">
                             <button type="submit" class="btn btn-success fw-bold py-2.5 shadow-sm rounded-3 fs-6">
@@ -205,6 +237,22 @@
                             </a>
                         </div>
                     </form>
+
+                    <script>
+                        function updatePrice() {
+                            const select = document.getElementById('passTypeSelect');
+                            if (!select) return;
+                            const discount = parseFloat(select.options[select.selectedIndex].getAttribute('data-discount'));
+                            const basePrice = ${basePrice};
+                            const finalPrice = basePrice * (100 - discount) / 100;
+                            
+                            document.getElementById('priceDisplay').textContent = new Intl.NumberFormat('vi-VN').format(finalPrice) + ' đ';
+                        }
+                        
+                        window.addEventListener('DOMContentLoaded', () => {
+                            updatePrice();
+                        });
+                    </script>
                     
                 </div>
             </div>
