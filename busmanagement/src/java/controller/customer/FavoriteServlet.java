@@ -2,49 +2,64 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
  */
-
 package controller.customer;
 
+import dal.FavoriteDAO;
+import dto.RouteDTO;
 import java.io.IOException;
 import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+import java.util.List;
+import model.Account;
+import service.FavoriteService;
 
 /**
  *
  * @author Administrator
  */
 public class FavoriteServlet extends HttpServlet {
-   
-    /** 
-     * Processes requests for both HTTP <code>GET</code> and <code>POST</code> methods.
+
+    private FavoriteService favoriteService;
+
+    @Override
+    public void init() throws ServletException {
+        favoriteService = new FavoriteService();
+    }
+
+    /**
+     * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
+     * methods.
+     *
      * @param request servlet request
      * @param response servlet response
      * @throws ServletException if a servlet-specific error occurs
      * @throws IOException if an I/O error occurs
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
-    throws ServletException, IOException {
+            throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
         try (PrintWriter out = response.getWriter()) {
             /* TODO output your page here. You may use following sample code. */
             out.println("<!DOCTYPE html>");
             out.println("<html>");
             out.println("<head>");
-            out.println("<title>Servlet FavoriteServlet</title>");  
+            out.println("<title>Servlet FavoriteServlet</title>");
             out.println("</head>");
             out.println("<body>");
-            out.println("<h1>Servlet FavoriteServlet at " + request.getContextPath () + "</h1>");
+            out.println("<h1>Servlet FavoriteServlet at " + request.getContextPath() + "</h1>");
             out.println("</body>");
             out.println("</html>");
         }
-    } 
+    }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
-    /** 
+    /**
      * Handles the HTTP <code>GET</code> method.
+     *
      * @param request servlet request
      * @param response servlet response
      * @throws ServletException if a servlet-specific error occurs
@@ -52,12 +67,20 @@ public class FavoriteServlet extends HttpServlet {
      */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
-    throws ServletException, IOException {
-        processRequest(request, response);
-    } 
+            throws ServletException, IOException {
+        HttpSession session = request.getSession(false);
+        Account user = (Account) session.getAttribute("USER");
 
-    /** 
+        // Gọi Service lấy DTO
+        List<RouteDTO> favoriteRoutes = favoriteService.getFavoriteRoutes(user.getAccountID());
+        request.setAttribute("favoriteRoutes", favoriteRoutes);
+
+        request.getRequestDispatcher("/view/customer/favorite.jsp").forward(request, response);
+    }
+
+    /**
      * Handles the HTTP <code>POST</code> method.
+     *
      * @param request servlet request
      * @param response servlet response
      * @throws ServletException if a servlet-specific error occurs
@@ -65,12 +88,51 @@ public class FavoriteServlet extends HttpServlet {
      */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
-    throws ServletException, IOException {
-        processRequest(request, response);
+            throws ServletException, IOException {
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        PrintWriter out = response.getWriter();
+
+        HttpSession session = request.getSession(false);
+        if (session == null || session.getAttribute("USER") == null) {
+            out.print("{\"success\": false, \"message\": \"Not logged in\"}");
+            return;
+        }
+
+        Account user = (Account) session.getAttribute("USER");
+        int accountId = user.getAccountID();
+
+        try {
+            int routeId = Integer.parseInt(request.getParameter("routeId"));
+            String action = request.getParameter("action");
+
+            // VALIDATE ACTION (Chặn sửa URL)
+            if (!"add".equals(action) && !"remove".equals(action)) {
+                out.print("{\"success\": false, \"message\": \"Invalid action\"}");
+                return;
+            }
+
+            boolean result = false;
+            if ("add".equals(action)) {
+                result = favoriteService.addFavorite(accountId, routeId);
+            } else if ("remove".equals(action)) {
+                result = favoriteService.removeFavorite(accountId, routeId);
+            }
+
+            if (result) {
+                out.print("{\"success\": true}");
+            } else {
+                out.print("{\"success\": false}");
+            }
+
+        } catch (Exception e) {
+            out.print("{\"success\": false, \"message\": \"" + e.getMessage() + "\"}");
+        }
     }
 
-    /** 
+    /**
      * Returns a short description of the servlet.
+     *
      * @return a String containing servlet description
      */
     @Override

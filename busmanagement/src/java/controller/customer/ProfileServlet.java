@@ -1,33 +1,34 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
- */
 package controller.customer;
 
-import util.Validator;
 import dal.AccountDAO;
+import dal.FavoriteDAO;
+import dal.MonthlyPassDAO;
+import dal.NotificationDAO;
+import dal.TicketDAO;
 import java.io.IOException;
-import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import model.Account;
+import java.util.List;
 
-/**
- *
- * @author Administrator
- */
 public class ProfileServlet extends HttpServlet {
 
     private AccountDAO accountDAO;
-//    private Validator validator;
+    private TicketDAO ticketDAO;
+    private MonthlyPassDAO monthlyPassDAO;
+    private FavoriteDAO favoriteDAO;
+    private NotificationDAO notificationDAO;
 
     @Override
     public void init() throws ServletException {
         accountDAO = new AccountDAO();
-//        validator = new Validator();
+        ticketDAO = new TicketDAO();
+        monthlyPassDAO = new MonthlyPassDAO();
+        favoriteDAO = new FavoriteDAO();
+        notificationDAO = new NotificationDAO();
     }
 
     @Override
@@ -35,65 +36,60 @@ public class ProfileServlet extends HttpServlet {
             throws ServletException, IOException {
 
         HttpSession session = request.getSession(false);
-
-        if (session == null) {
+        if (session == null || session.getAttribute("USER") == null) {
             response.sendRedirect(request.getContextPath() + "/login");
             return;
         }
+
         Account user = (Account) session.getAttribute("USER");
+        int accountId = user.getAccountID();
+
+        // 1. Lấy thông tin chi tiết Account
+        Account account = accountDAO.getAccountById(accountId);
+        if (account == null) {
+            session.invalidate();
+            response.sendRedirect(request.getContextPath() + "/login");
+            return;
+        }
+        request.setAttribute("account", account);
+
+        // 2. Lấy số liệu thống kê nhanh (Giống Dashboard)
+        int totalTickets = 0;
+        int totalPasses = 0;
+        int totalFavorites = 0;
+        int unreadNotifications = 0;
+
+        try {
+            totalTickets = ticketDAO.countUnusedTickets(accountId);
+            totalPasses = monthlyPassDAO.countActivePasses(accountId);
+            totalFavorites = favoriteDAO.countFavorites(accountId);
+            unreadNotifications = notificationDAO.countUnreadNotifications(accountId);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        request.setAttribute("totalTickets", totalTickets);
+        request.setAttribute("totalPasses", totalPasses);
+        request.setAttribute("totalFavorites", totalFavorites);
+        request.setAttribute("unreadNotifications", unreadNotifications);
+
+        // 3. Lấy dữ liệu Vé Tháng đang sử dụng (Nếu có) để check hiển thị ở mục 4
+        // (Sau này bạn viết hàm lấy vé hoạt động mới nhất của User trong MonthlyPassDAO)
+        // Hiện tại giả lập object hoặc để trống để test giao diện
+        Object activeMonthlyPass = null; 
+        // activeMonthlyPass = monthlyPassDAO.getActivePassByAccountId(accountId);
+        request.setAttribute("activeMonthlyPass", activeMonthlyPass);
+
+        // 4. Lấy danh sách lịch sử chuyến đi gần đây (Giả lập List dữ liệu)
+        // Sau này bạn có thể tạo TripHistoryDAO để lấy List<Trip> thực tế
+        request.setAttribute("recentTrips", null); 
+
         request.getRequestDispatcher("/view/customer/profile.jsp").forward(request, response);
     }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-
-        request.setCharacterEncoding("UTF-8");
-        HttpSession session = request.getSession(false);
-        if (session == null || session.getAttribute("USER") == null) {
-            response.sendRedirect(request.getContextPath() + "/login");
-            return;
-        }
-        Account user = (Account) session.getAttribute("USER");
-
-        // 1. Lấy dữ liệu từ form
-        String fullName = request.getParameter("fullName").trim();
-        String email = request.getParameter("email");
-        String phone = request.getParameter("phone");
-        String avatar = request.getParameter("avatar"); // Lưu dưới dạng URL ảnh
-
-        //check email
-        if (Validator.isValidEmail(email)) {
-            request.setAttribute("errorMsg", "Định dạng email không hợp lệ.");
-            doGet(request, response);
-            return;
-        }
-        //check sdt
-        if (Validator.isValidPhone(phone)) {
-            request.setAttribute("errorMsg", "Số điện thoại không hợp lệ.");
-            doGet(request, response);
-            return;
-        }
-        if (!email.equalsIgnoreCase(user.getEmail())) {
-            if (accountDAO.existsByEmail(email)) {
-                request.setAttribute("errorMsg", "Cập nhật thất bại! Email này đã được sử dụng bởi một tài khoản khác.");
-                doGet(request, response);
-                return;
-            }
-        }
-        // 2. Cập nhật vào Database
-        boolean isSuccess = accountDAO.updateProfile(user.getAccountID(), fullName, email, phone, avatar);
-
-        if (isSuccess) {
-            Account updated = accountDAO.getAccountById(user.getAccountID());
-            request.setAttribute("USER", updated);
-
-            request.setAttribute("successMsg", "Cập nhật hồ sơ cá nhân thành công!");
-        } else {
-            request.setAttribute("errorMsg", "Cập nhật thất bại. Email hoặc Số điện thoại có thể đã được sử dụng.");
-        }
-
-        // 3. Render lại trang
         doGet(request, response);
     }
 }

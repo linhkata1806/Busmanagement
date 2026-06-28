@@ -1,0 +1,95 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ */
+package dto;
+
+import enums.PassStatus;
+import java.time.LocalDate;
+
+/**
+ *
+ * @author Administrator
+ */
+public class MonthlyPassDTO {
+    private String passCode;
+    private LocalDate startDate;
+    private LocalDate endDate;
+    private PassStatus status;
+    
+    //cac truong join themm
+    private String routeNumber;
+    private String routeName;
+    private String typeName;
+
+    public MonthlyPassDTO() {
+    }
+
+    public MonthlyPassDTO(String passCode, LocalDate startDate, LocalDate endDate, PassStatus status, String routeNumber, String routeName, String typeName) {
+        this.passCode = passCode;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.status = status;
+        this.routeNumber = routeNumber;
+        this.routeName = routeName;
+        this.typeName = typeName;
+    }
+
+    public String getPassCode() {
+        return passCode;
+    }
+
+    public void setPassCode(String passCode) {
+        this.passCode = passCode;
+    }
+
+    public LocalDate getStartDate() {
+        return startDate;
+    }
+
+    public void setStartDate(LocalDate startDate) {
+        this.startDate = startDate;
+    }
+
+    public LocalDate getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(LocalDate endDate) {
+        this.endDate = endDate;
+    }
+
+    public PassStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(PassStatus status) {
+        this.status = status;
+    }
+
+    public String getRouteNumber() {
+        return routeNumber;
+    }
+
+    public void setRouteNumber(String routeNumber) {
+        this.routeNumber = routeNumber;
+    }
+
+    public String getRouteName() {
+        return routeName;
+    }
+
+    public void setRouteName(String routeName) {
+        this.routeName = routeName;
+    }
+
+    public String getTypeName() {
+        return typeName;
+    }
+
+    public void setTypeName(String typeName) {
+        this.typeName = typeName;
+    }
+    
+    
+}

@@ -50,5 +50,15 @@ public class Validator {
         }
         return phone.matches("^0\\d{9}$");
     }
-
+    
+    public static boolean isBlank(String str) {
+        return str == null || str.trim().isEmpty();
+    }
+    
+    public static boolean isValidPassword(String password) {
+        if (isBlank(password)) {
+            return false;
+        }
+        return password.length() >= 6 && password.length() <= 50;
+    }
 }
