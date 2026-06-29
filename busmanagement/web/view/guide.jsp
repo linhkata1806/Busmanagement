@@ -455,8 +455,30 @@
 
 <!-- ===== FOOTER ===== -->
 <footer>
-    <div class="container text-center">
-        <small>© 2026 Bus Hà Nội. Phát triển bởi team Hanoi Bus.</small>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4 mb-3 text-start">
+                <h6 class="text-white fw-bold">🚌 Bus Hà Nội</h6>
+                <small class="text-white-50">Hệ thống quản lý xe bus công cộng thành phố Hà Nội.</small>
+            </div>
+            <div class="col-md-4 mb-3 text-start">
+                <h6 class="text-white fw-bold">Liên kết</h6>
+                <ul class="list-unstyled small">
+                    <li><a href="${pageContext.request.contextPath}/home">Trang chủ</a></li>
+                    <li><a href="${pageContext.request.contextPath}/route-list">Danh sách tuyến</a></li>
+                    <li><a href="${pageContext.request.contextPath}/login">Đăng nhập</a></li>
+                </ul>
+            </div>
+            <div class="col-md-4 mb-3 text-start">
+                <h6 class="text-white fw-bold">Liên hệ</h6>
+                <small class="text-white-50">
+                    <i class="fas fa-phone me-1"></i>1900 xxxx<br>
+                    <i class="fas fa-envelope me-1"></i>support@bushanoi.vn
+                </small>
+            </div>
+        </div>
+        <hr style="border-color: rgba(255,255,255,0.1)">
+        <div class="text-center small text-white-50">© 2024 Bus Hà Nội. All rights reserved.</div>
     </div>
 </footer>
 
@@ -484,32 +506,9 @@
         });
     });
 
-    // 2. Fetch Hanoi Realtime Weather using Open-Meteo API
-    const weatherUrl = "https://api.open-meteo.com/v1/forecast?latitude=21.0285&longitude=105.8542&current=temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m&daily=weather_code,temperature_2m_max,temperature_2m_min&timezone=Asia%2FBangkok";
-
-    function getWeatherIcon(code) {
-        if (code === 0) return 'fa-sun text-warning';
-        if (code >= 1 && code <= 3) return 'fa-cloud-sun text-white-50';
-        if (code === 45 || code === 48) return 'fa-smog text-white-50';
-        if (code >= 51 && code <= 55) return 'fa-cloud-rain text-info';
-        if (code >= 61 && code <= 65) return 'fa-cloud-showers-heavy text-info';
-        if (code >= 80 && code <= 82) return 'fa-cloud-showers-water text-info';
-        if (code >= 95) return 'fa-cloud-bolt text-danger';
-        return 'fa-cloud text-white-50';
-    }
-
-    function getWeatherDesc(code) {
-        if (code === 0) return 'Trời quang đãng';
-        if (code === 1) return 'Ít mây';
-        if (code === 2) return 'Mây rải rác';
-        if (code === 3) return 'Nhiều mây';
-        if (code === 45 || code === 48) return 'Có sương mù';
-        if (code >= 51 && code <= 55) return 'Mưa phùn nhẹ';
-        if (code >= 61 && code <= 65) return 'Mưa vừa';
-        if (code >= 80 && code <= 82) return 'Mưa rào lớn';
-        if (code >= 95) return 'Có dông bão';
-        return 'Có mây';
-    }
+    // 2. Fetch Hanoi Realtime Weather từ Backend Java sử dụng WeatherAPI.com
+    const contextPath = "${pageContext.request.contextPath}";
+    const weatherUrl = contextPath + "/weather?city=Hanoi";
 
     function getDayName(dateStr) {
         const date = new Date(dateStr);
@@ -519,42 +518,55 @@
     }
 
     fetch(weatherUrl)
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) throw new Error("API Connection Failed");
+            return response.json();
+        })
         .then(data => {
             const current = data.current;
-            const daily = data.daily;
+            const forecastday = data.forecast.forecastday;
             
-            // Set current weather values
-            document.getElementById('weather-temp').innerText = Math.round(current.temperature_2m) + "°C";
-            document.getElementById('weather-desc').innerText = getWeatherDesc(current.weather_code);
-            document.getElementById('weather-humidity').innerText = current.relative_humidity_2m + "%";
-            document.getElementById('weather-wind').innerText = Math.round(current.wind_speed_10m) + " km/h";
+            // Cập nhật thông tin thời tiết hiện tại
+            document.getElementById('weather-temp').innerText = Math.round(current.temp_c) + "°C";
+            document.getElementById('weather-desc').innerText = current.condition.text;
+            document.getElementById('weather-humidity').innerText = current.humidity + "%";
+            document.getElementById('weather-wind').innerText = Math.round(current.wind_kph) + " km/h";
             
-            // Update big weather icon
+            // Cập nhật icon lớn
             const iconElement = document.getElementById('weather-icon');
-            iconElement.className = `fas ${getWeatherIcon(current.weather_code)} fs-1 me-3`;
+            if (iconElement.tagName === 'I') {
+                const img = document.createElement('img');
+                img.id = 'weather-icon';
+                img.src = 'https:' + current.condition.icon;
+                img.className = 'me-3';
+                img.style.width = '64px';
+                img.style.height = '64px';
+                iconElement.parentNode.replaceChild(img, iconElement);
+            } else {
+                iconElement.src = 'https:' + current.condition.icon;
+            }
             
-            // Populate 3-day forecast
+            // Cập nhật dự báo 3 ngày tiếp theo
             const forecastContainer = document.getElementById('forecast-container');
             forecastContainer.innerHTML = '';
             
-            // Loop next 3 days (index 1, 2, 3 in daily response)
             for(let i = 1; i <= 3; i++) {
-                const dayName = i === 1 ? 'Ngày mai' : getDayName(daily.time[i]);
-                const maxTemp = Math.round(daily.temperature_2m_max[i]);
-                const minTemp = Math.round(daily.temperature_2m_min[i]);
-                const weatherCode = daily.weather_code[i];
-                const iconClass = getWeatherIcon(weatherCode);
+                const dayData = forecastday[i];
+                if (!dayData) continue;
                 
-                forecastContainer.innerHTML += `
-                    <div class="col-4">
-                        <div class="weather-forecast-day">
-                            <small class="text-white-50" style="font-size: 0.75rem;">${dayName}</small>
-                            <div class="my-2"><i class="fas ${iconClass}"></i></div>
-                            <small class="fw-semibold" style="font-size: 0.8rem;">${minTemp}°/${maxTemp}°</small>
-                        </div>
-                    </div>
-                `;
+                const dayName = i === 1 ? 'Ngày mai' : getDayName(dayData.date);
+                const maxTemp = Math.round(dayData.day.maxtemp_c);
+                const minTemp = Math.round(dayData.day.mintemp_c);
+                const iconUrl = 'https:' + dayData.day.condition.icon;
+                
+                forecastContainer.innerHTML += 
+                     '<div class="col-4">' +
+                         '<div class="weather-forecast-day">' +
+                             '<small class="text-white-50" style="font-size: 0.75rem;">' + dayName + '</small>' +
+                             '<div class="my-2"><img src="' + iconUrl + '" style="width: 32px; height: 32px;" alt="icon" /></div>' +
+                             '<small class="fw-semibold" style="font-size: 0.8rem;">' + minTemp + '°/' + maxTemp + '°</small>' +
+                         '</div>' +
+                     '</div>';
             }
         })
         .catch(err => {

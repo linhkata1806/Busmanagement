@@ -136,32 +136,37 @@
             <div class="row g-4">
                 <c:forEach var="route" items="${routes}">
                     <div class="col-lg-4 col-md-6">
-                        <div class="card route-card p-3">
-                            <div class="d-flex align-items-start gap-3">
-                                <div class="route-number-badge">${route.routeNumber}</div>
-                                <div class="flex-grow-1">
-                                    <div class="route-name">${route.routeName}</div>
-                                    <div class="route-endpoint">
-                                        <i class="fas fa-map-marker-alt text-success"></i> ${route.startPoint}
-                                        <i class="fas fa-long-arrow-alt-right mx-1 text-muted"></i>
-                                        <i class="fas fa-map-marker-alt text-danger"></i> ${route.endPoint}
+                        <div class="card route-card p-3 h-100">
+                            <!-- Phần đầu (Header) - dùng flex-grow-1 để giãn rộng đồng đều giữa các Card -->
+                            <div class="flex-grow-1 mb-3">
+                                <div class="d-flex align-items-start justify-content-between gap-2">
+                                    <div class="d-flex align-items-start gap-3">
+                                        <div class="route-number-badge">${route.routeNumber}</div>
+                                        <div class="flex-grow-1">
+                                            <div class="route-name">${route.routeName}</div>
+                                            <div class="route-endpoint">
+                                                <i class="fas fa-map-marker-alt text-success"></i> ${route.startPoint}
+                                                <i class="fas fa-long-arrow-alt-right mx-1 text-muted"></i>
+                                                <i class="fas fa-map-marker-alt text-danger"></i> ${route.endPoint}
+                                            </div>
+                                        </div>
                                     </div>
+                                    <span class="price-badge flex-shrink-0">
+                                        <fmt:formatNumber value="${route.ticketPrice}" pattern="#,###"/>đ
+                                    </span>
                                 </div>
                             </div>
 
-                            <div class="route-meta d-flex justify-content-between align-items-center flex-wrap gap-2">
-                                <div>
-                                    <div class="route-meta-item"><i class="fas fa-clock"></i>${route.operatingHours}</div>
-                                    <c:if test="${not empty route.frequence}">
-                                        <div class="route-meta-item mt-1"><i class="fas fa-sync-alt"></i>${route.frequence}</div>
-                                    </c:if>
-                                </div>
-                                <span class="price-badge">
-                                    <fmt:formatNumber value="${route.ticketPrice}" pattern="#,###"/>đ
-                                </span>
+                            <!-- Phần giữa (Meta) - căn lề thẳng hàng vì phần trên đã giãn đều -->
+                            <div class="route-meta">
+                                <div class="route-meta-item"><i class="fas fa-clock"></i>${route.operatingHours}</div>
+                                <c:if test="${not empty route.frequence}">
+                                    <div class="route-meta-item mt-1"><i class="fas fa-sync-alt"></i>${route.frequence}</div>
+                                </c:if>
                             </div>
 
-                            <a href="${pageContext.request.contextPath}/route-detail?id=${route.routeID}" class="btn btn-detail">
+                            <!-- Nút bấm ở cuối -->
+                            <a href="${pageContext.request.contextPath}/route-detail?id=${route.routeID}" class="btn btn-detail mt-3">
                                 <i class="fas fa-info-circle me-1"></i>Xem chi tiết
                             </a>
                         </div>

@@ -117,26 +117,34 @@
                     <select class="form-select" name="fromStopID" required>
                         <option value="">-- Chọn trạm xuất phát --</option>
                         <c:forEach var="stop" items="${stopNames}">
-                            <option value="${stop.stopID}" ${param.fromStopID == stop.stopID ? 'selected' : ''}>${stop.stopName}</option>
+                            <option value="${stop.stopID}" ${param.fromStopID == stop.stopID ? 'selected' : ''}>
+                                ${stop.stopName.length() > 45 ? stop.stopName.substring(0, 45).concat('...') : stop.stopName}
+                            </option>
                         </c:forEach>
                     </select>
                 </div>
-                <div class="col-md-1 text-center mt-4 mt-md-5">
-                    <button type="button" class="swap-btn" id="swapStops" title="Đổi chiều bến">
-                        <i class="fas fa-exchange-alt fa-rotate-90"></i>
+                <div class="col-md-1 text-center">
+                    <label class="form-label d-none d-md-block">&nbsp;</label>
+                    <button type="button" class="swap-btn" id="swapStops" title="Đổi chiều bến" style="margin-top: 3px;">
+                        <i class="fas fa-exchange-alt"></i>
                     </button>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-5">
                     <label class="form-label text-dark small fw-bold"><i class="fas fa-map-marker-alt text-danger me-1"></i>Điểm đến</label>
                     <select class="form-select" name="toStopID" required>
                         <option value="">-- Chọn bến đích --</option>
                         <c:forEach var="stop" items="${stopNames}">
-                            <option value="${stop.stopID}" ${param.toStopID == stop.stopID ? 'selected' : ''}>${stop.stopName}</option>
+                            <option value="${stop.stopID}" ${param.toStopID == stop.stopID ? 'selected' : ''}>
+                                ${stop.stopName.length() > 45 ? stop.stopName.substring(0, 45).concat('...') : stop.stopName}
+                            </option>
                         </c:forEach>
                     </select>
                 </div>
-                <div class="col-md-2 mt-4 mt-md-5">
-                    <button type="submit" class="btn-search py-2"><i class="fas fa-route me-1"></i>Tìm tuyến</button>
+                <div class="col-md-1">
+                    <label class="form-label d-none d-md-block">&nbsp;</label>
+                    <button type="submit" class="btn-search py-2" style="height: 46px; display: flex; align-items: center; justify-content: center; margin-top: 3px;">
+                        <i class="fas fa-route"></i>
+                    </button>
                 </div>
             </div>
         </form>
@@ -208,15 +216,14 @@
             </div>
         </c:when>
         
-        <%-- CHỈ HIỂN THỊ TRẠNG THÁI TRỐNG KHI ĐÃ SEARCH MÀ KHÔNG THẤY (KHI ERROR KHÔNG CÓ) --%>
-        <c:when test="${empty matchingRoutes && empty error && not empty param.fromStopID}">
-            <div class="text-center py-5 text-muted bg-light rounded-3 mt-4 border">
+        <c:when test="${empty matchingRoutes && empty error && requestScope.searchPerformed}">
+            <div class="text-center py-5 text-muted bg-white rounded-3 mt-4 border shadow-sm">
                 <i class="fas fa-bus-slash fa-4x mb-3 opacity-25 text-secondary"></i>
-                <h5>Rất tiếc! Không có tuyến xe chạy trực tiếp giữa hai trạm này</h5>
+                <h5 class="fw-bold text-dark">Hiện không có chuyến xe phù hợp</h5>
                 <p class="max-width-600 mx-auto small text-muted px-3 mt-2">
-                    Hệ thống không tìm thấy tuyến xe đơn lẻ nào đi qua cả hai bến theo đúng trình tự đi. Bạn vui lòng chọn lại cặp bến khác hoặc chuyển đổi lộ trình đi xe liên tuyến.
+                    Hệ thống không tìm thấy tuyến xe đơn lẻ nào chạy trực tiếp giữa hai trạm này. Bạn vui lòng chọn lại cặp bến khác hoặc tìm kiếm lộ trình đi xe liên tuyến.
                 </p>
-                <a href="${pageContext.request.contextPath}/home" class="btn btn-outline-primary btn-sm mt-3 px-3 rounded-pill">Quay lại Trang chủ</a>
+                <a href="${pageContext.request.contextPath}/home" class="btn btn-outline-primary btn-sm mt-3 px-4 rounded-pill fw-semibold">Quay lại Trang chủ</a>
             </div>
         </c:when>
     </c:choose>

@@ -9,6 +9,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import model.Notification;
+import model.NotificationType;
 
 /**
  *
@@ -20,9 +21,13 @@ public class NotificationService {
     public NotificationService() {
         notificationDAO = new NotificationDAO();
     }
+
+    public void setConnection(java.sql.Connection conn) {
+        this.notificationDAO.setConnection(conn);
+    }
         
     
-    public void createNotification(int accountID, String type, String notiTitle, String notiContent) {
+    public void createNotification(int accountID, NotificationType type, String notiTitle, String notiContent) {
         Notification noti = new Notification();
         
         noti.setAccountID(accountID);

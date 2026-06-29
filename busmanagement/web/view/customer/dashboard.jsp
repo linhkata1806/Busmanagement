@@ -364,7 +364,9 @@
                                 <select class="form-select" name="fromStop" required>
                                     <option value="">-- Trạm đi --</option>
                                     <c:forEach var="stop" items="${stopNames}">
-                                        <option value="${stop.stopID}">${stop.stopName}</option>
+                                        <option value="${stop.stopID}">
+                                            ${stop.stopName.length() > 45 ? stop.stopName.substring(0, 45).concat('...') : stop.stopName}
+                                        </option>
                                     </c:forEach>
                                 </select>
                             </div>
@@ -375,7 +377,9 @@
                                 <select class="form-select" name="toStop" required>
                                     <option value="">-- Trạm đến --</option>
                                     <c:forEach var="stop" items="${stopNames}">
-                                        <option value="${stop.stopID}">${stop.stopName}</option>
+                                        <option value="${stop.stopID}">
+                                            ${stop.stopName.length() > 45 ? stop.stopName.substring(0, 45).concat('...') : stop.stopName}
+                                        </option>
                                     </c:forEach>
                                 </select>
                             </div>

@@ -112,7 +112,6 @@
                         <ul class="dropdown-menu dropdown-menu-end shadow">
                             <li><a class="dropdown-item" href="${pageContext.request.contextPath}/customer/profile"><i class="fas fa-user me-2 text-primary"></i>Hồ sơ</a></li>
                             <li><a class="dropdown-item" href="${pageContext.request.contextPath}/customer/ticket"><i class="fas fa-wallet me-2 text-primary"></i>Vé của tôi</a></li>
-                            <li><a class="dropdown-item" href="${pageContext.request.contextPath}/customer/favorite"><i class="fas fa-heart me-2 text-danger"></i>Yêu thích</a></li>
                             <li><hr class="dropdown-divider"></li>
                             <li><a class="dropdown-item" href="${pageContext.request.contextPath}/logout"><i class="fas fa-sign-out-alt me-2 text-danger"></i>Đăng xuất</a></li>
                         </ul>
@@ -130,6 +129,9 @@
                     <span class="badge bg-danger rounded-pill fs-6 ms-2" id="unreadBadge">${unreadCount} mới</span>
                 </c:if>
             </h4>
+            <a href="${pageContext.request.contextPath}/customer/profile" class="btn btn-light rounded-pill px-4 fw-bold text-dark shadow-sm">
+                <i class="fas fa-arrow-left me-2"></i>Quay lại
+            </a>
         </div>
 
         <div class="card border-0 shadow-sm rounded-3 overflow-hidden">

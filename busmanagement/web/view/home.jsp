@@ -458,7 +458,9 @@
                             <select class="form-select" name="fromStop" required>
                                 <option value="">-- Chọn trạm đi --</option>
                                 <c:forEach var="stop" items="${stopNames}">
-                                    <option value="${stop.stopID}">${stop.stopName}</option>
+                                    <option value="${stop.stopID}">
+                                        ${stop.stopName.length() > 45 ? stop.stopName.substring(0, 45).concat('...') : stop.stopName}
+                                    </option>
                                 </c:forEach>
                             </select>
                         </div>
@@ -474,7 +476,9 @@
                             <select class="form-select" name="toStop" required>
                                 <option value="">-- Chọn trạm đến --</option>
                                 <c:forEach var="stop" items="${stopNames}">
-                                    <option value="${stop.stopID}">${stop.stopName}</option>
+                                    <option value="${stop.stopID}">
+                                        ${stop.stopName.length() > 45 ? stop.stopName.substring(0, 45).concat('...') : stop.stopName}
+                                    </option>
                                 </c:forEach>
                             </select>
                         </div>
@@ -508,39 +512,44 @@
             <div class="row g-4">
                 <c:forEach var="route" items="${popularRoutes}">
                     <div class="col-lg-4 col-md-6">
-                        <div class="card route-card p-3">
-                            <div class="d-flex align-items-start gap-3">
-                                <div class="route-number-badge">${route.routeNumber}</div>
-                                <div class="flex-grow-1">
-                                    <div class="route-name">${route.routeName}</div>
-                                    <div class="route-endpoint">
-                                        <i class="fas fa-map-marker-alt text-success"></i>
-                                        ${route.startPoint}
-                                        <i class="fas fa-long-arrow-alt-right mx-1 text-muted"></i>
-                                        <i class="fas fa-map-marker-alt text-danger"></i>
-                                        ${route.endPoint}
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="route-meta d-flex justify-content-between align-items-center flex-wrap gap-2">
-                                <div>
-                                    <div class="route-meta-item">
-                                        <i class="fas fa-clock"></i>${route.operatingHours}
-                                    </div>
-                                    <c:if test="${not empty route.frequence}">
-                                        <div class="route-meta-item mt-1">
-                                            <i class="fas fa-sync-alt"></i>${route.frequence}
+                        <div class="card route-card p-3 h-100">
+                            <!-- Phần đầu (Header) - dùng flex-grow-1 để giãn rộng đồng đều giữa các Card -->
+                            <div class="flex-grow-1 mb-3">
+                                <div class="d-flex align-items-start justify-content-between gap-2">
+                                    <div class="d-flex align-items-start gap-3">
+                                        <div class="route-number-badge">${route.routeNumber}</div>
+                                        <div class="flex-grow-1">
+                                            <div class="route-name">${route.routeName}</div>
+                                            <div class="route-endpoint">
+                                                <i class="fas fa-map-marker-alt text-success"></i>
+                                                ${route.startPoint}
+                                                <i class="fas fa-long-arrow-alt-right mx-1 text-muted"></i>
+                                                <i class="fas fa-map-marker-alt text-danger"></i>
+                                                ${route.endPoint}
+                                            </div>
                                         </div>
-                                    </c:if>
+                                    </div>
+                                    <span class="price-badge flex-shrink-0">
+                                        <fmt:formatNumber value="${route.ticketPrice}" pattern="#,###"/>đ
+                                    </span>
                                 </div>
-                                <span class="price-badge">
-                                    <fmt:formatNumber value="${route.ticketPrice}" pattern="#,###"/>đ
-                                </span>
                             </div>
 
+                            <!-- Phần giữa (Meta) - căn lề thẳng hàng vì phần trên đã giãn đều -->
+                            <div class="route-meta">
+                                <div class="route-meta-item">
+                                    <i class="fas fa-clock"></i>${route.operatingHours}
+                                </div>
+                                <c:if test="${not empty route.frequence}">
+                                    <div class="route-meta-item mt-1">
+                                        <i class="fas fa-sync-alt"></i>${route.frequence}
+                                    </div>
+                                </c:if>
+                            </div>
+
+                            <!-- Nút bấm ở cuối -->
                             <a href="${pageContext.request.contextPath}/route-detail?id=${route.routeID}"
-                               class="btn btn-detail">
+                               class="btn btn-detail mt-3">
                                 <i class="fas fa-info-circle me-1"></i>Xem chi tiết
                             </a>
                         </div>
@@ -597,56 +606,56 @@
         <!-- Right Column: Hot News & Articles -->
         <div class="col-lg-7">
             <div class="section-title mb-1"><i class="fas fa-fire text-danger me-2"></i> Tin tức & Sự kiện nóng hổi</div>
-            <div class="section-subtitle mb-4">Các tin bài mới nhất về chủ đề Bus Map & Đô thị thông minh</div>
+            <div class="section-subtitle mb-4">Các tin bài nổi bật về chủ đề Bus Map & Đô thị thông minh</div>
             
             <div class="d-flex flex-column gap-3">
                 <!-- Article 1 -->
                 <div class="article-card">
-                    <img src="https://images.unsplash.com/photo-1570125909232-eb263c188f7e?w=300&auto=format&fit=crop&q=60" alt="Hanoi Bus" class="article-img">
+                    <img src="https://i1-vnexpress.vnecdn.net/2026/06/26/Bus1-1782446638-1677-1782446643.jpg?w=500&h=300&q=100&dpr=2&fit=crop&s=d9zKX9lwM6ml7Cftjym4Fw" alt="Hanoi Bus" class="article-img">
                     <div class="article-content flex-grow-1">
                         <div>
                             <span class="article-badge">HOT NEWS</span>
-                            <h6 class="article-title">Hà Nội ra mắt bản đồ số xe buýt thông minh tích hợp định vị GPS</h6>
-                            <p class="article-desc">Hành khách giờ đây có thể theo dõi vị trí thực tế của xe buýt qua bản đồ số trực quan, hạn chế tối đa thời gian chờ đợi tại trạm.</p>
+                            <h6 class="article-title">Xe buýt lao vào gốc cây vì tài xế ngất xỉu nghi do nắng nóng</h6>
+                            <p class="article-desc">Giữa đợt nắng nóng kỷ lục tại Paris, một tài xế xe buýt bất ngờ đổ bệnh khi đang cầm lái, khiến phương tiện lao thẳng vào gốc cây.</p>
                         </div>
                         <div class="article-meta">
                             <span><i class="far fa-newspaper me-1"></i> VnExpress</span>
-                            <span><i class="far fa-clock me-1"></i> Hôm qua</span>
-                            <a href="https://vnexpress.net" target="_blank" class="read-more-btn">Đọc báo <i class="fas fa-chevron-right"></i></a>
+                            <span><i class="far fa-clock me-1"></i> 26/06/2026 </span>
+                            <a href="https://vnexpress.net/xe-buyt-lao-vao-goc-cay-vi-tai-xe-ngat-xiu-nghi-do-nang-nong-5090119.html" target="_blank" class="read-more-btn">Đọc báo <i class="fas fa-chevron-right"></i></a>
                         </div>
                     </div>
                 </div>
                 
                 <!-- Article 2 -->
                 <div class="article-card">
-                    <img src="https://images.unsplash.com/photo-1524661135-423995f22d0b?w=300&auto=format&fit=crop&q=60" alt="Bus Map App" class="article-img">
+                    <img src="https://cdn2.tuoitre.vn/471584752817336320/2026/6/29/base64-178270660875979418886.jpeg" alt="Bus Map App" class="article-img">
                     <div class="article-content flex-grow-1">
                         <div>
                             <span class="article-badge" style="background:#e6f7ff; color:#1890ff;">XU HƯỚNG</span>
-                            <h6 class="article-title">Ứng dụng Bus Map giúp giảm 30% tình trạng trễ giờ của hành khách</h6>
-                            <p class="article-desc">Khảo sát mới đây cho thấy hệ thống tìm đường thông minh trên bản đồ số giúp người dân tiếp cận giao thông công cộng dễ dàng hơn.</p>
+                            <h6 class="article-title">Tôi đi làm bằng xe buýt, càng đi càng 'ghiền'</h6>
+                            <p class="article-desc">Gần 10 năm sau ngày ra trường, tôi mới trở lại với xe buýt. Chuyến đi thử ban đầu nhanh chóng trở thành lựa chọn thường xuyên, khiến tôi tính lại kế hoạch mua xe và thuyết phục cả vợ cùng thay đổi cách đi làm.</p>
                         </div>
                         <div class="article-meta">
                             <span><i class="far fa-newspaper me-1"></i> Tuổi Trẻ</span>
-                            <span><i class="far fa-clock me-1"></i> 2 ngày trước</span>
-                            <a href="https://tuoitre.vn" target="_blank" class="read-more-btn">Đọc báo <i class="fas fa-chevron-right"></i></a>
+                            <span><i class="far fa-clock me-1"></i> 29/06/2026 </span>
+                            <a href="https://tuoitre.vn/toi-di-lam-bang-xe-buyt-cang-di-cang-ghien-100260629111724447.htm" target="_blank" class="read-more-btn">Đọc báo <i class="fas fa-chevron-right"></i></a>
                         </div>
                     </div>
                 </div>
                 
                 <!-- Article 3 -->
                 <div class="article-card">
-                    <img src="https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?w=300&auto=format&fit=crop&q=60" alt="Eco Transportation" class="article-img">
+                    <img src="https://cdn.nhandan.vn/images/a8218e9ba6533fbb4ee217be884401b3cbb93c38eb7c8c0b36632135ae311372a371cd74bf1da198a3548c645252effb/22.png.avif" alt="Eco Transportation" class="article-img">
                     <div class="article-content flex-grow-1">
                         <div>
                             <span class="article-badge" style="background:#f6ffed; color:#52c41a;">MỚI</span>
-                            <h6 class="article-title">Phát triển hệ thống giao thông công cộng Hà Nội hướng tới đô thị xanh</h6>
-                            <p class="article-desc">Đẩy mạnh tích hợp các giải pháp thẻ vé thông minh và bản đồ số cho toàn bộ mạng lưới xe buýt và đường sắt đô thị trong năm 2026.</p>
+                            <h6 class="article-title">TP Hồ Chí Minh hoàn tiền vé tập xe buýt khi miễn phí 100% giá vé từ ngày 1/7</h6>
+                            <p class="article-desc">Hành khách còn vé tập xe buýt năm 2026 chưa sử dụng sẽ được hoàn tiền sau khi TP Hồ Chí Minh triển khai chính sách miễn phí 100% giá vé trên 134 tuyến xe buýt từ ngày 1/7 đến hết năm 2026.</p>
                         </div>
                         <div class="article-meta">
-                            <span><i class="far fa-newspaper me-1"></i> Thanh Niên</span>
-                            <span><i class="far fa-clock me-1"></i> 3 ngày trước</span>
-                            <a href="https://thanhnien.vn" target="_blank" class="read-more-btn">Đọc báo <i class="fas fa-chevron-right"></i></a>
+                            <span><i class="far fa-newspaper me-1"></i> Nhân Dân</span>
+                            <span><i class="far fa-clock me-1"></i> 29/06/2026 </span>
+                            <a href="https://nhandan.vn/video-tp-ho-chi-minh-hoan-tien-ve-tap-xe-buyt-khi-mien-phi-100-gia-ve-tu-ngay-17-post971707.html" target="_blank" class="read-more-btn">Đọc báo <i class="fas fa-chevron-right"></i></a>
                         </div>
                     </div>
                 </div>

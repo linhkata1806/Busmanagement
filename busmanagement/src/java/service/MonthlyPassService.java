@@ -17,6 +17,10 @@ public class MonthlyPassService {
     public MonthlyPassService() {
     }
 
+    public void setConnection(java.sql.Connection conn) {
+        this.monthlyPassDAO.setConnection(conn);
+    }
+
     public void registerRoutePass(int accountID, int routeId, int passTypeID, String imageProof) {
         if (monthlyPassDAO.hasPendingOrApprovedPass(accountID, routeId)) {
             throw new IllegalArgumentException("Bạn đã đăng ký vé tháng cho tuyến này.");
@@ -68,7 +72,7 @@ public class MonthlyPassService {
         return "PASS-" + System.currentTimeMillis();
     }
 
-    private long calculatePassPrice(Integer routeId, int passTypeID) {
+    public long calculatePassPrice(Integer routeId, int passTypeID) {
         MonthlyPassTypeDAO monthlyPassType = new MonthlyPassTypeDAO();
         double basePrice = (routeId == null) ? 200000 : 100000;
 

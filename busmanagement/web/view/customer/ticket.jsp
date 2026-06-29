@@ -32,15 +32,27 @@
         .ticket-card:hover {
             transform: translateY(-3px);
         }
+        /* ===== FOOTER ===== */
+        footer {
+            background: #1a1a2e;
+            color: rgba(255,255,255,0.7);
+            padding: 30px 0;
+            margin-top: 60px;
+        }
+        footer a { color: rgba(255,255,255,0.7); text-decoration: none; }
+        footer a:hover { color: white; }
     </style>
 </head>
-<body>
+<body class="d-flex flex-column min-vh-100">
 
-<div class="container my-5">
-    <div class="d-flex align-items-center mb-4">
+<div class="container my-5 flex-grow-1">
+    <div class="d-flex align-items-center justify-content-between mb-4">
         <h3 class="fw-bold text-secondary m-0">
             <i class="fas fa-wallet me-2 text-primary"></i>Lịch sử mua & Đăng ký dịch vụ vé
         </h3>
+        <a href="${pageContext.request.contextPath}/customer/profile" class="btn btn-light rounded-pill px-4 fw-bold text-dark shadow-sm">
+            <i class="fas fa-arrow-left me-2"></i>Quay lại
+        </a>
     </div>
 
     <ul class="nav nav-pills mb-4 shadow-sm bg-white p-2 rounded-3">
@@ -174,6 +186,35 @@
         
     </div>
 </div>
+
+<!-- ===== FOOTER ===== -->
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4 mb-3 text-start">
+                <h6 class="text-white fw-bold">🚌 Bus Hà Nội</h6>
+                <small class="text-white-50">Hệ thống quản lý xe bus công cộng thành phố Hà Nội.</small>
+            </div>
+            <div class="col-md-4 mb-3 text-start">
+                <h6 class="text-white fw-bold">Liên kết</h6>
+                <ul class="list-unstyled small">
+                    <li><a href="${pageContext.request.contextPath}/home">Trang chủ</a></li>
+                    <li><a href="${pageContext.request.contextPath}/route-list">Danh sách tuyến</a></li>
+                    <li><a href="${pageContext.request.contextPath}/login">Đăng nhập</a></li>
+                </ul>
+            </div>
+            <div class="col-md-4 mb-3 text-start">
+                <h6 class="text-white fw-bold">Liên hệ</h6>
+                <small class="text-white-50">
+                    <i class="fas fa-phone me-1"></i>1900 xxxx<br>
+                    <i class="fas fa-envelope me-1"></i>support@bushanoi.vn
+                </small>
+            </div>
+        </div>
+        <hr style="border-color: rgba(255,255,255,0.1)">
+        <div class="text-center small text-white-50">© 2024 Bus Hà Nội. All rights reserved.</div>
+    </div>
+</footer>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
 </body>
