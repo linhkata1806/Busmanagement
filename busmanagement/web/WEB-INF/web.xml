@@ -77,10 +77,6 @@
         <servlet-class>controller.customer.TicketServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>MonthlyPassServlet</servlet-name>
-        <servlet-class>controller.customer.MonthlyPassServlet</servlet-class>
-    </servlet>
-    <servlet>
         <servlet-name>NotificationServlet</servlet-name>
         <servlet-class>controller.customer.NotificationServlet</servlet-class>
     </servlet>
@@ -95,6 +91,34 @@
     <servlet>
         <servlet-name>StaffDashboardServlet</servlet-name>
         <servlet-class>controller.staff.StaffDashboardServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>MonthlyPassServlet</servlet-name>
+        <servlet-class>controller.staff.MonthlyPassServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>ApproveMonthlyPassServlet</servlet-name>
+        <servlet-class>controller.staff.ApproveMonthlyPassServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>RejectMonthlyPassServlet</servlet-name>
+        <servlet-class>controller.staff.RejectMonthlyPassServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>NotificationManagementServlet</servlet-name>
+        <servlet-class>controller.staff.NotificationManagementServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>CreateNotificationServlet</servlet-name>
+        <servlet-class>controller.staff.CreateNotificationServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>EditNotificationServlet</servlet-name>
+        <servlet-class>controller.staff.EditNotificationServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>DeleteNotificationServlet</servlet-name>
+        <servlet-class>controller.staff.DeleteNotificationServlet</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>LoginServlet</servlet-name>
@@ -149,10 +173,6 @@
         <url-pattern>/customer/ticket</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>MonthlyPassServlet</servlet-name>
-        <url-pattern>/customer/monthly</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
         <servlet-name>NotificationServlet</servlet-name>
         <url-pattern>/customer/notification</url-pattern>
     </servlet-mapping>
@@ -167,6 +187,34 @@
     <servlet-mapping>
         <servlet-name>StaffDashboardServlet</servlet-name>
         <url-pattern>/staff/dashboard</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>MonthlyPassServlet</servlet-name>
+        <url-pattern>/staff/monthly-pass</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ApproveMonthlyPassServlet</servlet-name>
+        <url-pattern>/staff/monthly-pass/approve</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>RejectMonthlyPassServlet</servlet-name>
+        <url-pattern>/staff/monthly-pass/reject</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>NotificationManagementServlet</servlet-name>
+        <url-pattern>/staff/notification</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>CreateNotificationServlet</servlet-name>
+        <url-pattern>/staff/notification/create</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>EditNotificationServlet</servlet-name>
+        <url-pattern>/staff/notification/edit</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>DeleteNotificationServlet</servlet-name>
+        <url-pattern>/staff/notification/delete</url-pattern>
     </servlet-mapping>
     <welcome-file-list>
         <welcome-file>home</welcome-file>

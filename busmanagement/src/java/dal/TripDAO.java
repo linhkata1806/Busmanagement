@@ -12,7 +12,7 @@ import java.sql.ResultSet;
 public class TripDAO extends DBContext {
 
     public int countTripsToday() {
-        String sql = "SELECT COUNT(*) FROM Trips WHERE CAST(DepartureDate AS DATE) = CAST(GETDATE() AS DATE)";
+        String sql = "SELECT COUNT(*) FROM Trips WHERE CAST(TripDate AS DATE) = CAST(GETDATE() AS DATE)";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {

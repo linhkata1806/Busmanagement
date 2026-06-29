@@ -10,6 +10,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.sql.Date;
 import java.util.List;
 import model.MonthlyPass;
 
@@ -207,8 +208,15 @@ public class MonthlyPassDAO extends DBContext {
 
         mp.setPassTypeID(rs.getInt("PassTypeID"));
         mp.setPassCode(rs.getString("PassCode"));
-        mp.setStartDate(rs.getDate("StartDate").toLocalDate());
-        mp.setEndDate(rs.getDate("EndDate").toLocalDate());
+        Date startDate = rs.getDate("StartDate");
+        if (startDate != null) {
+            mp.setStartDate(startDate.toLocalDate());
+        }
+
+        Date endDate = rs.getDate("endDate");
+        if (startDate != null) {
+            mp.setEndDate(endDate.toLocalDate());
+        }
         mp.setPrice(rs.getLong("Price"));
         mp.setStatus(PassStatus.valueOf(rs.getString("Status")));
         mp.setImageProof(rs.getString("ImageProof"));
@@ -219,8 +227,13 @@ public class MonthlyPassDAO extends DBContext {
         java.sql.Date approvedAt = rs.getDate("ApprovedAt");
         if (approvedAt != null) {
             mp.setApprovedAt(approvedAt.toLocalDate());
+        } else {
+            mp.setApprovedAt(null);
         }
-        mp.setCreatedAt(rs.getDate("CreatedAt").toLocalDate());
+        java.sql.Date createdAt = rs.getDate("CreatedAt");
+        if (createdAt != null) {
+            mp.setCreatedAt(createdAt.toLocalDate());
+        }
         return mp;
     }
 
@@ -244,6 +257,7 @@ public class MonthlyPassDAO extends DBContext {
         String sql = "SELECT \n"
                 + "    mp.PassID, \n"
                 + "    mp.PassCode, \n"
+                + "    mp.AccountID, \n"
                 + "    a.FullName, \n"
                 + "    mp.StartDate, \n"
                 + "    mp.EndDate, \n"

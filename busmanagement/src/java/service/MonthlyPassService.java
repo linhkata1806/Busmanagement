@@ -8,6 +8,7 @@ import enums.PassStatus;
 import model.MonthlyPass;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import model.MonthlyPassType;
 import model.Notification;
@@ -121,7 +122,7 @@ public class MonthlyPassService {
         if (updated) {
             sendNotification(pass.getAccountID(),
                     "PASS_APPROVED",
-                     "Vé tháng được duyệt",
+                    "Vé tháng được duyệt",
                     "Đăng ký vé tháng thành công vé tháng mã: "
                     + pass.getPassCode() + " của bạn đã được phê duyệt hành công");
 
@@ -138,7 +139,7 @@ public class MonthlyPassService {
         if (updated) {
             sendNotification(pass.getAccountID(),
                     "PASS_REJECTED",
-                     "Vé tháng bị từ chối",
+                    "Vé tháng bị từ chối",
                     "Đăng ký vé tháng thất bại vé tháng mã: "
                     + pass.getPassCode() + " của bạn bị từ chối");
 
@@ -152,7 +153,39 @@ public class MonthlyPassService {
         notif.setNotificationType(type);
         notif.setTitle(title);
         notif.setContent(content);
+        notif.setCreatedAt(java.time.LocalDateTime.now());
         notificationDAO.insert(notif);
+    }
+    // ham nay get va all trang tahi
+    public List<MonthlyPassDTO> getAllPassesForStaff(String searchQuery) {
+        List<MonthlyPassDTO> passList = monthlyPassDAO.getAllPasses();
+        return filterPassesBySearchQuery(passList, searchQuery);
+    }
+    // ham nay get ve theo 1 trang thai nhat dinh
+    public List<MonthlyPassDTO> getPassesByStatusForStaff(String status, String searchQuery) {
+        List<MonthlyPassDTO> passList = monthlyPassDAO.getPassesByStatus(status);
+        return filterPassesBySearchQuery(passList, searchQuery);
+
+    }
+
+    private List<MonthlyPassDTO> filterPassesBySearchQuery(List<MonthlyPassDTO> passList, String searchQuery) {
+        //check search query k co j 
+        if(searchQuery==null|| searchQuery.isBlank()){
+            return passList;// tra ve luon ca danh sach k phai loc
+        }
+        
+        String query = searchQuery.trim().toLowerCase();
+        List<MonthlyPassDTO> filteredList = new ArrayList<>();
+        
+        for(MonthlyPassDTO dto : passList){
+            //check xem ma ve hoac ten co khop voi tu khoa tim kiem k
+            boolean matchCode = dto.getPassCode()!=null&&dto.getPassCode().toLowerCase().contains(query);
+            boolean matchName = dto.getFullName() != null && dto.getFullName().toLowerCase().contains(query);
+            if(matchCode||matchName){
+                filteredList.add(dto);
+            }
+        }
+        return filteredList;
     }
 
 }
