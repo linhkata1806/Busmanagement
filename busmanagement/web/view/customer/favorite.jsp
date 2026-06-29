@@ -27,9 +27,14 @@
 <body>
 
 <div class="container my-5">
-    <h3 class="fw-bold text-secondary mb-4">
-        <i class="fas fa-heart text-danger me-2"></i>Danh sách tuyến yêu thích
-    </h3>
+    <div class="d-flex align-items-center justify-content-between mb-4">
+        <h3 class="fw-bold text-secondary m-0">
+            <i class="fas fa-heart text-danger me-2"></i>Danh sách tuyến yêu thích
+        </h3>
+        <a href="${pageContext.request.contextPath}/customer/profile" class="btn btn-light rounded-pill px-4 fw-bold text-dark shadow-sm">
+            <i class="fas fa-arrow-left me-2"></i>Quay lại
+        </a>
+    </div>
 
     <div class="row g-3" id="favoriteList">
         <c:choose>

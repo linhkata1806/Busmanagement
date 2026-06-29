@@ -44,13 +44,20 @@ public class FindRoundServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         String fromStopStr = request.getParameter("fromStopID");
+        if (fromStopStr == null || fromStopStr.trim().isEmpty()) {
+            fromStopStr = request.getParameter("fromStop");
+        }
         String toStopStr = request.getParameter("toStopID");
+        if (toStopStr == null || toStopStr.trim().isEmpty()) {
+            toStopStr = request.getParameter("toStop");
+        }
 
         List<Stop> allStops = stopDAO.getAllStops();
         request.setAttribute("stopNames", allStops);
 
         if (fromStopStr != null && toStopStr != null
                 && !fromStopStr.isEmpty() && !toStopStr.isEmpty()) {
+            request.setAttribute("searchPerformed", true);
 
             try {
 

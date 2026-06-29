@@ -8,6 +8,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import model.Notification;
+import model.NotificationType;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
@@ -40,7 +41,7 @@ public class NotificationDAO extends DBContext {
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
 
             ps.setInt(1, noti.getAccountID());
-            ps.setString(2, noti.getNotificationType()); // Khớp với Model của bạn
+            ps.setString(2, noti.getNotificationType().name()); // Lưu tên Enum vào DB
             ps.setString(3, noti.getTitle());
             ps.setString(4, noti.getContent());
             ps.setBoolean(5, noti.isIsRead());
@@ -64,7 +65,8 @@ public class NotificationDAO extends DBContext {
                     Notification n = new Notification();
                     n.setNotificationID(rs.getInt("NotificationID"));
                     n.setAccountID(rs.getInt("AccountID"));
-                    n.setNotificationType(rs.getString("NotificationType"));
+                    String typeStr = rs.getString("NotificationType");
+                    n.setNotificationType(NotificationType.valueOf(typeStr));
                     n.setTitle(rs.getString("Title"));
                     n.setContent(rs.getString("Content"));
                     n.setIsRead(rs.getBoolean("IsRead"));

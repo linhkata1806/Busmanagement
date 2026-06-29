@@ -72,8 +72,8 @@ CREATE TABLE Routes (
     RouteName     NVARCHAR(200) NOT NULL,
     StartPoint    NVARCHAR(150) NOT NULL,
     EndPoint      NVARCHAR(150) NOT NULL,
-    OperatingHours VARCHAR(50)  NOT NULL,
-    Frequency     NVARCHAR(50),
+    OperatingHours NVARCHAR(150) NOT NULL,
+    Frequency     NVARCHAR(150),
     TicketPrice   DECIMAL(10,0) NOT NULL,
     TotalDistance DECIMAL(6,2),
     IsActive      BIT           NOT NULL DEFAULT 1,
@@ -143,7 +143,7 @@ CREATE TABLE Tickets (
     TicketCode   VARCHAR(50)   NOT NULL UNIQUE,
     Price        DECIMAL(10,0) NOT NULL,
     SaleChannel  VARCHAR(50)   NOT NULL DEFAULT 'ONLINE',
-    Status       VARCHAR(50)   NOT NULL DEFAULT 'UNUSED',
+    Status       VARCHAR(50)   NOT NULL DEFAULT 'PENDING',
     PurchasedAt  DATETIME      NOT NULL DEFAULT GETDATE(),
     UsedAt       DATETIME,
     CONSTRAINT FK_Tickets_Account FOREIGN KEY (AccountID) REFERENCES Accounts(AccountID),
@@ -151,7 +151,7 @@ CREATE TABLE Tickets (
     CONSTRAINT FK_Tickets_Route   FOREIGN KEY (RouteID)   REFERENCES Routes(RouteID),
     CONSTRAINT CHK_Tickets_Price  CHECK (Price >= 0),
     CONSTRAINT CHK_Tickets_SaleChannel CHECK (SaleChannel IN ('ONLINE', 'COUNTER', 'ON_BUS')),
-    CONSTRAINT CHK_Tickets_Status CHECK (Status IN ('UNUSED', 'USED', 'EXPIRED'))
+    CONSTRAINT CHK_Tickets_Status CHECK (Status IN ('PENDING', 'UNUSED', 'USED', 'EXPIRED'))
 );
 
 CREATE TABLE MonthlyPassTypes (
