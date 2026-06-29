@@ -35,18 +35,21 @@
         footer a { color: rgba(255,255,255,0.7); text-decoration: none; }
         footer a:hover { color: white; }
 
-        /* MINI SEARCH BAR */
-        .mini-search-header {
-            background: linear-gradient(135deg, var(--primary) 0%, #0d47a1 100%);
-            padding: 30px 0;
+        /* PAGE HEADER */
+        .page-header {
+            background: linear-gradient(135deg, var(--primary) 0%, #1565c0 100%);
+            padding: 20px 0;
             color: white;
-            margin-bottom: 40px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
         }
-        .search-input-group { max-width: 600px; margin: 0 auto; }
-        .search-input-group .form-control { border-radius: 8px 0 0 8px; padding: 12px 16px; font-size: 1rem; border: none; }
-        .search-input-group .form-control:focus { box-shadow: none; }
-        .btn-search { background: var(--accent); color: #333; border: none; border-radius: 0 8px 8px 0; padding: 12px 24px; font-weight: 600; font-size: 1rem; transition: background 0.2s; }
-        .btn-search:hover { background: #f9a825; }
+        .page-header h3 {
+            font-size: 1.45rem;
+            letter-spacing: -0.3px;
+        }
+        .page-header p {
+            font-size: 0.88rem;
+        }
 
         /* ROUTE CARD */
         .route-card { border: none; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); transition: transform 0.2s, box-shadow 0.2s; height: 100%; }
@@ -74,7 +77,7 @@
         </button>
         <div class="collapse navbar-collapse" id="navMenu">
             <ul class="navbar-nav me-auto">
-                <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/home">Trang chủ</a></li>
+                <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/guide">Hướng dẫn</a></li>
                 <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/route-list">Tuyến xe</a></li>
             </ul>
             <ul class="navbar-nav ms-auto align-items-center">
@@ -85,9 +88,9 @@
                                 <i class="fas fa-user-circle me-1"></i> Chào, <strong>${USER.fullName}</strong>
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end">
-                                <li><a class="dropdown-item" href="${pageContext.request.contextPath}/profile"><i class="fas fa-user me-2 text-primary"></i>Hồ sơ</a></li>
+                                <li><a class="dropdown-item" href="${pageContext.request.contextPath}/customer/profile"><i class="fas fa-user me-2 text-primary"></i>Hồ sơ</a></li>
                                 <c:if test="${USER.roleName == 'CUSTOMER'}">
-                                    <li><a class="dropdown-item" href="${pageContext.request.contextPath}/my-tickets"><i class="fas fa-ticket-alt me-2 text-primary"></i>Vé của tôi</a></li>
+                                    <li><a class="dropdown-item" href="${pageContext.request.contextPath}/customer/ticket"><i class="fas fa-ticket-alt me-2 text-primary"></i>Vé của tôi</a></li>
                                 </c:if>
                                 <li><hr class="dropdown-divider"></li>
                                 <li><a class="dropdown-item text-danger" href="${pageContext.request.contextPath}/logout"><i class="fas fa-sign-out-alt me-2"></i>Đăng xuất</a></li>
@@ -104,19 +107,21 @@
     </div>
 </nav>
 
-<div class="mini-search-header">
-    <div class="container text-center">
-        <h3 class="mb-3">Tìm kiếm Tuyến Xe Bus</h3>
-        <form action="${pageContext.request.contextPath}/search-route" method="get">
-            <div class="input-group search-input-group">
-                <input type="text" class="form-control" name="keyword" 
-                       placeholder="Nhập số tuyến (VD: 32) hoặc tên tuyến (VD: Nhổn)..." 
-                       value="${keyword}" required>
-                <button class="btn-search" type="submit">
-                    <i class="fas fa-search me-1"></i>Tìm kiếm
-                </button>
+<div class="page-header">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-md-5 text-center text-md-start mb-3 mb-md-0">
+                <h3 class="fw-bold m-0"><i class="fas fa-search me-2"></i>Tìm kiếm Tuyến Xe Bus</h3>
             </div>
-        </form>
+            <div class="col-md-7 col-lg-6 ms-auto">
+                <form action="${pageContext.request.contextPath}/search-route" method="GET" class="d-flex shadow-sm">
+                    <input type="text" name="keyword" class="form-control border-0 px-3 py-2 bg-white" placeholder="Tìm kiếm nhanh số tuyến hoặc tên tuyến..." style="font-size: 0.9rem; border-radius: 8px 0 0 8px;" value="${keyword}" required>
+                    <button type="submit" class="btn btn-warning border-0 px-4 fw-semibold text-white d-flex align-items-center" style="background: var(--accent); border-radius: 0 8px 8px 0; font-size: 0.9rem;">
+                        <i class="fas fa-search me-2"></i>Tìm kiếm
+                    </button>
+                </form>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -148,7 +153,7 @@
                                 <div>
                                     <div class="route-meta-item"><i class="fas fa-clock"></i>${route.operatingHours}</div>
                                     <c:if test="${not empty route.frequence}">
-                                        <div class="route-meta-item mt-1"><i class="fas fa-sync-alt"></i>${route.frequency}</div>
+                                        <div class="route-meta-item mt-1"><i class="fas fa-sync-alt"></i>${route.frequence}</div>
                                     </c:if>
                                 </div>
                                 <span class="price-badge">

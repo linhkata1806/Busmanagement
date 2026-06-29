@@ -223,4 +223,26 @@ public class MonthlyPassDAO extends DBContext {
         mp.setCreatedAt(rs.getDate("CreatedAt").toLocalDate());
         return mp;
     }
+
+    public MonthlyPassDTO getActivePassByAccountId(int accountID) {
+        String sql = "SELECT TOP 1 mp.PassCode, mp.StartDate, mp.EndDate, mp.Status, "
+                + "r.RouteNumber, r.RouteName, mpt.TypeName "
+                + "FROM MonthlyPasses mp "
+                + "LEFT JOIN Routes r ON mp.RouteID = r.RouteID "
+                + "JOIN MonthlyPassTypes mpt ON mp.PassTypeID = mpt.PassTypeID "
+                + "WHERE mp.AccountID = ? AND mp.Status = 'APPROVED' AND mp.EndDate >= CAST(GETDATE() AS DATE) "
+                + "ORDER BY mp.EndDate DESC";
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, accountID);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return mapRowToMonthlyPassDTO(rs);
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("Lỗi getActivePassByAccountId: " + e.getMessage());
+        }
+        return null;
+    }
 }

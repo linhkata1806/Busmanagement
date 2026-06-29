@@ -66,7 +66,7 @@
 
     <nav class="navbar navbar-expand-lg">
         <div class="container">
-            <a class="navbar-brand" href="${pageContext.request.contextPath}/customer/dashboard">
+            <a class="navbar-brand" href="${pageContext.request.contextPath}/home">
                 🚌 Bus <span>Hà Nội</span>
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
@@ -74,9 +74,8 @@
             </button>
             <div class="collapse navbar-collapse" id="navMenu">
                 <ul class="navbar-nav me-auto">
-                    <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/customer/dashboard">Trang chủ</a></li>
+                    <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/guide">Hướng dẫn</a></li>
                     <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/route-list">Tuyến xe</a></li>
-                    <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/customer/dashboard">Dashboard</a></li>
                 </ul>
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item dropdown">

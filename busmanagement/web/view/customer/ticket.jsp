@@ -66,7 +66,10 @@
                     <c:when test="${empty ticketList}">
                         <div class="col-12 text-center py-5 text-muted shadow-sm bg-white rounded-3">
                             <i class="fas fa-box-open fa-3x mb-3 text-black-50"></i>
-                            <p class="m-0">Bạn chưa thực hiện giao dịch mua vé lượt nào.</p>
+                            <p class="mb-3">Bạn chưa thực hiện giao dịch mua vé lượt nào.</p>
+                            <a href="${pageContext.request.contextPath}/route-list" class="btn btn-primary fw-bold px-4 py-2 rounded-3" style="background-color: var(--primary);">
+                                <i class="fas fa-search-location me-2"></i>Tìm tuyến & Mua vé ngay
+                            </a>
                         </div>
                     </c:when>
                     <c:otherwise>
@@ -102,9 +105,12 @@
             <div class="row g-3 mb-5">
                 <c:choose>
                     <c:when test="${empty routePassList}">
-                        <div class="col-12 text-center py-4 text-muted shadow-sm bg-white rounded-3">
-                            <i class="fas fa-box-open fa-2x mb-2 text-black-50"></i>
-                            <p class="m-0">Không tìm thấy dữ liệu đăng ký vé tháng của tuyến cố định.</p>
+                        <div class="col-12 text-center py-5 text-muted shadow-sm bg-white rounded-3">
+                            <i class="fas fa-id-card fa-3x mb-3 text-black-50"></i>
+                            <p class="mb-3">Không tìm thấy dữ liệu đăng ký vé tháng của tuyến cố định.</p>
+                            <a href="${pageContext.request.contextPath}/route-list" class="btn btn-outline-primary fw-bold px-4 py-2 rounded-3">
+                                <i class="fas fa-search me-2"></i>Chọn tuyến để đăng ký
+                            </a>
                         </div>
                     </c:when>
                     <c:otherwise>
@@ -134,9 +140,12 @@
             <div class="row g-3">
                 <c:choose>
                     <c:when test="${empty allRoutePassList}">
-                        <div class="col-12 text-center py-4 text-muted shadow-sm bg-white rounded-3">
-                            <i class="fas fa-box-open fa-2x mb-2 text-black-50"></i>
-                            <p class="m-0">Không tìm thấy dữ liệu đăng ký vé tháng liên tuyến toàn mạng lưới.</p>
+                        <div class="col-12 text-center py-5 text-muted shadow-sm bg-white rounded-3">
+                            <i class="fas fa-globe fa-3x mb-3 text-black-50"></i>
+                            <p class="mb-3">Không tìm thấy dữ liệu đăng ký vé tháng liên tuyến toàn mạng lưới.</p>
+                            <a href="${pageContext.request.contextPath}/customer/buy-ticket?routeId=0&ticketType=lien_chuyen" class="btn btn-success fw-bold px-4 py-2 rounded-3">
+                                <i class="fas fa-check-circle me-2"></i>Đăng ký vé liên tuyến ngay
+                            </a>
                         </div>
                     </c:when>
                     <c:otherwise>

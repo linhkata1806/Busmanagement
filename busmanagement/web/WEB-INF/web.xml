@@ -41,6 +41,10 @@
         <servlet-class>controller.HomeServlet</servlet-class>
     </servlet>
     <servlet>
+        <servlet-name>GuideServlet</servlet-name>
+        <servlet-class>controller.GuideServlet</servlet-class>
+    </servlet>
+    <servlet>
         <servlet-name>SearchRouteServlet</servlet-name>
         <servlet-class>controller.SearchRouteServlet</servlet-class>
     </servlet>
@@ -107,6 +111,10 @@
     <servlet-mapping>
         <servlet-name>HomeServlet</servlet-name>
         <url-pattern>/home</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>GuideServlet</servlet-name>
+        <url-pattern>/guide</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>SearchRouteServlet</servlet-name>

@@ -17,7 +17,7 @@ public class MonthlyPassService {
     public MonthlyPassService() {
     }
 
-    public void registerRoutePass(int accountID, int routeId, int passTypeID) {
+    public void registerRoutePass(int accountID, int routeId, int passTypeID, String imageProof) {
         if (monthlyPassDAO.hasPendingOrApprovedPass(accountID, routeId)) {
             throw new IllegalArgumentException("Bạn đã đăng ký vé tháng cho tuyến này.");
         }
@@ -34,11 +34,12 @@ public class MonthlyPassService {
 
         pass.setPrice(calculatePassPrice(routeId, passTypeID));
         pass.setStatus(PassStatus.PENDING);
+        pass.setImageProof(imageProof);
 
         monthlyPassDAO.insert(pass);
     }
 
-    public void registerAllRoutePass(int accountID, int passTypeID) {
+    public void registerAllRoutePass(int accountID, int passTypeID, String imageProof) {
         if (monthlyPassDAO.hasPendingOrApprovedAllRoutePass(accountID)) {
             throw new IllegalArgumentException("Bạn đã có vé tháng liên tuyến.");
         }
@@ -54,11 +55,10 @@ public class MonthlyPassService {
         pass.setStartDate(today);
         pass.setEndDate(today.plusMonths(1));
 
-        // Lưu ý: hàm tính giá cần truyền đúng tham số (null cho routeId vì là liên tuyến)
-        // Nếu hàm calculatePassPrice yêu cầu int routeId, bạn cần xử lý trường hợp null này
-        pass.setPrice(calculatePassPrice(0, passTypeID)); // Cần kiểm tra lại hàm tính giá của bạn
+        pass.setPrice(calculatePassPrice(null, passTypeID));
 
         pass.setStatus(PassStatus.PENDING);
+        pass.setImageProof(imageProof);
 
         monthlyPassDAO.insert(pass);
     }

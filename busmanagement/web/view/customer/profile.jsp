@@ -107,7 +107,7 @@
 
     <nav class="navbar navbar-expand-lg">
         <div class="container">
-            <a class="navbar-brand" href="${pageContext.request.contextPath}/customer/dashboard">
+            <a class="navbar-brand" href="${pageContext.request.contextPath}/home">
                 🚌 Bus <span>Hà Nội</span>
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
@@ -115,9 +115,8 @@
             </button>
             <div class="collapse navbar-collapse" id="navMenu">
                 <ul class="navbar-nav me-auto">
-                    <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/customer/dashboard">Trang chủ</a></li>
+                    <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/guide">Hướng dẫn</a></li>
                     <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/route-list">Tuyến xe</a></li>
-                    <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/customer/dashboard">Dashboard</a></li>
                 </ul>
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item dropdown">
@@ -150,6 +149,15 @@
     </div>
 
     <div class="container profile-layout">
+        <c:if test="${not empty sessionScope.successMsg}">
+            <div class="alert alert-success alert-dismissible fade show d-flex align-items-center mb-4" role="alert">
+                <i class="fas fa-check-circle me-2 fs-5"></i>
+                <div>${sessionScope.successMsg}</div>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            <c:remove var="successMsg" scope="session" />
+        </c:if>
+        
         <div class="row">
             
             <div class="col-lg-4">
@@ -157,7 +165,7 @@
                 <div class="card custom-card p-3">
                     <h5 class="fw-bold mb-3 text-secondary" style="font-size: 0.95rem;"><i class="fas fa-link me-2"></i>LỐI TẮT NHANH</h5>
                     <div class="d-grid gap-2">
-                        <a href="${pageContext.request.contextPath}/customer/dashboard" class="btn btn-light text-start border-2"><i class="fas fa-th-large me-2 text-primary"></i> Dashboard Tổng quan</a>
+                        <a href="${pageContext.request.contextPath}/home" class="btn btn-light text-start border-2"><i class="fas fa-home me-2 text-primary"></i> Trang chủ hệ thống</a>
                         <a href="${pageContext.request.contextPath}/customer/ticket" class="btn btn-light text-start"><i class="fas fa-ticket-alt me-2 text-success"></i> Vé của tôi</a>
                         <a href="${pageContext.request.contextPath}/customer/favorite" class="btn btn-light text-start"><i class="fas fa-heart me-2 text-danger"></i> Tuyến yêu thích</a>
                         <a href="${pageContext.request.contextPath}/customer/notification" class="btn btn-light text-start"><i class="fas fa-bell me-2 text-warning"></i> Thông báo hệ thống</a>
@@ -170,21 +178,29 @@
                         <c:when test="${not empty activeMonthlyPass}">
                             <div class="p-3 bg-light rounded border-start border-success border-4">
                                 <div class="fw-bold text-success mb-1">Vé tháng xe bus</div>
-                                <div class="small text-muted mb-1">Loại đối tượng: ${activeMonthlyPass.type}</div>
-                                <div class="small text-muted mb-1">Tuyến đăng ký: ${activeMonthlyPass.routeName}</div>
-                                <div class="small text-muted mb-2">Hiệu lực: ${activeMonthlyPass.expiryDate}</div>
+                                <div class="small text-muted mb-1">Đối tượng: <strong>${activeMonthlyPass.typeName}</strong></div>
+                                <div class="small text-muted mb-1">Phạm vi: 
+                                    <strong>
+                                        <c:choose>
+                                            <c:when test="${empty activeMonthlyPass.routeNumber}">
+                                                Liên tuyến toàn mạng lưới
+                                            </c:when>
+                                            <c:otherwise>
+                                                Tuyến ${activeMonthlyPass.routeNumber}
+                                            </c:otherwise>
+                                        </c:choose>
+                                    </strong>
+                                </div>
+                                <div class="small text-muted mb-2">Hạn sử dụng: <strong>${activeMonthlyPass.endDate}</strong></div>
                                 <span class="badge bg-success">Đang hoạt động</span>
                             </div>
                         </c:when>
                         <c:otherwise>
-                            <div class="p-3 bg-light rounded border-start border-primary border-4 mb-2">
-                                <div class="fw-bold text-primary mb-1">Vé Tháng Mẫu</div>
-                                <div class="small mb-1"><strong>Loại:</strong> Sinh viên</div>
-                                <div class="small mb-1"><strong>Tuyến:</strong> 32 (Nhổn - Giáp Bát)</div>
-                                <div class="small mb-2"><strong>Hiệu lực:</strong> 01/12/2025 - 31/12/2025</div>
-                                <span class="badge bg-success">Đang hoạt động</span>
+                            <div class="text-center py-3 text-muted">
+                                <i class="fas fa-id-card fa-2x mb-2 opacity-50"></i>
+                                <p class="small mb-0">Bạn chưa đăng ký vé tháng nào đang có hiệu lực.</p>
+                                <a href="${pageContext.request.contextPath}/route-list" class="btn btn-sm btn-outline-primary mt-2">Đăng ký ngay</a>
                             </div>
-                            <p class="text-muted small text-center mb-0 mt-2">Bạn chưa sở hữu thêm vé tháng nào khác.</p>
                         </c:otherwise>
                     </c:choose>
                 </div>
@@ -306,18 +322,10 @@
                                     </c:when>
                                     <c:otherwise>
                                         <tr>
-                                            <td>15/12/2025</td>
-                                            <td><span class="badge bg-primary px-2">01</span></td>
-                                            <td>29B-12345</td>
-                                            <td class="text-start text-truncate" style="max-width: 130px;">Bến xe Gia Lâm</td>
-                                            <td class="text-start text-truncate" style="max-width: 130px;">Bờ Hồ</td>
-                                        </tr>
-                                        <tr>
-                                            <td>14/12/2025</td>
-                                            <td><span class="badge bg-primary px-2">32</span></td>
-                                            <td>30H-56789</td>
-                                            <td class="text-start text-truncate" style="max-width: 130px;">Bến xe Cầu Giấy</td>
-                                            <td class="text-start text-truncate" style="max-width: 130px;">Bến xe Mỹ Đình</td>
+                                            <td colspan="5" class="text-center py-4 text-muted">
+                                                <i class="fas fa-history fa-2x mb-2 d-block opacity-50"></i>
+                                                Chưa ghi nhận lịch sử chuyến đi nào của bạn.
+                                            </td>
                                         </tr>
                                     </c:otherwise>
                                 </c:choose>
