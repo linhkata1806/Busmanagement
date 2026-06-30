@@ -1,6 +1,6 @@
 //kết nối đến WeatherAPI bằng key của bạn và cấu hình cache 30 phút.
 
-package service;
+package api;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
