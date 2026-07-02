@@ -234,6 +234,12 @@ public class MonthlyPassDAO extends DBContext {
         if (createdAt != null) {
             mp.setCreatedAt(createdAt.toLocalDate());
         }
+        // BỔ SUNG: Đọc QRCodeToken và LastUsedAt
+        mp.setQrCodeToken(rs.getString("QRCodeToken"));
+        java.sql.Timestamp lastUsedAt = rs.getTimestamp("LastUsedAt");
+        if (lastUsedAt != null) {
+            mp.setLastUsedAt(lastUsedAt);
+        }
         return mp;
     }
 
@@ -330,14 +336,29 @@ public class MonthlyPassDAO extends DBContext {
     }
 
     public boolean updateStatus(int passID, PassStatus passStatus, int staffID) {
-        String sql = "UPDATE MonthlyPasses SET Status = ?, ApprovedBy = ?, ApprovedAt = GETDATE() WHERE PassID = ?";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setString(1, passStatus.name());
-            ps.setInt(2, staffID);
-            ps.setInt(3, passID);
-            return ps.executeUpdate() > 0;
-        } catch (SQLException e) {
-            System.out.println("Lỗi updateStatus: " + e.getMessage());
+        String sql;
+        if (passStatus == PassStatus.APPROVED) {
+            // BỔ SUNG: Khi duyệt thẻ, tự động tạo QRCodeToken bảo mật bằng UUID ngẫu nhiên
+            sql = "UPDATE MonthlyPasses SET Status = ?, ApprovedBy = ?, ApprovedAt = GETDATE(), QRCodeToken = ? WHERE PassID = ?";
+            try (PreparedStatement ps = connection.prepareStatement(sql)) {
+                ps.setString(1, passStatus.name());
+                ps.setInt(2, staffID);
+                ps.setString(3, java.util.UUID.randomUUID().toString()); // Tạo UUID ngẫu nhiên
+                ps.setInt(4, passID);
+                return ps.executeUpdate() > 0;
+            } catch (SQLException e) {
+                System.out.println("Lỗi updateStatus (APPROVED): " + e.getMessage());
+            }
+        } else {
+            sql = "UPDATE MonthlyPasses SET Status = ?, ApprovedBy = ?, ApprovedAt = GETDATE() WHERE PassID = ?";
+            try (PreparedStatement ps = connection.prepareStatement(sql)) {
+                ps.setString(1, passStatus.name());
+                ps.setInt(2, staffID);
+                ps.setInt(3, passID);
+                return ps.executeUpdate() > 0;
+            } catch (SQLException e) {
+                System.out.println("Lỗi updateStatus: " + e.getMessage());
+            }
         }
         return false;
     }

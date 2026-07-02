@@ -27,6 +27,8 @@ public class MonthlyPass {
     private Integer approvedBy;
     private LocalDate approvedAt;
     private LocalDate createdAt;
+    private String qrCodeToken;          // BỔ SUNG: Token bảo mật QR Code
+    private java.sql.Timestamp lastUsedAt; // BỔ SUNG: Lần quét thẻ gần nhất
 
     public MonthlyPass() {
     }
@@ -151,8 +153,24 @@ public class MonthlyPass {
         this.createdAt = createdAt;
     }
 
+    public String getQrCodeToken() {
+        return qrCodeToken;
+    }
+
+    public void setQrCodeToken(String qrCodeToken) {
+        this.qrCodeToken = qrCodeToken;
+    }
+
+    public java.sql.Timestamp getLastUsedAt() {
+        return lastUsedAt;
+    }
+
+    public void setLastUsedAt(java.sql.Timestamp lastUsedAt) {
+        this.lastUsedAt = lastUsedAt;
+    }
+
     @Override
     public String toString() {
-        return "MonthlyPass{" + "passCode='" + passCode + '\'' + ", status=" + status + '}';
+        return "MonthlyPass{" + "passCode='" + passCode + '\'' + ", status=" + status + ", qrCodeToken=" + qrCodeToken + '}';
     }
 }
