@@ -1,10 +1,7 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package model;
 
 import enums.TripStatus;
+import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
@@ -23,6 +20,8 @@ public class Trip {
     private LocalTime endTime;
     private int direction;
     private TripStatus status;
+    private Timestamp actualStartTime; // BỔ SUNG: Thời điểm thực tế bắt đầu chuyến
+    private Timestamp actualEndTime;   // BỔ SUNG: Thời điểm thực tế kết thúc chuyến
 
     public Trip() {
     }
@@ -120,10 +119,28 @@ public class Trip {
         this.status = status;
     }
 
+    public Timestamp getActualStartTime() {
+        return actualStartTime;
+    }
+
+    public void setActualStartTime(Timestamp actualStartTime) {
+        this.actualStartTime = actualStartTime;
+    }
+
+    public Timestamp getActualEndTime() {
+        return actualEndTime;
+    }
+
+    public void setActualEndTime(Timestamp actualEndTime) {
+        this.actualEndTime = actualEndTime;
+    }
+
     @Override
     public String toString() {
-        return "Trip{" + "tripID=" + tripID + ", routeID=" + routeID + ", busID=" + busID + ", driverID=" + driverID + ", assistantID=" + assistantID + ", tripDate=" + tripDate + ", startTime=" + startTime + ", endTime=" + endTime + ", direction=" + direction + ", status=" + status + '}';
+        return "Trip{" + "tripID=" + tripID + ", routeID=" + routeID + ", busID=" + busID
+                + ", driverID=" + driverID + ", assistantID=" + assistantID
+                + ", tripDate=" + tripDate + ", startTime=" + startTime + ", endTime=" + endTime
+                + ", direction=" + direction + ", status=" + status
+                + ", actualStartTime=" + actualStartTime + ", actualEndTime=" + actualEndTime + '}';
     }
-    
-    
 }

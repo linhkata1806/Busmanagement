@@ -196,6 +196,10 @@
         <servlet-name>AddStopToRouteServlet</servlet-name>
         <servlet-class>controller.staff.AddStopToRouteServlet</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>PaymentQRJSP</servlet-name>
+        <jsp-file>/view/customer/payment-qr.jsp</jsp-file>
+    </servlet>
     <servlet-mapping>
         <servlet-name>LoginServlet</servlet-name>
         <url-pattern>/login</url-pattern>
@@ -264,7 +268,6 @@
         <servlet-name>BuyTicketServlet</servlet-name>
         <url-pattern>/customer/buy-ticket</url-pattern>
     </servlet-mapping>
-<<<<<<< HEAD
     <servlet-mapping>
         <servlet-name>StaffDashboardServlet</servlet-name>
         <url-pattern>/staff/dashboard</url-pattern>
@@ -368,15 +371,10 @@
     <servlet-mapping>
         <servlet-name>AddStopToRouteServlet</servlet-name>
         <url-pattern>/staff/route-stop/add</url-pattern>
-=======
-    <servlet>
-        <servlet-name>PaymentQRJSP</servlet-name>
-        <jsp-file>/view/customer/payment-qr.jsp</jsp-file>
-    </servlet>
+    </servlet-mapping>
     <servlet-mapping>
         <servlet-name>PaymentQRJSP</servlet-name>
         <url-pattern>/customer/payment-qr</url-pattern>
->>>>>>> 36454c5b7303d5f9f4610da0cfeff3d2edfb1d24
     </servlet-mapping>
     <welcome-file-list>
         <welcome-file>home</welcome-file>
