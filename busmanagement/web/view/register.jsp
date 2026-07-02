@@ -304,7 +304,9 @@
                 </form>
 
                 <div class="text-center mt-4">
-                    <a href="home" class="link-home"><i class="fas fa-arrow-left me-1"></i> Trở về menu chính</a>
+                    <a href="home" class="btn btn-light rounded-pill px-4 fw-bold text-dark shadow-sm">
+                        <i class="fas fa-arrow-left me-2"></i>Quay lại
+                    </a>
                 </div>
             </div>
         </div>
@@ -403,7 +405,7 @@
                         alertContainer.innerHTML = `
                             <div class="alert alert-danger alert-dismissible fade show d-flex align-items-center mb-3" role="alert">
                                 <i class="fas fa-exclamation-circle me-2"></i>
-                                <div>${errorMsg}</div>
+                                <div>\${errorMsg}</div>
                                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                             </div>
                         `;

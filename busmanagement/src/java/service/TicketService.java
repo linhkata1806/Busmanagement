@@ -26,6 +26,10 @@ public class TicketService {
     public TicketService() {
     }
 
+    public void setConnection(java.sql.Connection conn) {
+        this.ticketDAO.setConnection(conn);
+    }
+
     public void buySingleTicket(int accountID, int routeId, long ticketPrice, String ticketType) throws Exception {
         Ticket ticket = new Ticket();
 
@@ -36,7 +40,7 @@ public class TicketService {
 
         ticket.setPrice(ticketPrice);
         ticket.setSaleChannel(SaleChannel.ONLINE);
-        ticket.setStatus(TicketStatus.UNUSED);
+        ticket.setStatus(TicketStatus.PENDING);
         ticket.setPurchasedAt(LocalDateTime.now());
         ticket.setTripID(null);
         if (!ticketDAO.insert(ticket)) {

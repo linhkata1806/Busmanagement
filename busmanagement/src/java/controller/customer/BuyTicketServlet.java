@@ -16,6 +16,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import model.Account;
 import model.Route;
+import model.NotificationType;
 import service.NotificationService;
 
 /**
@@ -23,19 +24,6 @@ import service.NotificationService;
  * @author Administrator
  */
 public class BuyTicketServlet extends HttpServlet {
-
-    private RouteDAO routeDAO;
-    private TicketService ticketService;
-    private NotificationService notificationService;
-    private MonthlyPassService monthlyPassService;
-
-    @Override
-    public void init() throws ServletException {
-        routeDAO = new RouteDAO();
-        ticketService = new TicketService();
-        notificationService = new NotificationService();
-        monthlyPassService = new MonthlyPassService();
-    }
 
     // ==========================================
     // GET: LẤY THÔNG TIN TUYẾN & HIỂN THỊ FORM XÁC NHẬN
@@ -45,6 +33,7 @@ public class BuyTicketServlet extends HttpServlet {
             throws ServletException, IOException {
 
         HttpSession session = request.getSession(false);
+        RouteDAO routeDAO = new RouteDAO();
         try {
             String routeIdRaw = request.getParameter("routeId");
             String ticketType = request.getParameter("ticketType"); // luot, thang, lien_chuyen
@@ -108,11 +97,13 @@ public class BuyTicketServlet extends HttpServlet {
             // loi chung chung nma phan lon do database
             session.setAttribute("errorMsg", "Hệ thống gặp sự cố khi tải thông tin tuyến: " + e.getMessage());
             response.sendRedirect(request.getContextPath() + "/route-list");
+        } finally {
+            routeDAO.close(); // Giải phóng kết nối ngay sau khi tải xong thông tin
         }
     }
 
     // ==========================================
-    // POST: XỬ LÝ LƯU GIAO DỊCH MUA VÉ
+    // POST: XỬ LÝ LƯU GIAO DỊCH MUA VÉ VỚI TRANSACTION & COMMIT/ROLLBACK
     // ==========================================
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
@@ -121,6 +112,7 @@ public class BuyTicketServlet extends HttpServlet {
         HttpSession session = request.getSession(false);
         Account user = (Account) session.getAttribute("USER");
 
+        String action = request.getParameter("action");
         String routeIdRaw = request.getParameter("routeId");
         String ticketType = request.getParameter("ticketType");
         
@@ -137,11 +129,17 @@ public class BuyTicketServlet extends HttpServlet {
             return;
         }
 
+        RouteDAO routeDAO = new RouteDAO();
+        TicketService ticketService = new TicketService();
+        NotificationService notificationService = new NotificationService();
+        MonthlyPassService monthlyPassService = new MonthlyPassService();
+
         // xu ly neu du lieu k trung voi 3 dang kia
         if (ticketType == null || (!ticketType.equals("luot") && !ticketType.equals("thang") && !ticketType.equals("lien_chuyen"))) {
             request.setAttribute("errorMsg", "Loại dịch vụ vé không hợp lệ.");
-            reloadFormContext(request, routeIdRaw, "luot"); // Ép về luot để hiển thị lại form
+            reloadFormContext(request, routeDAO, routeIdRaw, "luot"); // Ép về luot để hiển thị lại form
             request.getRequestDispatcher("/view/customer/buy-ticket.jsp").forward(request, response);
+            routeDAO.close();
             return;
         }
 
@@ -152,85 +150,144 @@ public class BuyTicketServlet extends HttpServlet {
             if (route == null) {
                 request.setAttribute("errorMsg", "Tuyến xe không tồn tại hoặc đã bị gỡ bỏ.");
                 request.getRequestDispatcher("/view/customer/buy-ticket.jsp").forward(request, response);
+                routeDAO.close();
                 return;
             }
 
-            String notiTitle = "";
-            String notiContent = "";
-            // ====================================================================
-            // GỌI SERVICE: Cho phép Service tự quyết định và ném lỗi cụ thể (e.getMessage())
-            // ====================================================================
-            switch (ticketType) {
-                case "luot":
-                    ticketService.buySingleTicket(user.getAccountID(), routeId, route.getTicketPrice(), ticketType);
-                    notiTitle = "Mua vé lượt thành công";
-                    notiContent = "Bạn đã thanh toán vé lượt tuyến số " + route.getRouteNumber() + " thành công.";
-                    break;
-
-                case "thang":
-
-                    monthlyPassService.registerRoutePass(
-                            user.getAccountID(),
-                            routeId,
-                            passTypeID,
-                            imageProof
-                    );
-
-                    notiTitle = "Đăng ký vé tháng thành công";
-
-                    notiContent = "Bạn đã đăng ký vé tháng cho tuyến số "
-                            + route.getRouteNumber()
-                            + " thành công.";
-
-                    break;
-
-                case "lien_chuyen":
-
-                    monthlyPassService.registerAllRoutePass(
-                            user.getAccountID(),
-                            passTypeID,
-                            imageProof
-                    );
-
-                    notiTitle = "Đăng ký vé liên tuyến thành công";
-
-                    notiContent
-                            = "Bạn đã đăng ký thành công vé liên tuyến đi toàn mạng lưới.";
-
-                    break;
-
-                default:
-                    throw new IllegalArgumentException("Loại dịch vụ vé không hợp lệ.");
+            // Kiểm tra trùng lặp vé tháng trước khi tiến hành
+            if (ticketType.equals("thang")) {
+                dal.MonthlyPassDAO mpDAO = new dal.MonthlyPassDAO();
+                mpDAO.setConnection(routeDAO.getConnection()); // dùng chung connection để tối ưu
+                if (mpDAO.hasPendingOrApprovedPass(user.getAccountID(), routeId)) {
+                    request.setAttribute("errorMsg", "Bạn đã đăng ký vé tháng cho tuyến này rồi.");
+                    reloadFormContext(request, routeDAO, routeIdRaw, ticketType);
+                    request.getRequestDispatcher("/view/customer/buy-ticket.jsp").forward(request, response);
+                    routeDAO.close();
+                    return;
+                }
+            } else if (ticketType.equals("lien_chuyen")) {
+                dal.MonthlyPassDAO mpDAO = new dal.MonthlyPassDAO();
+                mpDAO.setConnection(routeDAO.getConnection()); // dùng chung connection để tối ưu
+                if (mpDAO.hasPendingOrApprovedAllRoutePass(user.getAccountID())) {
+                    request.setAttribute("errorMsg", "Bạn đã có vé tháng liên tuyến rồi.");
+                    reloadFormContext(request, routeDAO, routeIdRaw, ticketType);
+                    request.getRequestDispatcher("/view/customer/buy-ticket.jsp").forward(request, response);
+                    routeDAO.close();
+                    return;
+                }
             }
 
-            notificationService.createNotification(
-                    user.getAccountID(),
-                    "TICKET", // Type để sau này filter
-                    notiTitle, // Tiêu đề ngắn gọn
-                    notiContent // Nội dung chi tiết
-            );
+            // Tính toán giá tiền thực tế
+            long price = 0;
+            if (ticketType.equals("luot")) {
+                price = route.getTicketPrice();
+            } else if (ticketType.equals("thang")) {
+                price = monthlyPassService.calculatePassPrice(routeId, passTypeID);
+            } else {
+                price = monthlyPassService.calculatePassPrice(null, passTypeID);
+            }
 
-            session.setAttribute("successMsg", "Mua vé trực tuyến thành công!");
-            response.sendRedirect(request.getContextPath() + "/customer/ticket");
+            if (action != null && action.equals("confirm")) {
+                // ==========================================
+                // LUỒNG XÁC NHẬN: Thực tế ghi nhận vào Database
+                // ==========================================
+                java.sql.Connection conn = null;
+                try {
+                    dal.DBContext db = new dal.DBContext();
+                    conn = db.getConnection();
+                    conn.setAutoCommit(false); // Bắt đầu transaction
 
-        } catch (IllegalArgumentException e) {
-            //  nghiệp vụ từ Service (Ví dụ: Số dư tài khoản không đủ, Đã sở hữu vé...) nheee
-            request.setAttribute("errorMsg", e.getMessage());
+                    routeDAO.setConnection(conn);
+                    ticketService.setConnection(conn);
+                    notificationService.setConnection(conn);
+                    monthlyPassService.setConnection(conn);
 
-            // Đẩy lại dữ liệu cũ sang JSP để giao diện không bị trống trơn thông tin tuyến khi tải lại
-            reloadFormContext(request, routeIdRaw, ticketType);
-            request.getRequestDispatcher("/view/customer/buy-ticket.jsp").forward(request, response);
+                    String notiTitle = "";
+                    String notiContent = "";
+
+                    switch (ticketType) {
+                        case "luot":
+                            ticketService.buySingleTicket(user.getAccountID(), routeId, route.getTicketPrice(), ticketType);
+                            notiTitle = "Mua vé lượt thành công";
+                            notiContent = "Bạn đã thanh toán vé lượt tuyến số " + route.getRouteNumber() + " thành công.";
+                            break;
+
+                        case "thang":
+                            monthlyPassService.registerRoutePass(
+                                    user.getAccountID(),
+                                    routeId,
+                                    passTypeID,
+                                    imageProof
+                            );
+                            notiTitle = "Đăng ký vé tháng thành công";
+                            notiContent = "Bạn đã đăng ký vé tháng cho tuyến số "
+                                    + route.getRouteNumber()
+                                    + " thành công.";
+                            break;
+
+                        case "lien_chuyen":
+                            monthlyPassService.registerAllRoutePass(
+                                    user.getAccountID(),
+                                    passTypeID,
+                                    imageProof
+                            );
+                            notiTitle = "Đăng ký vé liên tuyến thành công";
+                            notiContent = "Bạn đã đăng ký thành công vé liên tuyến đi toàn mạng lưới.";
+                            break;
+                    }
+
+                    // Tạo thông báo cho người dùng
+                    notificationService.createNotification(
+                            user.getAccountID(),
+                            NotificationType.TICKET,
+                            notiTitle,
+                            notiContent
+                    );
+
+                    // Commit giao dịch
+                    conn.commit();
+
+                    session.setAttribute("successMsg", "Mua vé trực tuyến thành công! Vé đang chờ phê duyệt thanh toán.");
+                    response.sendRedirect(request.getContextPath() + "/customer/ticket");
+
+                } catch (Exception e) {
+                    if (conn != null) {
+                        try { conn.rollback(); } catch (java.sql.SQLException ex) { ex.printStackTrace(); }
+                    }
+                    request.setAttribute("errorMsg", "Lỗi lưu giao dịch: " + e.getMessage());
+                    reloadFormContext(request, routeDAO, routeIdRaw, ticketType);
+                    request.getRequestDispatcher("/view/customer/buy-ticket.jsp").forward(request, response);
+                } finally {
+                    if (conn != null) {
+                        try { conn.close(); } catch (java.sql.SQLException ex) { ex.printStackTrace(); }
+                    }
+                    routeDAO.close();
+                }
+
+            } else {
+                // ==========================================
+                // LUỒNG CHUYỂN HƯỚNG SANG QR: Chưa ghi vào Database
+                // ==========================================
+                routeDAO.close();
+                session.setAttribute("successMsg", "Đặt mua thành công! Vui lòng quét mã QR thanh toán để hoàn tất.");
+                response.sendRedirect(request.getContextPath() + "/customer/payment-qr"
+                        + "?type=" + ticketType
+                        + "&amount=" + price
+                        + "&route=" + (route != null ? route.getRouteNumber() : "ALL")
+                        + "&routeId=" + routeId
+                        + "&passTypeId=" + passTypeID
+                        + "&imageProof=" + java.net.URLEncoder.encode(imageProof, "UTF-8"));
+            }
 
         } catch (Exception e) {
-
             request.setAttribute("errorMsg", "Lỗi hệ thống: " + e.getMessage());
-
-            reloadFormContext(request, routeIdRaw, ticketType);
+            reloadFormContext(request, routeDAO, routeIdRaw, ticketType);
             request.getRequestDispatcher("/view/customer/buy-ticket.jsp").forward(request, response);
+            routeDAO.close();
         }
     }
 
-    private void reloadFormContext(HttpServletRequest request, String routeIdRaw, String ticketType) {
+    private void reloadFormContext(HttpServletRequest request, RouteDAO routeDAO, String routeIdRaw, String ticketType) {
         try {
             int routeId = Integer.parseInt(routeIdRaw);
             request.setAttribute("route", routeDAO.getRouteById(routeId));
@@ -239,5 +296,4 @@ public class BuyTicketServlet extends HttpServlet {
         } catch (Exception ignored) {
         }
     }
-
 }

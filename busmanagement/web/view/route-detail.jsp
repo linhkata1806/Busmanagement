@@ -215,7 +215,6 @@ Author     : Administrator
                                         <li><a class="dropdown-item" href="${pageContext.request.contextPath}/customer/profile"><i class="fas fa-user me-2 text-primary"></i>Hồ sơ</a></li>
                                         <c:if test="${USER.roleName == 'CUSTOMER'}">
                                             <li><a class="dropdown-item" href="${pageContext.request.contextPath}/customer/ticket"><i class="fas fa-ticket-alt me-2 text-primary"></i>Vé của tôi</a></li>
-                                            <li><a class="dropdown-item" href="${pageContext.request.contextPath}/customer/favorite"><i class="fas fa-heart me-2 text-danger"></i>Yêu thích</a></li>
                                         </c:if>
                                         <li><hr class="dropdown-divider"></li>
                                         <li><a class="dropdown-item text-danger" href="${pageContext.request.contextPath}/logout"><i class="fas fa-sign-out-alt me-2"></i>Đăng xuất</a></li>
@@ -254,6 +253,11 @@ Author     : Administrator
                                 <p class="lead m-0 mt-1 opacity-75">
                                     <i class="fas fa-map-marked-alt me-1"></i> Chi tiết lộ trình hành trình xe buýt công cộng
                                 </p>
+                            </div>
+                            <div class="col-md-auto text-md-end text-center mt-3 mt-md-0">
+                                <a href="javascript:history.back()" class="btn btn-light rounded-pill px-4 fw-bold text-dark shadow-sm">
+                                    <i class="fas fa-arrow-left me-2"></i>Quay lại
+                                </a>
                             </div>
                         </div>
                     </div>

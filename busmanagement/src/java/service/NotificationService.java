@@ -9,6 +9,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import model.Notification;
+import model.NotificationType;
 
 /**
  *
@@ -28,7 +29,7 @@ public class NotificationService {
             Notification noti = new Notification();
 
             noti.setAccountID(accountID);
-            noti.setNotificationType(type);
+            noti.setNotificationType(NotificationType.valueOf(type.toUpperCase()));
             noti.setTitle(notiTitle);
             noti.setContent(notiContent);
             noti.setIsRead(false);
@@ -36,13 +37,32 @@ public class NotificationService {
             noti.setCreatedAt(now);
 
             notificationDAO.insert(noti);
-            return  true;
+            return true;
         } catch (Exception e) {
             System.out.println("Lỗi tạo thông báo: " + e.getMessage());
             // 3. Nếu xảy ra lỗi, trả về false để Servlet báo lỗi ra màn hình
 
         }
         return false;
+    }
+
+    public void setConnection(java.sql.Connection conn) {
+        this.notificationDAO.setConnection(conn);
+    }
+
+    public void createNotification(int accountID, NotificationType type, String notiTitle, String notiContent) {
+        Notification noti = new Notification();
+
+        noti.setAccountID(accountID);
+        noti.setNotificationType(type);
+        noti.setTitle(notiTitle);
+        noti.setContent(notiContent);
+        noti.setIsRead(false);
+        LocalDateTime now = LocalDateTime.now();
+        noti.setCreatedAt(now);
+
+        notificationDAO.insert(noti);
+
     }
 
     // Lấy toàn bộ danh sách thông báo (Dùng cho giao diện Staff)

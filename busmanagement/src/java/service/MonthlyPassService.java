@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import model.MonthlyPassType;
 import model.Notification;
+import model.NotificationType;
 
 public class MonthlyPassService {
 
@@ -21,6 +22,10 @@ public class MonthlyPassService {
     public MonthlyPassService() {
         monthlyPassDAO = new MonthlyPassDAO();
         notificationDAO = new NotificationDAO();
+    }
+
+    public void setConnection(java.sql.Connection conn) {
+        this.monthlyPassDAO.setConnection(conn);
     }
 
     public void registerRoutePass(int accountID, int routeId, int passTypeID, String imageProof) {
@@ -67,7 +72,6 @@ public class MonthlyPassService {
 
         pass.setPrice(calculatePassPrice(null, passTypeID));
 
-
         pass.setStatus(PassStatus.PENDING);
         pass.setImageProof(imageProof);
 
@@ -79,7 +83,7 @@ public class MonthlyPassService {
         return "PASS-" + System.currentTimeMillis();
     }
 
-    private long calculatePassPrice(Integer routeId, int passTypeID) {
+    public long calculatePassPrice(Integer routeId, int passTypeID) {
         MonthlyPassTypeDAO monthlyPassType = new MonthlyPassTypeDAO();
         long basePrice = (routeId == null) ? 200000 : 100000;
 
@@ -155,17 +159,23 @@ public class MonthlyPassService {
     private void sendNotification(int accountID, String type, String title, String content) {
         Notification notif = new Notification();
         notif.setAccountID(accountID);
-        notif.setNotificationType(type);
+
+        // Dùng luôn tham số 'type' truyền vào, thêm toUpperCase() để tránh lỗi chữ hoa/thường
+        notif.setNotificationType(NotificationType.valueOf(type.toUpperCase()));
+
         notif.setTitle(title);
         notif.setContent(content);
         notif.setCreatedAt(java.time.LocalDateTime.now());
+
         notificationDAO.insert(notif);
     }
+
     // ham nay get va all trang tahi
     public List<MonthlyPassDTO> getAllPassesForStaff(String searchQuery) {
         List<MonthlyPassDTO> passList = monthlyPassDAO.getAllPasses();
         return filterPassesBySearchQuery(passList, searchQuery);
     }
+
     // ham nay get ve theo 1 trang thai nhat dinh
     public List<MonthlyPassDTO> getPassesByStatusForStaff(String status, String searchQuery) {
         List<MonthlyPassDTO> passList = monthlyPassDAO.getPassesByStatus(status);
@@ -175,18 +185,18 @@ public class MonthlyPassService {
 
     private List<MonthlyPassDTO> filterPassesBySearchQuery(List<MonthlyPassDTO> passList, String searchQuery) {
         //check search query k co j 
-        if(searchQuery==null|| searchQuery.isBlank()){
+        if (searchQuery == null || searchQuery.isBlank()) {
             return passList;// tra ve luon ca danh sach k phai loc
         }
-        
+
         String query = searchQuery.trim().toLowerCase();
         List<MonthlyPassDTO> filteredList = new ArrayList<>();
-        
-        for(MonthlyPassDTO dto : passList){
+
+        for (MonthlyPassDTO dto : passList) {
             //check xem ma ve hoac ten co khop voi tu khoa tim kiem k
-            boolean matchCode = dto.getPassCode()!=null&&dto.getPassCode().toLowerCase().contains(query);
+            boolean matchCode = dto.getPassCode() != null && dto.getPassCode().toLowerCase().contains(query);
             boolean matchName = dto.getFullName() != null && dto.getFullName().toLowerCase().contains(query);
-            if(matchCode||matchName){
+            if (matchCode || matchName) {
                 filteredList.add(dto);
             }
         }

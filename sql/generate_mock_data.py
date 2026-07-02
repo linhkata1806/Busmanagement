@@ -78,13 +78,40 @@ def parse_bus_data():
         stops_section_match = re.search(r'Chiều đi tuyến\s+' + re.escape(route_number) + r'.*?(?=\(B\)|Chiều về tuyến|$)', full_text, re.IGNORECASE)
         stops_text = stops_section_match.group(0) if stops_section_match else full_text
         
-        # Regex to find numbered stops
-        stop_matches = re.findall(r'\b(\d+)\s+([A-Za-z0-9_ÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚĂĐĨŨƠàáâãèéêìíòóôõùúăđĩũơƯĂÂĐÊÔƠƯưăâđêôơư\s\(\)\-\.,#&\/:\+–\'\"\’]+?)(?=\s+\d+\s+|$|\b[A-Za-z]\s+\([A-Za-z]\))', stops_text)
-        
+        # Phân tích cú pháp trạm dừng tuần tự để tránh chia nhỏ trạm dừng khi tên trạm chứa số
+        stop_matches = []
+        current_num = 1
+        pos = 0
+        while True:
+            pattern = r'\b' + str(current_num) + r'\s+'
+            match = re.search(pattern, stops_text[pos:])
+            if not match:
+                break
+            
+            stop_start = pos + match.end()
+            next_pattern = r'\b' + str(current_num + 1) + r'\s+'
+            next_match = re.search(next_pattern, stops_text[stop_start:])
+            
+            if next_match:
+                stop_end = stop_start + next_match.start()
+                stop_name = stops_text[stop_start:stop_end]
+                pos = stop_start + next_match.start()
+            else:
+                end_marker = re.search(r'\b[A-Za-z]\s+\([A-Za-z]\)', stops_text[stop_start:])
+                if end_marker:
+                    stop_end = stop_start + end_marker.start()
+                else:
+                    stop_end = len(stops_text)
+                stop_name = stops_text[stop_start:stop_end]
+                stop_matches.append((current_num, stop_name))
+                break
+            
+            stop_matches.append((current_num, stop_name))
+            current_num += 1
+            
         order = 1
-        for match in stop_matches:
-            stop_num = int(match[0])
-            stop_name = clean_text(match[1])
+        for stop_num, raw_stop_name in stop_matches:
+            stop_name = clean_text(raw_stop_name)
             
             # Basic validation of stop name
             if len(stop_name) < 3 or any(kw in stop_name.lower() for kw in ["chiều đi", "chiều về", "lộ trình", "giá vé", "đơn vị"]):
@@ -326,11 +353,14 @@ def generate_sql():
     sql_lines.append(",\n".join(loc_values) + ";")
     sql_lines.append("GO\n")
     
-    output_path = r"d:\Java_BusManagement\BusManagement\sql\InsertMockData.sql"
-    with open(output_path, 'w', encoding='utf-8') as f:
-        f.write("\n".join(sql_lines))
-        
-    print(f"Thành công! Đã ghi file mock data SQL vào {output_path}")
+    output_paths = [
+        r"d:\Java_BusManagement\BusManagement\sql\InsertMockData.sql",
+        r"d:\Java_BusManagement\BusManagement\busmanagement\sql\InsertMockData.sql"
+    ]
+    for path in output_paths:
+        with open(path, 'w', encoding='utf-8') as f:
+            f.write("\n".join(sql_lines))
+        print(f"Thành công! Đã ghi file mock data SQL vào {path}")
 
 if __name__ == '__main__':
     generate_sql()

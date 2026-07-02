@@ -55,6 +55,7 @@ CREATE TABLE Stops (
 );
 
 CREATE TABLE Routes (
+<<<<<<< HEAD
     RouteID           INT           PRIMARY KEY IDENTITY(1,1),
     RouteNumber       VARCHAR(10)   NOT NULL UNIQUE,
     RouteName         NVARCHAR(200) NOT NULL,
@@ -66,6 +67,18 @@ CREATE TABLE Routes (
     TotalDistance     DECIMAL(6,2),
     EstimatedDuration INT, 
     IsActive          BIT           NOT NULL DEFAULT 1,
+=======
+    RouteID       INT           PRIMARY KEY IDENTITY(1,1),
+    RouteNumber   VARCHAR(10)   NOT NULL UNIQUE,
+    RouteName     NVARCHAR(200) NOT NULL,
+    StartPoint    NVARCHAR(150) NOT NULL,
+    EndPoint      NVARCHAR(150) NOT NULL,
+    OperatingHours NVARCHAR(150) NOT NULL,
+    Frequency     NVARCHAR(150),
+    TicketPrice   DECIMAL(10,0) NOT NULL,
+    TotalDistance DECIMAL(6,2),
+    IsActive      BIT           NOT NULL DEFAULT 1,
+>>>>>>> 36454c5b7303d5f9f4610da0cfeff3d2edfb1d24
     CONSTRAINT CHK_Routes_Price CHECK (TicketPrice >= 0)
 );
 
@@ -135,7 +148,7 @@ CREATE TABLE Tickets (
     TicketCode   VARCHAR(50)   NOT NULL UNIQUE,
     Price        DECIMAL(10,0) NOT NULL,
     SaleChannel  VARCHAR(50)   NOT NULL DEFAULT 'ONLINE',
-    Status       VARCHAR(50)   NOT NULL DEFAULT 'UNUSED',
+    Status       VARCHAR(50)   NOT NULL DEFAULT 'PENDING',
     PurchasedAt  DATETIME      NOT NULL DEFAULT GETDATE(),
     UsedAt       DATETIME,
     CONSTRAINT FK_Tickets_Account FOREIGN KEY (AccountID) REFERENCES Accounts(AccountID),
@@ -143,7 +156,11 @@ CREATE TABLE Tickets (
     CONSTRAINT FK_Tickets_Route   FOREIGN KEY (RouteID)   REFERENCES Routes(RouteID),
     CONSTRAINT CHK_Tickets_Price  CHECK (Price >= 0),
     CONSTRAINT CHK_Tickets_SaleChannel CHECK (SaleChannel IN ('ONLINE', 'COUNTER', 'ON_BUS')),
+<<<<<<< HEAD
     CONSTRAINT CHK_Tickets_Status CHECK (Status IN ('UNUSED', 'CHECKED_IN', 'COMPLETED', 'EXPIRED', 'CANCELLED')) 
+=======
+    CONSTRAINT CHK_Tickets_Status CHECK (Status IN ('PENDING', 'UNUSED', 'USED', 'EXPIRED'))
+>>>>>>> 36454c5b7303d5f9f4610da0cfeff3d2edfb1d24
 );
 
 CREATE TABLE MonthlyPassTypes (

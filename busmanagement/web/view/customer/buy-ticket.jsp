@@ -121,6 +121,12 @@
     <div class="container my-5">
         <div class="ticket-container">
             
+            <div class="mb-3 text-start">
+                <a href="javascript:history.back()" class="btn btn-light rounded-pill px-4 fw-bold text-dark shadow-sm">
+                    <i class="fas fa-arrow-left me-2"></i>Quay lại
+                </a>
+            </div>
+            
             <c:if test="${not empty errorMsg}">
                 <div class="alert alert-danger alert-dismissible fade show shadow-sm mb-4" role="alert">
                     <i class="fas fa-exclamation-triangle me-2"></i> ${errorMsg}

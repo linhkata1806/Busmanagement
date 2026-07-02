@@ -14,7 +14,7 @@ public class Notification {
 
     private int notificationID;
     private int accountID;
-    private String notificationType;
+    private NotificationType notificationType;
     private String title;
     private String content;
     private boolean isRead;
@@ -23,7 +23,7 @@ public class Notification {
     public Notification() {
     }
 
-    public Notification(int notificationID, int accountID, String notificationType, String title, String content, boolean isRead, LocalDateTime createdAt) {
+    public Notification(int notificationID, int accountID, NotificationType notificationType, String title, String content, boolean isRead, LocalDateTime createdAt) {
         this.notificationID = notificationID;
         this.accountID = accountID;
         this.notificationType = notificationType;
@@ -49,11 +49,11 @@ public class Notification {
         this.accountID = accountID;
     }
 
-    public String getNotificationType() {
+    public NotificationType getNotificationType() {
         return notificationType;
     }
 
-    public void setNotificationType(String notificationType) {
+    public void setNotificationType(NotificationType notificationType) {
         this.notificationType = notificationType;
     }
 

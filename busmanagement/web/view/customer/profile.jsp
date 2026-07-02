@@ -76,6 +76,12 @@
             border: 1px solid #e8eaed;
             display: flex;
             align-items: center;
+            transition: all 0.2s ease;
+        }
+        .mini-stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.08) !important;
+            border-color: #1a73e8;
         }
         .mini-stat-icon {
             width: 40px;
@@ -101,6 +107,15 @@
             padding: 14px 20px;
             border-bottom: 1px solid #f1f3f4;
         }
+        /* ===== FOOTER ===== */
+        footer {
+            background: #1a1a2e;
+            color: rgba(255,255,255,0.7);
+            padding: 30px 0;
+            margin-top: 60px;
+        }
+        footer a { color: rgba(255,255,255,0.7); text-decoration: none; }
+        footer a:hover { color: white; }
     </style>
 </head>
 <body>
@@ -125,6 +140,8 @@
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end shadow">
                             <li><a class="dropdown-item active" href="${pageContext.request.contextPath}/customer/profile"><i class="fas fa-user me-2 text-primary"></i>Hồ sơ</a></li>
+                            <li><a class="dropdown-item" href="${pageContext.request.contextPath}/customer/ticket"><i class="fas fa-wallet me-2 text-primary"></i>Vé của tôi</a></li>
+                            <li><hr class="dropdown-divider"></li>
                             <li><a class="dropdown-item" href="${pageContext.request.contextPath}/logout"><i class="fas fa-sign-out-alt me-2 text-danger"></i>Đăng xuất</a></li>
                         </ul>
                     </li>
@@ -162,15 +179,7 @@
             
             <div class="col-lg-4">
                 
-                <div class="card custom-card p-3">
-                    <h5 class="fw-bold mb-3 text-secondary" style="font-size: 0.95rem;"><i class="fas fa-link me-2"></i>LỐI TẮT NHANH</h5>
-                    <div class="d-grid gap-2">
-                        <a href="${pageContext.request.contextPath}/home" class="btn btn-light text-start border-2"><i class="fas fa-home me-2 text-primary"></i> Trang chủ hệ thống</a>
-                        <a href="${pageContext.request.contextPath}/customer/ticket" class="btn btn-light text-start"><i class="fas fa-ticket-alt me-2 text-success"></i> Vé của tôi</a>
-                        <a href="${pageContext.request.contextPath}/customer/favorite" class="btn btn-light text-start"><i class="fas fa-heart me-2 text-danger"></i> Tuyến yêu thích</a>
-                        <a href="${pageContext.request.contextPath}/customer/notification" class="btn btn-light text-start"><i class="fas fa-bell me-2 text-warning"></i> Thông báo hệ thống</a>
-                    </div>
-                </div>
+
 
                 <div class="card custom-card p-3">
                     <h5 class="fw-bold mb-3 text-secondary" style="font-size: 0.95rem;"><i class="fas fa-id-card-alt me-2"></i>VÉ THÁNG ĐANG SỬ DỤNG</h5>
@@ -210,40 +219,48 @@
                 
                 <div class="row g-3 mb-4">
                     <div class="col-sm-6 col-md-3">
-                        <div class="mini-stat-card shadow-sm">
-                            <div class="mini-stat-icon" style="background: #e8f0fe; color: #1a73e8;"><i class="fas fa-ticket-alt"></i></div>
-                            <div>
-                                <div class="fw-bold text-dark h5 mb-0">${totalTickets}</div>
-                                <span class="text-muted small">Vé hiện có</span>
+                        <a href="${pageContext.request.contextPath}/customer/ticket?tab=ticket" class="text-decoration-none">
+                            <div class="mini-stat-card shadow-sm">
+                                <div class="mini-stat-icon" style="background: #e8f0fe; color: #1a73e8;"><i class="fas fa-ticket-alt"></i></div>
+                                <div>
+                                    <div class="fw-bold text-dark h5 mb-0">${totalTickets}</div>
+                                    <span class="text-muted small">Vé hiện có</span>
+                                </div>
                             </div>
-                        </div>
+                        </a>
                     </div>
                     <div class="col-sm-6 col-md-3">
-                        <div class="mini-stat-card shadow-sm">
-                            <div class="mini-stat-icon" style="background: #e6f4ea; color: #1e8e3e;"><i class="fas fa-id-card"></i></div>
-                            <div>
-                                <div class="fw-bold text-dark h5 mb-0">${totalPasses}</div>
-                                <span class="text-muted small">Vé tháng</span>
+                        <a href="${pageContext.request.contextPath}/customer/ticket?tab=pass" class="text-decoration-none">
+                            <div class="mini-stat-card shadow-sm">
+                                <div class="mini-stat-icon" style="background: #e6f4ea; color: #1e8e3e;"><i class="fas fa-id-card"></i></div>
+                                <div>
+                                    <div class="fw-bold text-dark h5 mb-0">${totalPasses}</div>
+                                    <span class="text-muted small">Vé tháng</span>
+                                </div>
                             </div>
-                        </div>
+                        </a>
                     </div>
                     <div class="col-sm-6 col-md-3">
-                        <div class="mini-stat-card shadow-sm">
-                            <div class="mini-stat-icon" style="background: #fef7e0; color: #f9ab00;"><i class="fas fa-heart"></i></div>
-                            <div>
-                                <div class="fw-bold text-dark h5 mb-0">${totalFavorites}</div>
-                                <span class="text-muted small">Yêu thích</span>
+                        <a href="${pageContext.request.contextPath}/customer/favorite" class="text-decoration-none">
+                            <div class="mini-stat-card shadow-sm">
+                                <div class="mini-stat-icon" style="background: #fef7e0; color: #f9ab00;"><i class="fas fa-heart"></i></div>
+                                <div>
+                                    <div class="fw-bold text-dark h5 mb-0">${totalFavorites}</div>
+                                    <span class="text-muted small">Yêu thích</span>
+                                </div>
                             </div>
-                        </div>
+                        </a>
                     </div>
                     <div class="col-sm-6 col-md-3">
-                        <div class="mini-stat-card shadow-sm">
-                            <div class="mini-stat-icon" style="background: #fce8e6; color: #d93025;"><i class="fas fa-bell"></i></div>
-                            <div>
-                                <div class="fw-bold text-dark h5 mb-0">${unreadNotifications}</div>
-                                <span class="text-muted small">Thông báo mới</span>
+                        <a href="${pageContext.request.contextPath}/customer/notification" class="text-decoration-none">
+                            <div class="mini-stat-card shadow-sm">
+                                <div class="mini-stat-icon" style="background: #fce8e6; color: #d93025;"><i class="fas fa-bell"></i></div>
+                                <div>
+                                    <div class="fw-bold text-dark h5 mb-0">${unreadNotifications}</div>
+                                    <span class="text-muted small">Thông báo mới</span>
+                                </div>
                             </div>
-                        </div>
+                        </a>
                     </div>
                 </div>
 
@@ -337,6 +354,35 @@
             </div>
         </div>
     </div>
+
+<!-- ===== FOOTER ===== -->
+<footer class="mt-5">
+    <div class="container">
+        <div class="row text-start">
+            <div class="col-md-4 mb-3">
+                <h6 class="text-white fw-bold">🚌 Bus Hà Nội</h6>
+                <small class="text-white-50">Hệ thống quản lý xe bus công cộng thành phố Hà Nội.</small>
+            </div>
+            <div class="col-md-4 mb-3">
+                <h6 class="text-white fw-bold">Liên kết</h6>
+                <ul class="list-unstyled small">
+                    <li><a href="${pageContext.request.contextPath}/home">Trang chủ</a></li>
+                    <li><a href="${pageContext.request.contextPath}/route-list">Danh sách tuyến</a></li>
+                    <li><a href="${pageContext.request.contextPath}/login">Đăng nhập</a></li>
+                </ul>
+            </div>
+            <div class="col-md-4 mb-3">
+                <h6 class="text-white fw-bold">Liên hệ</h6>
+                <small class="text-white-50">
+                    <i class="fas fa-phone me-1"></i>1900 xxxx<br>
+                    <i class="fas fa-envelope me-1"></i>support@bushanoi.vn
+                </small>
+            </div>
+        </div>
+        <hr style="border-color: rgba(255,255,255,0.1)">
+        <div class="text-center small text-white-50">© 2024 Bus Hà Nội. All rights reserved.</div>
+    </div>
+</footer>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
 </body>

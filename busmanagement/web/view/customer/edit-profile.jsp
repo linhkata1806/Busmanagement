@@ -131,7 +131,7 @@
                         </div>
                     </c:if>
 
-                    <form action="${pageContext.request.contextPath}/customer/editProfile" method="POST">
+                    <form action="${pageContext.request.contextPath}/customer/editProfile" method="POST" enctype="multipart/form-data">
                         
                         <div class="row">
                             <div class="col-md-6 mb-3">
@@ -155,8 +155,21 @@
                             </div>
 
                             <div class="col-12 mb-4">
-                                <label for="avatar" class="form-label">Đường dẫn ảnh đại diện (Avatar URL)</label>
-                                <input type="text" class="form-control" id="avatar" name="avatar" value="${account.avatar}" placeholder="https://example.com/your-avatar.jpg">
+                                <label for="avatar" class="form-label">Tải lên ảnh đại diện mới (Avatar File)</label>
+                                <input type="file" class="form-control" id="avatar" name="avatar" accept="image/*">
+                                <c:if test="${not empty account.avatar}">
+                                    <div class="mt-2 small text-muted">
+                                        Ảnh hiện tại: 
+                                        <c:choose>
+                                            <c:when test="${account.avatar.startsWith('http')}">
+                                                <a href="${account.avatar}" target="_blank">${account.avatar}</a>
+                                            </c:when>
+                                            <c:otherwise>
+                                                <a href="${pageContext.request.contextPath}/${account.avatar}" target="_blank">${account.avatar}</a>
+                                            </c:otherwise>
+                                        </c:choose>
+                                    </div>
+                                </c:if>
                             </div>
                         </div>
 

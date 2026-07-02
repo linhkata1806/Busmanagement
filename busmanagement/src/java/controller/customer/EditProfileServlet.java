@@ -12,6 +12,9 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import jakarta.servlet.annotation.MultipartConfig;
+import jakarta.servlet.http.Part;
+import java.io.File;
 import model.Account;
 import util.Validator;
 
@@ -19,6 +22,11 @@ import util.Validator;
  *
  * @author Administrator
  */
+@MultipartConfig(
+    fileSizeThreshold = 1024 * 1024 * 2,  // 2MB
+    maxFileSize = 1024 * 1024 * 10,       // 10MB
+    maxRequestSize = 1024 * 1024 * 50     // 50MB
+)
 public class EditProfileServlet extends HttpServlet {
 
     private AccountDAO accountDAO;
@@ -72,10 +80,56 @@ public class EditProfileServlet extends HttpServlet {
         Account user = (Account) session.getAttribute("USER");
 
         // 1. Lấy dữ liệu từ form
-        String fullName = request.getParameter("fullName").trim();
-        String email = request.getParameter("email").trim();
-        String phone = request.getParameter("phone").trim();
-        String avatar = request.getParameter("avatar").trim(); // Tạm dùng URL string theo yêu cầu
+        String fullNameRaw = request.getParameter("fullName");
+        String emailRaw = request.getParameter("email");
+        String phoneRaw = request.getParameter("phone");
+
+        // Kiểm tra nếu Tomcat chưa nhận diện MultipartConfig
+        if (fullNameRaw == null || emailRaw == null || phoneRaw == null) {
+            request.setAttribute("errorMsg", "Hệ thống chưa nhận dạng được cấu hình tải file. Vui lòng Clean & Build dự án và Khởi động lại Server (Tomcat) trên NetBeans!");
+            doGet(request, response);
+            return;
+        }
+
+        String fullName = fullNameRaw.trim();
+        String email = emailRaw.trim();
+        String phone = phoneRaw.trim();
+        
+        // Mặc định giữ nguyên ảnh đại diện cũ
+        String avatar = user.getAvatar();
+
+        // Xử lý tệp tải lên
+        try {
+            Part filePart = request.getPart("avatar");
+            if (filePart != null && filePart.getSize() > 0) {
+                // Thư mục lưu file: webapp/uploads/avatars/
+                String uploadPath = request.getServletContext().getRealPath("/") + "uploads" + File.separator + "avatars";
+                File uploadDir = new File(uploadPath);
+                if (!uploadDir.exists()) {
+                    uploadDir.mkdirs();
+                }
+
+                // Trích xuất định dạng file (.png, .jpg, ...)
+                String submittedFileName = filePart.getSubmittedFileName();
+                String fileExtension = "";
+                int dotIndex = submittedFileName.lastIndexOf('.');
+                if (dotIndex >= 0) {
+                    fileExtension = submittedFileName.substring(dotIndex);
+                }
+
+                // Đổi tên tệp để tránh trùng lặp: avatar_ID.ext
+                String newFileName = "avatar_" + user.getAccountID() + fileExtension;
+                String fileSavePath = uploadPath + File.separator + newFileName;
+
+                // Ghi file xuống server
+                filePart.write(fileSavePath);
+
+                // Đường dẫn tương đối lưu vào DB
+                avatar = "uploads/avatars/" + newFileName;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         // 2. Validate dữ liệu đầu vào (Sử dụng Validator của bạn)
         if (Validator.isBlank(fullName)) {
