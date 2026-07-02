@@ -51,9 +51,9 @@ public class RouteService {
         return routeDAO.getRouteById(routeID);
     }
 
-    // 3. CẬP NHẬT TUYẾN (Bổ sung startPoint, endPoint)
+    // 3. CẬP NHẬT TUYẾN (Bổ sung startPoint, endPoint, estimatedDuration)
     public void updateRoute(int routeID, String routeName, String startPoint, String endPoint,
-            String operatingHours, String frequency, long ticketPrice, double distance, boolean isActive) throws Exception {
+            String operatingHours, String frequency, long ticketPrice, double distance, int estimatedDuration, boolean isActive) throws Exception {
 
         if (!routeDAO.existsById(routeID)) {
             throw new IllegalArgumentException("Tuyến xe không tồn tại trên hệ thống.");
@@ -69,7 +69,10 @@ public class RouteService {
         if (startPoint.trim().equalsIgnoreCase(endPoint.trim())) {
             throw new IllegalArgumentException("Vi phạm hành trình: Điểm đầu và Điểm cuối không được trùng nhau.");
         }
-        // ... (Giữ nguyên các đoạn validate Giá vé, Giờ, Khoảng cách ở dưới)
+        
+        if (estimatedDuration <= 0) {
+            throw new IllegalArgumentException("Thời gian dự kiến phải > 0 phút.");
+        }
 
         Route route = new Route();
         route.setRouteID(routeID);
@@ -81,6 +84,7 @@ public class RouteService {
         route.setTicketPrice(ticketPrice);
         route.setTotalDistance(distance);
         route.setIsActive(isActive);
+        route.setEstimatedDuration(estimatedDuration);
 
         if (!routeDAO.update(route)) {
             throw new Exception("Lỗi Database: Không thể cập nhật thông tin tuyến xe.");

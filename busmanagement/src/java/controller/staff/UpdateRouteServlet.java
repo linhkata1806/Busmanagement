@@ -56,6 +56,7 @@ public class UpdateRouteServlet extends HttpServlet {
         String frequency = request.getParameter("frequency");
         String ticketPriceStr = request.getParameter("ticketPrice");
         String distanceStr = request.getParameter("distance");
+        String estimatedDurationStr = request.getParameter("estimatedDuration"); // BỔ SUNG
         String statusStr = request.getParameter("status"); 
 
         Route route = new Route();
@@ -68,6 +69,7 @@ public class UpdateRouteServlet extends HttpServlet {
             route.setFrequence(frequency);
             if(ticketPriceStr != null && !ticketPriceStr.isEmpty()) route.setTicketPrice(Long.parseLong(ticketPriceStr.trim()));
             if(distanceStr != null && !distanceStr.isEmpty()) route.setTotalDistance(Double.parseDouble(distanceStr.trim()));
+            if(estimatedDurationStr != null && !estimatedDurationStr.isEmpty()) route.setEstimatedDuration(Integer.parseInt(estimatedDurationStr.trim())); // BỔ SUNG
             route.setIsActive("ACTIVE".equals(statusStr));
             
             // Mã tuyến vẫn khóa read-only
@@ -78,10 +80,11 @@ public class UpdateRouteServlet extends HttpServlet {
             int routeID = Integer.parseInt(routeIDStr);
             long ticketPrice = Long.parseLong(ticketPriceStr.trim());
             double distance = Double.parseDouble(distanceStr.trim());
+            int estimatedDuration = Integer.parseInt(estimatedDurationStr.trim()); // BỔ SUNG
             boolean isActive = "ACTIVE".equals(statusStr);
 
-            // Truyền đẩy đủ startPoint và endPoint xuống Service
-            routeService.updateRoute(routeID, routeName, startPoint, endPoint, operatingHours, frequency, ticketPrice, distance, isActive);
+            // Truyền đầy đủ startPoint, endPoint và estimatedDuration xuống Service
+            routeService.updateRoute(routeID, routeName, startPoint, endPoint, operatingHours, frequency, ticketPrice, distance, estimatedDuration, isActive);
 
             request.getSession().setAttribute("msgSuccess", "Đã cập nhật thông tin tuyến xe thành công!");
             response.sendRedirect(request.getContextPath() + "/staff/route");

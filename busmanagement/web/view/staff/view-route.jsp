@@ -25,6 +25,7 @@
 <c:set var="valFreq" value="${not empty r_frequency ? r_frequency : route.frequence}" />
 <c:set var="valPrice" value="${not empty r_ticketPrice ? r_ticketPrice : route.ticketPrice}" />
 <c:set var="valDist" value="${not empty r_distance ? r_distance : route.totalDistance}" />
+<c:set var="valDuration" value="${not empty r_estimatedDuration ? r_estimatedDuration : route.estimatedDuration}" />
 <c:choose>
     <c:when test="${not empty r_status}"><c:set var="valStatus" value="${r_status}" /></c:when>
     <c:otherwise><c:set var="valStatus" value="${route.isActive ? 'ACTIVE' : 'INACTIVE'}" /></c:otherwise>
@@ -101,13 +102,17 @@
                                 <label class="form-label small fw-bold text-secondary">Tần suất giãn cách</label>
                                 <input type="text" name="frequency" class="form-control py-2" value="${valFreq}">
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-md-4">
                                 <label class="form-label small fw-bold text-secondary">Giá vé lượt (VNĐ)</label>
                                 <input type="number" name="ticketPrice" class="form-control py-2" value="${valPrice}" required>
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-md-4">
                                 <label class="form-label small fw-bold text-secondary">Tổng chiều dài (km)</label>
                                 <input type="number" step="0.1" name="distance" class="form-control py-2" value="${valDist}" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label small fw-bold text-secondary">Thời gian dự kiến (phút)</label>
+                                <input type="number" name="estimatedDuration" class="form-control py-2" value="${valDuration}" min="1" required>
                             </div>
                         </form>
 

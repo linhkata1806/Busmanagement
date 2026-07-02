@@ -20,6 +20,7 @@ public class RouteDAO extends DBContext {
         route.setTicketPrice(rs.getLong("TicketPrice"));
         route.setTotalDistance(rs.getDouble("TotalDistance"));
         route.setIsActive(rs.getBoolean("IsActive"));
+        route.setEstimatedDuration(rs.getInt("EstimatedDuration"));
         return route;
     }
 
@@ -227,7 +228,7 @@ public class RouteDAO extends DBContext {
     }
 
     public boolean insert(Route route) {
-        String sql = "INSERT INTO Routes (RouteNumber, RouteName, StartPoint, EndPoint, OperatingHours, Frequency, TicketPrice, TotalDistance, IsActive) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO Routes (RouteNumber, RouteName, StartPoint, EndPoint, OperatingHours, Frequency, TicketPrice, TotalDistance, IsActive, EstimatedDuration) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, route.getRouteNumber());
             ps.setString(2, route.getRouteName());
@@ -238,6 +239,7 @@ public class RouteDAO extends DBContext {
             ps.setLong(7, route.getTicketPrice());
             ps.setDouble(8, route.getTotalDistance());
             ps.setInt(9, route.isIsActive() ? 1 : 0);
+            ps.setInt(10, route.getEstimatedDuration());
             return ps.executeUpdate() > 0;
         } catch (Exception e) {
             System.out.println("Lỗi insert Route: " + e.getMessage());
@@ -246,7 +248,7 @@ public class RouteDAO extends DBContext {
     }
 
     public boolean update(Route route) {
-        String sql = "UPDATE Routes SET RouteName=?, StartPoint=?, EndPoint=?, OperatingHours=?, Frequency=?, TicketPrice=?, TotalDistance=?, IsActive=? WHERE RouteID=?";
+        String sql = "UPDATE Routes SET RouteName=?, StartPoint=?, EndPoint=?, OperatingHours=?, Frequency=?, TicketPrice=?, TotalDistance=?, IsActive=?, EstimatedDuration=? WHERE RouteID=?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, route.getRouteName());
             ps.setString(2, route.getStartPoint()); // BỔ SUNG
@@ -256,7 +258,8 @@ public class RouteDAO extends DBContext {
             ps.setLong(6, route.getTicketPrice());
             ps.setDouble(7, route.getTotalDistance());
             ps.setInt(8, route.isIsActive() ? 1 : 0);
-            ps.setInt(9, route.getRouteID());
+            ps.setInt(9, route.getEstimatedDuration());
+            ps.setInt(10, route.getRouteID());
             return ps.executeUpdate() > 0;
         } catch (Exception e) {
             System.out.println("Lỗi update Route: " + e.getMessage());
