@@ -76,7 +76,7 @@ public class TicketDAO extends DBContext {
                 + "r.RouteNumber, r.RouteName "
                 + "FROM Tickets t "
                 + "JOIN Routes r ON t.RouteID = r.RouteID "
-                + "WHERE t.AccountID = ? AND t.Status != 'PENDING' ORDER BY t.PurchasedAt DESC";
+                + "WHERE t.AccountID = ? ORDER BY t.PurchasedAt DESC";
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, accountID);
@@ -125,7 +125,7 @@ public class TicketDAO extends DBContext {
                 + "JOIN Trips tr ON t.TripID = tr.TripID "
                 + "JOIN Routes r ON tr.RouteID = r.RouteID "
                 + "JOIN Buses b ON tr.BusID = b.BusID "
-                + "WHERE t.AccountID = ? AND t.Status = 'USED' "
+                + "WHERE t.AccountID = ? AND t.Status = 'COMPLETED' "
                 + "ORDER BY tr.TripDate DESC";
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
