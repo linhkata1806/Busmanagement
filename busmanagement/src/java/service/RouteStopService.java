@@ -46,7 +46,7 @@ public class RouteStopService {
     }
 
     // 3. THÊM STOP VÀO TUYẾN
-    public void addStopToRoute(int routeID, int stopID, int position) throws Exception {
+    public void addStopToRoute(int routeID, int stopID, int position, double distance) throws Exception {
 
         // Validate 1: Kiểm tra Tuyến xe (Route) có tồn tại không
         if (!routeDAO.existsById(routeID)) {
@@ -70,8 +70,13 @@ public class RouteStopService {
             throw new IllegalArgumentException("Vị trí chèn điểm dừng không hợp lệ (Phải từ 1 đến " + (totalStops + 1) + ").");
         }
 
+        // Validate 5: Khoảng cách hợp lệ (BỔ SUNG)
+        if (distance < 0) {
+            throw new IllegalArgumentException("Khoảng cách từ điểm đầu phải >= 0 km.");
+        }
+
         // Gọi DAO lưu xuống DB
-        routeStopDAO.addStopToRoute(routeID, stopID, position);
+        routeStopDAO.addStopToRoute(routeID, stopID, position, distance);
     }
 
     // 4. XÓA STOP KHỎI TUYẾN

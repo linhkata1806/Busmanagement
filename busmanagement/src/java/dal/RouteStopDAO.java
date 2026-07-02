@@ -15,7 +15,7 @@ public class RouteStopDAO extends DBContext {
     // 1. LẤY DANH SÁCH STOP THEO TUYẾN (Bổ sung Lat, Lng cho Map)
     public List<RouteStopDTO> getStopsByRoute(int routeID) {
         List<RouteStopDTO> list = new ArrayList<>();
-        String sql = "SELECT rs.RouteStopID, rs.RouteID, rs.StopID, rs.StopOrder, " +
+        String sql = "SELECT rs.RouteStopID, rs.RouteID, rs.StopID, rs.StopOrder, rs.DistanceFromStart, " +
                      "s.StopName, s.Address, s.Latitude, s.Longitude, s.IsActive " +
                      "FROM Route_Stop rs JOIN Stops s ON rs.StopID = s.StopID " +
                      "WHERE rs.RouteID = ? ORDER BY rs.StopOrder ASC";
@@ -28,14 +28,13 @@ public class RouteStopDAO extends DBContext {
                     dto.setRouteID(rs.getInt("RouteID"));
                     dto.setStopID(rs.getInt("StopID"));
                     dto.setStopOrder(rs.getInt("StopOrder"));
+                    dto.setDistanceFromStart(rs.getDouble("DistanceFromStart")); // BỔ SUNG
                     
                     // Dữ liệu JOIN từ bảng Stops
                     dto.setStopName(rs.getString("StopName"));
                     dto.setAddress(rs.getString("Address"));
                     dto.setLatitude(rs.getDouble("Latitude"));
                     dto.setLongitude(rs.getDouble("Longitude"));
-                    
-                    // Gợi ý: Bạn có thể thêm trường isActive vào RouteStopDTO nếu muốn hiển thị trạm bị mờ trên giao diện
                     
                     list.add(dto);
                 }
@@ -60,6 +59,7 @@ public class RouteStopDAO extends DBContext {
                     dto.setRouteID(rs.getInt("RouteID"));
                     dto.setStopID(rs.getInt("StopID"));
                     dto.setStopOrder(rs.getInt("StopOrder"));
+                    dto.setDistanceFromStart(rs.getDouble("DistanceFromStart")); // BỔ SUNG
                     
                     // Lấy thêm StopName
                     dto.setStopName(rs.getString("StopName"));
@@ -122,9 +122,9 @@ public class RouteStopDAO extends DBContext {
     // =========================================================================
 
     // 6. THÊM STOP VÀO TUYẾN
-    public void addStopToRoute(int routeID, int stopID, int position) throws Exception {
+    public void addStopToRoute(int routeID, int stopID, int position, double distance) throws Exception {
         String sqlShift = "UPDATE Route_Stop SET StopOrder = StopOrder + 1 WHERE RouteID = ? AND StopOrder >= ?";
-        String sqlInsert = "INSERT INTO Route_Stop (RouteID, StopID, StopOrder) VALUES (?, ?, ?)";
+        String sqlInsert = "INSERT INTO Route_Stop (RouteID, StopID, StopOrder, DistanceFromStart) VALUES (?, ?, ?, ?)";
         
         try {
             connection.setAutoCommit(false); // BEGIN TRAN
@@ -141,6 +141,7 @@ public class RouteStopDAO extends DBContext {
                 psInsert.setInt(1, routeID);
                 psInsert.setInt(2, stopID);
                 psInsert.setInt(3, position);
+                psInsert.setDouble(4, distance); // BỔ SUNG: Khoảng cách từ điểm đầu
                 psInsert.executeUpdate();
             }
             

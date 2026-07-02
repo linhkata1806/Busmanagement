@@ -10,6 +10,7 @@ public class RouteStopDTO {
     private int routeID;
     private int stopID;
     private int stopOrder;
+    private double distanceFromStart; // BỔ SUNG: Khoảng cách từ điểm đầu (km)
     
     // Các trường lấy thêm từ bảng Stops (Qua phép JOIN)
     private String stopName;
@@ -86,6 +87,14 @@ public class RouteStopDTO {
 
     public void setLongitude(double longitude) {
         this.longitude = longitude;
+    }
+
+    public double getDistanceFromStart() {
+        return distanceFromStart;
+    }
+
+    public void setDistanceFromStart(double distanceFromStart) {
+        this.distanceFromStart = distanceFromStart;
     }
 
     public boolean isIsActive() {
