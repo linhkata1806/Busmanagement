@@ -36,9 +36,9 @@ public class StopDAO extends DBContext {
         stop.setStopID(rs.getInt("StopID"));
         stop.setStopName(rs.getString("StopName"));
         stop.setAddress(rs.getString("Address"));
-        // Nếu có tọa độ GPS (Kinh độ/Vĩ độ)
-        // stop.setLatitude(rs.getDouble("Latitude"));
-        // stop.setLongitude(rs.getDouble("Longitude"));
+
+        stop.setLatitude(rs.getDouble("Latitude"));
+        stop.setLongitude(rs.getDouble("Longitude"));
         stop.setIsActive(rs.getBoolean("IsActive"));
 
         return stop;
@@ -84,5 +84,146 @@ public class StopDAO extends DBContext {
         }
         return null;
     }
+// 1. TÌM KIẾM VÀ LỌC ĐIỂM DỪNG (Xử lý chuỗi ALL/ACTIVE/INACTIVE sang BIT)
 
+    public List<Stop> searchAndFilter(String keyword, String status) {
+        List<Stop> list = new ArrayList<>();
+        StringBuilder sql = new StringBuilder("SELECT * FROM Stops WHERE (StopName LIKE ? OR Address LIKE ?) ");
+
+        // Chuyển đổi String "ACTIVE"/"INACTIVE" thành điều kiện lọc BIT
+        if ("ACTIVE".equalsIgnoreCase(status)) {
+            sql.append("AND IsActive = 1 ");
+        } else if ("INACTIVE".equalsIgnoreCase(status)) {
+            sql.append("AND IsActive = 0 ");
+        }
+        sql.append("ORDER BY StopName ASC");
+
+        try (PreparedStatement ps = connection.prepareStatement(sql.toString())) {
+            String searchPattern = "%" + keyword + "%";
+            ps.setString(1, searchPattern);
+            ps.setString(2, searchPattern);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    list.add(mapStop(rs));
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("Lỗi searchAndFilter Stop: " + e.getMessage());
+        }
+        return list;
+    }
+
+    // 2. KIỂM TRA TRÙNG TÊN ĐIỂM DỪNG
+    public boolean existsStopName(String stopName, Integer excludeStopID) {
+        String sql = "SELECT TOP 1 1 FROM Stops WHERE StopName = ?";
+        if (excludeStopID != null) {
+            sql += " AND StopID != ?";
+        }
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, stopName);
+            if (excludeStopID != null) {
+                ps.setInt(2, excludeStopID);
+            }
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next();
+            }
+        } catch (Exception e) {
+            System.out.println("Lỗi existsStopName: " + e.getMessage());
+        }
+        return false;
+    }
+
+    // 3. THÊM MỚI
+    public boolean insert(Stop stop) {
+        String sql = "INSERT INTO Stops (StopName, Address, Latitude, Longitude, IsActive) VALUES (?, ?, ?, ?, ?)";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, stop.getStopName());
+            ps.setString(2, stop.getAddress());
+            ps.setDouble(3, stop.getLatitude());
+            ps.setDouble(4, stop.getLongitude());
+            ps.setBoolean(5, stop.isIsActive());
+            return ps.executeUpdate() > 0;
+        } catch (Exception e) {
+            System.out.println("Lỗi insert Stop: " + e.getMessage());
+        }
+        return false;
+    }
+
+    // 4. CẬP NHẬT
+    public boolean update(Stop stop) {
+        String sql = "UPDATE Stops SET StopName = ?, Address = ?, Latitude = ?, Longitude = ?, IsActive = ? WHERE StopID = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, stop.getStopName());
+            ps.setString(2, stop.getAddress());
+            ps.setDouble(3, stop.getLatitude());
+            ps.setDouble(4, stop.getLongitude());
+            ps.setBoolean(5, stop.isIsActive());
+            ps.setInt(6, stop.getStopID());
+            return ps.executeUpdate() > 0;
+        } catch (Exception e) {
+            System.out.println("Lỗi update Stop: " + e.getMessage());
+        }
+        return false;
+    }
+
+    // 5. CẬP NHẬT TRẠNG THÁI (Dùng cho Soft Delete)
+    public boolean updateStatus(int stopID, boolean isActive) {
+        String sql = "UPDATE Stops SET IsActive = ? WHERE StopID = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setBoolean(1, isActive);
+            ps.setInt(2, stopID);
+            return ps.executeUpdate() > 0;
+        } catch (Exception e) {
+            System.out.println("Lỗi updateStatus Stop: " + e.getMessage());
+        }
+        return false;
+    }
+
+    // 6. XÓA VẬT LÝ (Hard Delete)
+    public boolean delete(int stopID) {
+        String sql = "DELETE FROM Stops WHERE StopID = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, stopID);
+            return ps.executeUpdate() > 0;
+        } catch (Exception e) {
+            System.out.println("Lỗi delete Stop: " + e.getMessage());
+        }
+        return false;
+    }
+
+    public List<Stop> getAvailableStops(int routeID) {
+        List<Stop> list = new ArrayList<>();
+        
+        // Truy vấn lấy các trạm ACTIVE và CHƯA nằm trong Route_Stop của tuyến hiện tại
+        String sql = "SELECT * FROM Stops "
+                   + "WHERE IsActive = 1 "
+                   + "AND StopID NOT IN ("
+                   + "    SELECT StopID FROM Route_Stop WHERE RouteID = ?"
+                   + ") "
+                   + "ORDER BY StopName ASC";
+                   
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, routeID);
+            
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Stop stop = new Stop();
+                    stop.setStopID(rs.getInt("StopID"));
+                    stop.setStopName(rs.getString("StopName"));
+                    stop.setAddress(rs.getString("Address"));
+                    stop.setLatitude(rs.getDouble("Latitude"));
+                    stop.setLongitude(rs.getDouble("Longitude"));
+                    stop.setIsActive(rs.getBoolean("IsActive"));
+                    
+                    list.add(stop);
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("Lỗi tại getAvailableStops (StopDAO): " + e.getMessage());
+            e.printStackTrace();
+        }
+        
+        return list;
+    }
 }

@@ -38,10 +38,18 @@
 
         /* PAGE HEADER */
         .page-header {
-            background: linear-gradient(135deg, var(--primary) 0%, #0d47a1 100%);
-            padding: 40px 0;
+            background: linear-gradient(135deg, var(--primary) 0%, #1565c0 100%);
+            padding: 20px 0;
             color: white;
-            margin-bottom: 40px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+        .page-header h3 {
+            font-size: 1.45rem;
+            letter-spacing: -0.3px;
+        }
+        .page-header p {
+            font-size: 0.88rem;
         }
 
         /* TABLE STYLING */
@@ -111,9 +119,8 @@
         </button>
         <div class="collapse navbar-collapse" id="navMenu">
             <ul class="navbar-nav me-auto">
-                <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/home">Trang chủ</a></li>
+                <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/guide">Hướng dẫn</a></li>
                 <li class="nav-item"><a class="nav-link active" href="${pageContext.request.contextPath}/route-list">Tuyến xe</a></li>
-                 <li class="nav-item"><a class="nav-link active" href="${pageContext.request.contextPath}/customer/dashboard">Dashboard</a></li>
             </ul>
             <ul class="navbar-nav ms-auto align-items-center">
                 <c:choose>
@@ -123,9 +130,9 @@
                                 <i class="fas fa-user-circle me-1"></i> Chào, <strong>${USER.fullName}</strong>
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end">
-                                <li><a class="dropdown-item" href="${pageContext.request.contextPath}/profile"><i class="fas fa-user me-2 text-primary"></i>Hồ sơ</a></li>
+                                <li><a class="dropdown-item" href="${pageContext.request.contextPath}/customer/profile"><i class="fas fa-user me-2 text-primary"></i>Hồ sơ</a></li>
                                 <c:if test="${USER.roleName == 'CUSTOMER'}">
-                                    <li><a class="dropdown-item" href="${pageContext.request.contextPath}/my-tickets"><i class="fas fa-ticket-alt me-2 text-primary"></i>Vé của tôi</a></li>
+                                    <li><a class="dropdown-item" href="${pageContext.request.contextPath}/customer/ticket"><i class="fas fa-ticket-alt me-2 text-primary"></i>Vé của tôi</a></li>
                                 </c:if>
                                 <li><hr class="dropdown-divider"></li>
                                 <li><a class="dropdown-item text-danger" href="${pageContext.request.contextPath}/logout"><i class="fas fa-sign-out-alt me-2"></i>Đăng xuất</a></li>
@@ -143,9 +150,20 @@
 </nav>
 
 <div class="page-header">
-    <div class="container text-center text-md-start">
-        <h2 class="fw-bold m-0"><i class="fas fa-list-ul me-2"></i>Danh mục tuyến xe Bus</h2>
-        <p class="lead m-0 mt-1 opacity-75">Tra cứu thông tin, giờ hoạt động và giá vé các tuyến xe vận hành trong thành phố</p>
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-md-5 text-center text-md-start mb-3 mb-md-0">
+                <h3 class="fw-bold m-0"><i class="fas fa-list-ul me-2"></i>Danh mục tuyến xe Bus</h3>
+            </div>
+            <div class="col-md-7 col-lg-6 ms-auto">
+                <form action="${pageContext.request.contextPath}/search-route" method="GET" class="d-flex shadow-sm">
+                    <input type="text" name="keyword" class="form-control border-0 px-3 py-2 bg-white" placeholder="Tìm kiếm nhanh số tuyến hoặc tên tuyến..." style="font-size: 0.9rem; border-radius: 8px 0 0 8px;" required>
+                    <button type="submit" class="btn btn-warning border-0 px-4 fw-semibold text-white d-flex align-items-center" style="background: var(--accent); border-radius: 0 8px 8px 0; font-size: 0.9rem;">
+                        <i class="fas fa-search me-2"></i>Tìm kiếm
+                    </button>
+                </form>
+            </div>
+        </div>
     </div>
 </div>
 

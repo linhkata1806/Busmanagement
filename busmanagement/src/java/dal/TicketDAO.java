@@ -118,5 +118,33 @@ public class TicketDAO extends DBContext {
         return t;
     }
     
+    public List<dto.TripHistoryDTO> getRecentTripsByAccount(int accountID) {
+        List<dto.TripHistoryDTO> list = new ArrayList<>();
+        String sql = "SELECT tr.TripDate, r.RouteNumber, b.LicensePlate, r.StartPoint, r.EndPoint "
+                + "FROM Tickets t "
+                + "JOIN Trips tr ON t.TripID = tr.TripID "
+                + "JOIN Routes r ON tr.RouteID = r.RouteID "
+                + "JOIN Buses b ON tr.BusID = b.BusID "
+                + "WHERE t.AccountID = ? AND t.Status = 'USED' "
+                + "ORDER BY tr.TripDate DESC";
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, accountID);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    dto.TripHistoryDTO dto = new dto.TripHistoryDTO();
+                    dto.setDate(rs.getDate("TripDate").toLocalDate());
+                    dto.setRouteNumber(rs.getString("RouteNumber"));
+                    dto.setBusPlate(rs.getString("LicensePlate"));
+                    dto.setStartPoint(rs.getString("StartPoint"));
+                    dto.setEndPoint(rs.getString("EndPoint"));
+                    list.add(dto);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
 
 }

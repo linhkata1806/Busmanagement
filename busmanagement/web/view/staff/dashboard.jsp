@@ -4,12 +4,6 @@
     Author     : Administrator
 --%>
 
-<%-- 
-    Document   : dashboard
-    Created on : Jun 28, 2026
-    Author     : Administrator
---%>
-
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
@@ -81,44 +75,9 @@
 
         <div class="container-fluid">
             <div class="row">
-                <nav class="col-md-3 col-lg-2 d-md-block sidebar collapse p-3 shadow">
-                    <div class="d-flex align-items-center mb-4 px-2">
-                        <i class="fas fa-bus-alt fa-2x text-info me-2"></i>
-                        <span class="fs-5 fw-bold text-white">Bus Hà Nội</span>
-                    </div>
-                    <hr class="text-secondary">
-                    <ul class="nav flex-column gap-2">
-                        <li class="nav-item">
-                            <a class="nav-link active py-2.5 px-3" href="${pageContext.request.contextPath}/staff/dashboard">
-                                <i class="fas fa-chart-pie me-2"></i>Tổng quan
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link py-2.5 px-3" href="${pageContext.request.contextPath}/staff/monthly-pass">
-                                <i class="fas fa-id-card me-2"></i>Quản lý vé tháng
-                                <c:if test="${pendingPasses > 0}">
-                                    <span class="badge bg-danger float-end rounded-pill">${pendingPasses}</span>
-                                </c:if>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link py-2.5 px-3" href="${pageContext.request.contextPath}/staff/trips">
-                                <i class="fas fa-route me-2"></i>Quản lý chuyến xe
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link py-2.5 px-3" href="${pageContext.request.contextPath}/staff/notification">
-                                <i class="fas fa-bell me-2"></i>Thông báo chung
-                            </a>
-                        </li>
-                    </ul>
-                    <div class="position-absolute bottom-0 start-0 w-100 p-3">
-                        <hr class="text-secondary">
-                        <a href="${pageContext.request.contextPath}/logout" class="nav-link py-2.5 px-3 text-danger">
-                            <i class="fas fa-sign-out-alt me-2"></i>Đăng xuất
-                        </a>
-                    </div>
-                </nav>
+                <jsp:include page="sidebar.jsp">
+                    <jsp:param name="activeMenu" value="dashboard" />
+                </jsp:include>
 
                 <main class="col-md-9 ms-sm-auto col-lg-10 main-content">
                     <div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom">
@@ -170,7 +129,7 @@
                                         </div>
                                     </div>
                                     <div class="pt-2 border-top">
-                                        <a href="${pageContext.request.contextPath}/staff/trips" class="small text-decoration-none fw-bold text-success d-flex align-items-center justify-content-between">
+                                        <a href="${pageContext.request.contextPath}/staff/trip" class="small text-decoration-none fw-bold text-success d-flex align-items-center justify-content-between">
                                             <span>Vào trang quản lý chuyến <i class="fas fa-external-link-alt ms-1" style="font-size: 0.75rem;"></i></span>
                                             <i class="fas fa-chevron-right text-muted"></i>
                                         </a>
@@ -208,19 +167,24 @@
                         </div>
                         <div class="card-body p-4">
                             <div class="row g-3">
-                                <div class="col-md-4">
-                                    <a href="${pageContext.request.contextPath}/staff/monthly-pass" class="btn btn-light w-100 py-3 text-start px-4 shadow-2xs rounded-3 quick-action-btn text-dark fw-semibold">
-                                        <i class="fas fa-clipboard-check text-primary me-3 fa-lg"></i>Phê duyệt đăng ký vé
+                                <div class="col-xl-3 col-md-6">
+                                    <a href="${pageContext.request.contextPath}/staff/monthly-pass" class="btn btn-light w-100 py-3 text-start px-3 shadow-2xs rounded-3 quick-action-btn text-dark fw-semibold">
+                                        <i class="fas fa-clipboard-check text-primary me-2 fa-lg"></i>Duyệt vé tháng
                                     </a>
                                 </div>
-                                <div class="col-md-4">
-                                    <a href="${pageContext.request.contextPath}/staff/trips" class="btn btn-light w-100 py-3 text-start px-4 shadow-2xs rounded-3 quick-action-btn text-dark fw-semibold">
-                                        <i class="fas fa-calendar-plus text-success me-3 fa-lg"></i>Quản lý lịch trình chuyến
+                                <div class="col-xl-3 col-md-6">
+                                    <a href="${pageContext.request.contextPath}/staff/route" class="btn btn-light w-100 py-3 text-start px-3 shadow-2xs rounded-3 quick-action-btn text-dark fw-semibold">
+                                        <i class="fas fa-map-marked-alt text-info me-2 fa-lg"></i>Mạng lưới tuyến
                                     </a>
                                 </div>
-                                <div class="col-md-4">
-                                    <a href="${pageContext.request.contextPath}/staff/notification/create" class="btn btn-light w-100 py-3 text-start px-4 shadow-2xs rounded-3 quick-action-btn text-dark fw-semibold">
-                                        <i class="fas fa-bullhorn text-danger me-3 fa-lg"></i>Bắn thông báo khẩn cấp
+                                <div class="col-xl-3 col-md-6">
+                                    <a href="${pageContext.request.contextPath}/staff/trip" class="btn btn-light w-100 py-3 text-start px-3 shadow-2xs rounded-3 quick-action-btn text-dark fw-semibold">
+                                        <i class="fas fa-calendar-plus text-success me-2 fa-lg"></i>Lịch trình chuyến
+                                    </a>
+                                </div>
+                                <div class="col-xl-3 col-md-6">
+                                    <a href="${pageContext.request.contextPath}/staff/notification/create" class="btn btn-light w-100 py-3 text-start px-3 shadow-2xs rounded-3 quick-action-btn text-dark fw-semibold">
+                                        <i class="fas fa-bullhorn text-danger me-2 fa-lg"></i>Thông báo khẩn
                                     </a>
                                 </div>
                             </div>
@@ -230,6 +194,6 @@
             </div>
         </div>
 
-        <script src=\"https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js\"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
     </body>
 </html>

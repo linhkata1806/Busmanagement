@@ -12,19 +12,19 @@ public class Stop {
     private int stopID;
     private String stopName;
     private String address;
+    private double latitude;
     private double longitude;
-    private double longtitude;
     private boolean isActive;
 
     public Stop() {
     }
 
-    public Stop(int stopID, String stopName, String address, double longitude, double longtitude, boolean isActive) {
+    public Stop(int stopID, String stopName, String address, double latitude, double longitude, boolean isActive) {
         this.stopID = stopID;
         this.stopName = stopName;
         this.address = address;
+        this.latitude = latitude;
         this.longitude = longitude;
-        this.longtitude = longtitude;
         this.isActive = isActive;
     }
 
@@ -53,19 +53,19 @@ public class Stop {
     }
 
     public double getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(double latitude) {
+        this.latitude = latitude;
+    }
+
+    public double getLongitude() {
         return longitude;
     }
 
-    public void setLatitude(double longitude) {
+    public void setLongitude(double longitude) {
         this.longitude = longitude;
-    }
-
-    public double getLongtitude() {
-        return longtitude;
-    }
-
-    public void setLongtitude(double longtitude) {
-        this.longtitude = longtitude;
     }
 
     public boolean isIsActive() {
@@ -78,7 +78,8 @@ public class Stop {
 
     @Override
     public String toString() {
-        return "Stop{" + "stopID=" + stopID + ", stopName=" + stopName + ", address=" + address + ", longitude=" + longitude + ", longtitude=" + longtitude + ", isActive=" + isActive + '}';
+        return "Stop{" + "stopID=" + stopID + ", stopName=" + stopName + ", address=" + address + ", latitude=" + latitude + ", longitude=" + longitude + ", isActive=" + isActive + '}';
     }
+
     
 }

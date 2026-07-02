@@ -93,7 +93,7 @@
 
     <nav class="navbar navbar-expand-lg mb-4">
         <div class="container">
-            <a class="navbar-brand" href="${pageContext.request.contextPath}/customer/dashboard">
+            <a class="navbar-brand" href="${pageContext.request.contextPath}/home">
                 🚌 Bus <span>Hà Nội</span>
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
@@ -101,9 +101,8 @@
             </button>
             <div class="collapse navbar-collapse" id="navMenu">
                 <ul class="navbar-nav me-auto">
-                    <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/customer/dashboard">Trang chủ</a></li>
+                    <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/guide">Hướng dẫn</a></li>
                     <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/route-list">Tuyến xe</a></li>
-                    <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/customer/dashboard">Dashboard</a></li>
                 </ul>
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item dropdown">
@@ -219,7 +218,7 @@
                 <div class="col-md-4 mb-3">
                     <h6 class="text-white fw-bold">Liên kết</h6>
                     <ul class="list-unstyled small">
-                        <li><a href="${pageContext.request.contextPath}/customer/dashboard">Trang chủ</a></li>
+                        <li><a href="${pageContext.request.contextPath}/home">Trang chủ</a></li>
                         <li><a href="${pageContext.request.contextPath}/route-list">Danh sách tuyến</a></li>
                     </ul>
                 </div>

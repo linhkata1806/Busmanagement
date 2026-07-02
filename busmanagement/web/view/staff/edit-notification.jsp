@@ -40,19 +40,9 @@
 
         <div class="container-fluid">
             <div class="row">
-                <nav class="col-md-3 col-lg-2 d-md-block sidebar collapse p-3 shadow">
-                    <div class="d-flex align-items-center mb-4 px-2">
-                        <i class="fas fa-bus-alt fa-2x text-info me-2"></i>
-                        <span class="fs-5 fw-bold text-white">Bus Hà Nội</span>
-                    </div>
-                    <hr class="text-secondary">
-                    <ul class="nav flex-column gap-2">
-                        <li class="nav-item"><a class="nav-link py-2.5 px-3" href="${pageContext.request.contextPath}/staff/dashboard"><i class="fas fa-chart-pie me-2"></i>Tổng quan</a></li>
-                        <li class="nav-item"><a class="nav-link py-2.5 px-3" href="${pageContext.request.contextPath}/staff/monthly-pass"><i class="fas fa-id-card me-2"></i>Quản lý vé tháng</a></li>
-                        <li class="nav-item"><a class="nav-link py-2.5 px-3" href="${pageContext.request.contextPath}/staff/trips"><i class="fas fa-route me-2"></i>Quản lý chuyến xe</a></li>
-                        <li class="nav-item"><a class="nav-link active py-2.5 px-3" href="${pageContext.request.contextPath}/staff/notification"><i class="fas fa-bell me-2"></i>Thông báo chung</a></li>
-                    </ul>
-                </nav>
+                <jsp:include page="sidebar.jsp">
+                    <jsp:param name="activeMenu" value="dashboard" />
+                </jsp:include>
 
                 <main class="col-md-9 ms-sm-auto col-lg-10 main-content">
                     <div class="mb-4 pb-2 border-bottom">

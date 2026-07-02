@@ -201,7 +201,7 @@ Author     : Administrator
                 </button>
                 <div class="collapse navbar-collapse" id="navMenu">
                     <ul class="navbar-nav me-auto">
-                        <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/home">Trang chủ</a></li>
+                        <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/guide">Hướng dẫn</a></li>
                         <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/route-list">Tuyến xe</a></li>
                     </ul>
                     <ul class="navbar-nav ms-auto align-items-center">
@@ -212,7 +212,7 @@ Author     : Administrator
                                         <i class="fas fa-user-circle me-1"></i> Chào, <strong>${USER.fullName}</strong>
                                     </a>
                                     <ul class="dropdown-menu dropdown-menu-end">
-                                        <li><a class="dropdown-item" href="${pageContext.request.contextPath}/profile"><i class="fas fa-user me-2 text-primary"></i>Hồ sơ</a></li>
+                                        <li><a class="dropdown-item" href="${pageContext.request.contextPath}/customer/profile"><i class="fas fa-user me-2 text-primary"></i>Hồ sơ</a></li>
                                         <c:if test="${USER.roleName == 'CUSTOMER'}">
                                             <li><a class="dropdown-item" href="${pageContext.request.contextPath}/customer/ticket"><i class="fas fa-ticket-alt me-2 text-primary"></i>Vé của tôi</a></li>
                                             <li><a class="dropdown-item" href="${pageContext.request.contextPath}/customer/favorite"><i class="fas fa-heart me-2 text-danger"></i>Yêu thích</a></li>
