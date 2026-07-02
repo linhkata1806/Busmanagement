@@ -107,4 +107,89 @@ public class NotificationDAO extends DBContext {
         return false;
     }
 
+    //cho staff
+    public int countNotifications() {
+        String sql = "SELECT COUNT(*) FROM Notifications";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("Lỗi countNotifications: " + e.getMessage());
+        }
+        return 0;
+    }
+
+    //get all noti cho staff
+    public List<Notification> getAll() {
+        List<Notification> list = new ArrayList<>();
+        String sql = "select * from Notifications";
+        try {
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                list.add(mapRow(rs));
+            }
+        } catch (Exception e) {
+        }
+        return list;
+    }
+
+    public Notification getById(int notificationId) {
+        String sql = "SELECT * FROM Notifications WHERE NotificationID = ?";
+        try {
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ps.setInt(1, notificationId);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return mapRow(rs);
+            }
+        } catch (Exception e) {
+            System.out.println("Lỗi getById Notification: " + e.getMessage());
+        }
+        return null;
+    }
+
+    // 4. Cập nhật (Chỉ sửa Title và Content theo Sprint 4)
+    public boolean update(int notificationId, String title, String content) {
+        String sql = "UPDATE Notifications SET Title = ?, Content = ? WHERE NotificationID = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, title);
+            ps.setString(2, content);
+            ps.setInt(3, notificationId);
+            return ps.executeUpdate() > 0;
+        } catch (Exception e) {
+            System.out.println("Lỗi update Notification: " + e.getMessage());
+        }
+        return false;
+    }
+
+    // 5. Xóa thông báo
+    public boolean delete(int notificationId) {
+        String sql = "DELETE FROM Notifications WHERE NotificationID = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, notificationId);
+            return ps.executeUpdate() > 0;
+        } catch (Exception e) {
+            System.out.println("Lỗi delete Notification: " + e.getMessage());
+        }
+        return false;
+    }
+
+    private Notification mapRow(ResultSet rs) throws Exception {
+        Notification n = new Notification();
+        n.setNotificationID(rs.getInt("NotificationID"));
+        n.setAccountID(rs.getInt("AccountID"));
+        n.setNotificationType(NotificationType.valueOf(rs.getString("NotificationType")));
+        n.setTitle(rs.getString("Title"));
+        n.setContent(rs.getString("Content"));
+        n.setIsRead(rs.getBoolean("IsRead"));
+        java.sql.Timestamp ts = rs.getTimestamp("CreatedAt");
+        if (ts != null) {
+            n.setCreatedAt(ts.toLocalDateTime());
+        }
+        return n;
+    }
 }

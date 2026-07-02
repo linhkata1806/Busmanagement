@@ -3,22 +3,30 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
  */
 
-package controller.customer;
+package controller.staff;
 
+import dto.MonthlyPassDTO;
 import java.io.IOException;
 import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.util.List;
+import service.MonthlyPassService;
 
 /**
  *
  * @author Administrator
  */
-@WebServlet(name="SearchHistoryServlet", urlPatterns={"/customer/searchHistoryServlet"})
-public class SearchHistoryServlet extends HttpServlet {
+public class MonthlyPassServlet extends HttpServlet {
+    private MonthlyPassService monthlyPassService;
+
+    @Override
+    public void init() throws ServletException {
+        monthlyPassService = new MonthlyPassService();
+    }
+    
    
     /** 
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code> methods.
@@ -35,10 +43,10 @@ public class SearchHistoryServlet extends HttpServlet {
             out.println("<!DOCTYPE html>");
             out.println("<html>");
             out.println("<head>");
-            out.println("<title>Servlet SearchHistoryServlet</title>");  
+            out.println("<title>Servlet MonthlyPassServlet</title>");  
             out.println("</head>");
             out.println("<body>");
-            out.println("<h1>Servlet SearchHistoryServlet at " + request.getContextPath () + "</h1>");
+            out.println("<h1>Servlet MonthlyPassServlet at " + request.getContextPath () + "</h1>");
             out.println("</body>");
             out.println("</html>");
         }
@@ -55,7 +63,27 @@ public class SearchHistoryServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException {
-        processRequest(request, response);
+        String statusFilter = request.getParameter("status");
+        String searchQuery = request.getParameter("search");
+        
+        List<MonthlyPassDTO> passList;
+        // day xuong service khi status null 
+        if(statusFilter ==null||statusFilter.isBlank()||statusFilter.equalsIgnoreCase("ALL")){
+            statusFilter="ALL";
+            passList = monthlyPassService.getAllPassesForStaff(searchQuery);
+        }else{
+            passList = monthlyPassService.getPassesByStatusForStaff(statusFilter.toUpperCase(),searchQuery);
+        }
+        
+        //lay so luong badge hien thi
+        int pendingCount = monthlyPassService.countPendingPasses();
+        
+        request.setAttribute("passList", passList);
+        request.setAttribute("currentStatus", statusFilter);
+        request.setAttribute("searchQuery", searchQuery);
+        request.setAttribute("pendingPasses", pendingCount);
+
+        request.getRequestDispatcher("/view/staff/monthly-pass.jsp").forward(request, response);
     } 
 
     /** 
@@ -68,7 +96,7 @@ public class SearchHistoryServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException {
-        processRequest(request, response);
+        doGet(request, response);
     }
 
     /** 

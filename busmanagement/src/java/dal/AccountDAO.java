@@ -9,6 +9,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -124,19 +126,19 @@ public class AccountDAO extends DBContext {
 
     public boolean updateProfile(int accountID, String fullName, String email, String phone, String avatar) {
         String sql = "UPDATE Accounts SET FullName = ?, Email = ?, Phone = ?, Avatar = ?, UpdatedAt = GETDATE() WHERE AccountID = ?";
-        
-        try  {
+
+        try {
             PreparedStatement ps = connection.prepareStatement(sql);
             ps.setString(1, fullName);
             ps.setString(2, email);
             ps.setString(3, phone);
             ps.setString(4, avatar);
             ps.setInt(5, accountID);
-            
+
             // executeUpdate() trả về số dòng bị ảnh hưởng. Nếu > 0 nghĩa là update thành công.
             int rowsAffected = ps.executeUpdate();
             return rowsAffected > 0;
-            
+
         } catch (Exception e) {
             System.out.println("Lỗi tại updateProfile: " + e.getMessage());
             e.printStackTrace();
@@ -144,20 +146,20 @@ public class AccountDAO extends DBContext {
         return false;
     }
 
-     public Account getAccountById(int accountID) {
+    public Account getAccountById(int accountID) {
         // Đã ghép lệnh JOIN để lấy được cả RoleName
-        String sql = "SELECT a.*, r.RoleName " +
-                     "FROM Accounts a " +
-                     "JOIN Roles r ON a.RoleID = r.RoleID " +
-                     "WHERE a.AccountID = ?";
-        
+        String sql = "SELECT a.*, r.RoleName "
+                + "FROM Accounts a "
+                + "JOIN Roles r ON a.RoleID = r.RoleID "
+                + "WHERE a.AccountID = ?";
+
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, accountID);
-            
+
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     // CẢ MỘT ĐOẠN DÀI BÂY GIỜ CHỈ CÒN ĐÚNG 1 DÒNG NÀY:
-                    return mapAccount(rs); 
+                    return mapAccount(rs);
                 }
             }
         } catch (Exception e) {
@@ -166,21 +168,44 @@ public class AccountDAO extends DBContext {
         }
         return null;
     }
-     public boolean changePassword(int accountId, String hashedPassword) {
+
+    public boolean changePassword(int accountId, String hashedPassword) {
         // Cập nhật Password và tự động gán luôn thời gian sửa đổi (UpdatedAt)
         String sql = "UPDATE Accounts SET Password = ?, UpdatedAt = GETDATE() WHERE AccountID = ?";
-        
-        try  {
+
+        try {
             PreparedStatement ps = connection.prepareStatement(sql);
             ps.setString(1, hashedPassword);
             ps.setInt(2, accountId);
-            
+
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
             System.out.println("Lỗi tại changePassword: " + e.getMessage());
             e.printStackTrace();
         }
         return false;
+    }
+
+    public List<Account> getAccountsByRole(int roleID) {
+        List<Account> list = new ArrayList<>();
+        // Chỉ lấy những tài khoản đang Active
+        String sql = "SELECT a.*, r.RoleName FROM Accounts a "
+                + "JOIN Roles r ON a.RoleID = r.RoleID "
+                + "WHERE a.RoleID = ? AND a.IsActive = 1";
+
+        try  {
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ps.setInt(1, roleID);
+            ResultSet rs = ps.executeQuery();
+                while (rs.next()) {
+                   
+                    list.add(mapAccount(rs));
+                }
+            
+        } catch (Exception e) {
+            System.out.println("Lỗi getAccountsByRole: " + e.getMessage());
+        }
+        return list;
     }
 
 }

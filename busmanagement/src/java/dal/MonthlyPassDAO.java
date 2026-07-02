@@ -10,6 +10,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.sql.Date;
 import java.util.List;
 import model.MonthlyPass;
 
@@ -207,8 +208,15 @@ public class MonthlyPassDAO extends DBContext {
 
         mp.setPassTypeID(rs.getInt("PassTypeID"));
         mp.setPassCode(rs.getString("PassCode"));
-        mp.setStartDate(rs.getDate("StartDate").toLocalDate());
-        mp.setEndDate(rs.getDate("EndDate").toLocalDate());
+        Date startDate = rs.getDate("StartDate");
+        if (startDate != null) {
+            mp.setStartDate(startDate.toLocalDate());
+        }
+
+        Date endDate = rs.getDate("endDate");
+        if (startDate != null) {
+            mp.setEndDate(endDate.toLocalDate());
+        }
         mp.setPrice(rs.getLong("Price"));
         mp.setStatus(PassStatus.valueOf(rs.getString("Status")));
         mp.setImageProof(rs.getString("ImageProof"));
@@ -219,9 +227,139 @@ public class MonthlyPassDAO extends DBContext {
         java.sql.Date approvedAt = rs.getDate("ApprovedAt");
         if (approvedAt != null) {
             mp.setApprovedAt(approvedAt.toLocalDate());
+        } else {
+            mp.setApprovedAt(null);
         }
-        mp.setCreatedAt(rs.getDate("CreatedAt").toLocalDate());
+        java.sql.Date createdAt = rs.getDate("CreatedAt");
+        if (createdAt != null) {
+            mp.setCreatedAt(createdAt.toLocalDate());
+        }
         return mp;
+    }
+
+    public int countByStaTus(String pending) {
+        String sql = "Select Count(*) from monthlyPasses where Status=?";
+        try {
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ps.setString(1, pending);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+        return 0;
+    }
+
+    public List<MonthlyPassDTO> getAllPasses() {
+        List<MonthlyPassDTO> list = new ArrayList<>();
+        String sql = "SELECT \n"
+                + "    mp.PassID, \n"
+                + "    mp.PassCode, \n"
+                + "    mp.AccountID, \n"
+                + "    a.FullName, \n"
+                + "    mp.StartDate, \n"
+                + "    mp.EndDate, \n"
+                + "    mp.Status, \n"
+                + "    r.RouteNumber, \n"
+                + "    r.RouteName, \n"
+                + "    mpt.TypeName\n"
+                + "FROM MonthlyPasses mp \n"
+                + "JOIN Accounts a ON mp.AccountID = a.AccountID \n"
+                + "LEFT JOIN Routes r ON mp.RouteID = r.RouteID \n"
+                + "JOIN MonthlyPassTypes mpt ON mp.PassTypeID = mpt.PassTypeID";
+        try {
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                list.add(mapStaffRowToDTO(rs));
+            }
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+        return list;
+    }
+
+    public List<MonthlyPassDTO> getPassesByStatus(String status) {
+        List<MonthlyPassDTO> list = new ArrayList<>();
+        String sql = "SELECT \n"
+                + "    mp.PassID, \n"
+                + "    mp.PassCode, \n"
+                + "    mp.AccountID, \n"
+                + "    a.FullName, \n"
+                + "    mp.StartDate, \n"
+                + "    mp.EndDate, \n"
+                + "    mp.Status, \n"
+                + "    r.RouteNumber, \n"
+                + "    r.RouteName, \n"
+                + "    mpt.TypeName \n"
+                + "FROM MonthlyPasses mp \n"
+                + "JOIN Accounts a ON mp.AccountID = a.AccountID \n"
+                + "LEFT JOIN Routes r ON mp.RouteID = r.RouteID \n"
+                + "JOIN MonthlyPassTypes mpt ON mp.PassTypeID = mpt.PassTypeID \n"
+                + "WHERE mp.Status = ?";
+        try {
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ps.setString(1, status);
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                list.add(mapStaffRowToDTO(rs));
+            }
+
+        } catch (Exception e) {
+        }
+        return list;
+    }
+
+    public MonthlyPass getPassByID(int passID) {
+        String sql = "Select * from MonthlyPasses where passID= ?";
+        try {
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ps.setInt(1, passID);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return mapRowToMonthlyPass(rs);
+            }
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+        return null;
+
+    }
+
+    public boolean updateStatus(int passID, PassStatus passStatus, int staffID) {
+        String sql = "UPDATE MonthlyPasses SET Status = ?, ApprovedBy = ?, ApprovedAt = GETDATE() WHERE PassID = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, passStatus.name());
+            ps.setInt(2, staffID);
+            ps.setInt(3, passID);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            System.out.println("Lỗi updateStatus: " + e.getMessage());
+        }
+        return false;
+    }
+
+    private MonthlyPassDTO mapStaffRowToDTO(ResultSet rs) throws SQLException {
+        dto.MonthlyPassDTO dto = new dto.MonthlyPassDTO();
+
+        // Các cột phục vụ nghiệp vụ Staff
+        dto.setPassID(rs.getInt("PassID"));
+        dto.setAccountID(rs.getInt("AccountID"));
+        dto.setFullName(rs.getString("FullName")); // Cột này sinh ra từ việc JOIN bảng Accounts
+
+        // Các cột hiển thị cơ bản
+        dto.setPassCode(rs.getString("PassCode"));
+        dto.setStartDate(rs.getDate("StartDate").toLocalDate());
+        dto.setEndDate(rs.getDate("EndDate").toLocalDate());
+        dto.setStatus(enums.PassStatus.valueOf(rs.getString("Status")));
+        dto.setRouteNumber(rs.getString("RouteNumber"));
+        dto.setRouteName(rs.getString("RouteName"));
+        dto.setTypeName(rs.getString("TypeName"));
+
+        return dto;
     }
 
     public MonthlyPassDTO getActivePassByAccountId(int accountID) {

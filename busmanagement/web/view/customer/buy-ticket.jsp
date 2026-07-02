@@ -194,6 +194,9 @@
                     <c:set var="basePrice" value="${ticketType == 'luot' ? route.ticketPrice : (ticketType == 'thang' ? 100000 : 200000)}" />
                     <div class="info-row align-items-center mt-4 pt-3 border-top border-2">
                         <span class="info-label fw-bold text-dark fs-6">Tổng chi phí:</span>
+
+                        <span class="info-value text-success fs-3 fw-bold">
+                            <fmt:formatNumber value="${displayPrice}" pattern="#,###"/> đ
                         <span class="info-value text-success fs-3 fw-bold" id="priceDisplay">
                             <fmt:formatNumber value="${basePrice}" pattern="#,###"/> đ
                         </span>

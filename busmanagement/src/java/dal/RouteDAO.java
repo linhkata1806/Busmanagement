@@ -1,27 +1,34 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package dal;
 
 import java.util.ArrayList;
 import java.util.List;
 import model.Route;
-import model.Stop;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
-/**
- *
- * @author Administrator
- */
 public class RouteDAO extends DBContext {
 
-    //top n popular
+    private Route mapRoute(ResultSet rs) throws Exception {
+        Route route = new Route();
+        route.setRouteID(rs.getInt("RouteID"));
+        route.setRouteNumber(rs.getString("RouteNumber"));
+        route.setRouteName(rs.getString("RouteName"));
+        route.setStartPoint(rs.getString("StartPoint"));
+        route.setEndPoint(rs.getString("EndPoint"));
+        route.setOperatingHours(rs.getString("OperatingHours"));
+        route.setFrequence(rs.getString("Frequency"));
+        route.setTicketPrice(rs.getLong("TicketPrice"));
+        route.setTotalDistance(rs.getDouble("TotalDistance"));
+        route.setIsActive(rs.getBoolean("IsActive"));
+        return route;
+    }
+
+    // =========================================================================
+    // KHU VỰC 1: CÁC HÀM CŨ ĐƯỢC GIỮ LẠI (ĐỂ KHÔNG BỊ LỖI ĐỎ Ở CÁC SERVLET CŨ)
+    // =========================================================================
     public List<Route> getPopularRoutes(int limit) {
         List<Route> list = new ArrayList<>();
-        String sql = "SELECT TOP (?) * "
-                + "FROM Routes WHERE IsActive = 1 ORDER BY RouteNumber ASC";
+        String sql = "SELECT TOP (?) * FROM Routes WHERE IsActive = 1 ORDER BY RouteNumber ASC";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, limit);
             try (ResultSet rs = ps.executeQuery()) {
@@ -35,33 +42,56 @@ public class RouteDAO extends DBContext {
         return list;
     }
 
-    private Route mapRoute(ResultSet rs) throws Exception {
-        Route route = new Route();
-        route.setRouteID(rs.getInt("RouteID"));
-        route.setRouteNumber(rs.getString("RouteNumber"));
-        route.setRouteName(rs.getString("RouteName"));        // ← tên field là route
-        route.setStartPoint(rs.getString("StartPoint"));
-        route.setEndPoint(rs.getString("EndPoint"));
-        route.setOperatingHours(rs.getString("OperatingHours"));
-        route.setFrequence(rs.getString("Frequency"));    // ← frequence
-        route.setTicketPrice(rs.getLong("TicketPrice"));  // ← long
-        route.setTotalDistance(rs.getDouble("TotalDistance")); // ← double
-        route.setIsActive(rs.getBoolean("IsActive"));
-        return route;
+    public List<Route> getAllActiveRoutes() {
+        List<Route> list = new ArrayList<>();
+        String sql = "SELECT * FROM Routes WHERE IsActive = 1 ORDER BY RouteNumber ASC";
+        try (PreparedStatement ps = connection.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                list.add(mapRoute(rs));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
     }
 
-    //search base on rout name or route number
+    public Route getRouteById(int routeId) {
+        String sql = "SELECT * FROM Routes WHERE RouteID = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, routeId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return mapRoute(rs);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public List<Route> getSuspendedRoutes() {
+        List<Route> list = new ArrayList<>();
+        String sql = "SELECT * FROM Routes WHERE IsActive = 0 ORDER BY RouteNumber ASC";
+        try (PreparedStatement ps = connection.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                list.add(mapRoute(rs));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
     public List<Route> searchRoutes(String keyword) {
         List<Route> list = new ArrayList<>();
-        String sql = "SELECT * "
-                + "FROM Routes WHERE IsActive = 1 "
+        String sql = "SELECT * FROM Routes WHERE IsActive = 1 "
                 + "AND (RouteNumber LIKE ? OR RouteName LIKE ? OR StartPoint LIKE ? OR EndPoint LIKE ?) "
                 + "ORDER BY RouteNumber ASC";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             if (keyword == null) {
                 keyword = "";
             }
-
             String kw = "%" + keyword.trim() + "%";
             ps.setString(1, kw);
             ps.setString(2, kw);
@@ -78,60 +108,12 @@ public class RouteDAO extends DBContext {
         return list;
     }
 
-    //get all active routes
-    public List<Route> getAllActiveRoutes() {
-        List<Route> list = new ArrayList<>();
-        String sql = "SELECT * FROM Routes WHERE IsActive = 1 ORDER BY RouteNumber ASC";
-        try (PreparedStatement ps = connection.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
-            while (rs.next()) {
-                list.add(mapRoute(rs));
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return list;
-    }
-
-    //get all suspended routes
-    public List<Route> getSuspendedRoutes() {
-        List<Route> list = new ArrayList<>();
-        String sql = "SELECT * FROM Routes WHERE IsActive = 0 ORDER BY RouteNumber ASC";
-        try (PreparedStatement ps = connection.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
-            while (rs.next()) {
-                list.add(mapRoute(rs));
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return list;
-    }
-
-    //get route by id
-    public Route getRouteById(int routeId) {
-        String sql = "SELECT * FROM Routes WHERE RouteID = ? AND IsActive = 1";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setInt(1, routeId);
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    return mapRoute(rs);
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
     public boolean existsRoute(int routeId) {
-        String sql = "SELECT 1\n"
-                + "FROM Routes\n"
-                + "WHERE RouteID=? and IsActive = 1";
+        String sql = "SELECT 1 FROM Routes WHERE RouteID=? and IsActive = 1";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, routeId);
             try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    return true;
-                }
+                return rs.next();
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -140,9 +122,7 @@ public class RouteDAO extends DBContext {
     }
 
     public Route getRouteByNumber(String routeNumber) {
-        String sql = "SELECT *\n"
-                + "FROM Routes\n"
-                + "WHERE RouteNumber=? and IsActive = 1";
+        String sql = "SELECT * FROM Routes WHERE RouteNumber=? and IsActive = 1";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, routeNumber);
             try (ResultSet rs = ps.executeQuery()) {
@@ -161,23 +141,149 @@ public class RouteDAO extends DBContext {
         String sql = "SELECT r.* FROM Routes r "
                 + "JOIN Route_Stop rs1 ON r.RouteID = rs1.RouteID "
                 + "JOIN Route_Stop rs2 ON r.RouteID = rs2.RouteID "
-                + "WHERE rs1.StopID = ? "
-                + "AND rs2.StopID = ? "
-                + "AND rs1.StopOrder < rs2.StopOrder "
-                + "AND r.IsActive = 1"; // Chỉ lấy các tuyến đang hoạt động
-        try {
-            PreparedStatement st = connection.prepareStatement(sql);
+                + "WHERE rs1.StopID = ? AND rs2.StopID = ? "
+                + "AND rs1.StopOrder < rs2.StopOrder AND r.IsActive = 1";
+        try (PreparedStatement st = connection.prepareStatement(sql)) {
             st.setInt(1, fromStopID);
             st.setInt(2, toStopID);
-            ResultSet rs = st.executeQuery();
-            while (rs.next()) {
-                // mapRoute là hàm đọc dữ liệu từ ResultSet vào Object Route của bạn
-                Route route = mapRoute(rs);
-                list.add(route);
+            try (ResultSet rs = st.executeQuery()) {
+                while (rs.next()) {
+                    list.add(mapRoute(rs));
+                }
             }
         } catch (Exception e) {
             System.out.println("Lỗi findRoutesBetweenStops: " + e.getMessage());
         }
         return list;
+    }
+
+    public List<Route> searchAndFilter(String keyword, String status) {
+        List<Route> list = new ArrayList<>();
+
+        // Format SQL dễ đọc, dễ maintain
+        String sql
+                = "SELECT * "
+                + "FROM Routes "
+                + "WHERE "
+                + "(RouteNumber LIKE ? "
+                + "OR RouteName LIKE ? "
+                + "OR StartPoint LIKE ? "
+                + "OR EndPoint LIKE ?) "
+                + "AND "
+                + "(?='ALL' OR IsActive=?) "
+                + "ORDER BY RouteNumber ASC";
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            String kw = "%" + keyword + "%";
+            ps.setString(1, kw);
+            ps.setString(2, kw);
+            ps.setString(3, kw);
+            ps.setString(4, kw);
+
+            ps.setString(5, status);
+
+            // Xử lý điều kiện rõ ràng, tường minh
+            int activeValue = 0;
+            if ("ACTIVE".equalsIgnoreCase(status)) {
+                activeValue = 1;
+            }
+            ps.setInt(6, activeValue);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    list.add(mapRoute(rs));
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("Lỗi searchAndFilter Route: " + e.getMessage());
+        }
+        return list;
+    }
+
+    public boolean existsRouteNumber(String routeNumber) {
+        String sql = "SELECT TOP 1 1 FROM Routes WHERE RouteNumber = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, routeNumber);
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public boolean existsById(int routeId) {
+        String sql = "SELECT TOP 1 1 FROM Routes WHERE RouteID = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, routeId);
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public boolean insert(Route route) {
+        String sql = "INSERT INTO Routes (RouteNumber, RouteName, StartPoint, EndPoint, OperatingHours, Frequency, TicketPrice, TotalDistance, IsActive) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, route.getRouteNumber());
+            ps.setString(2, route.getRouteName());
+            ps.setString(3, route.getStartPoint());
+            ps.setString(4, route.getEndPoint());
+            ps.setString(5, route.getOperatingHours());
+            ps.setString(6, route.getFrequence());
+            ps.setLong(7, route.getTicketPrice());
+            ps.setDouble(8, route.getTotalDistance());
+            ps.setInt(9, route.isIsActive() ? 1 : 0);
+            return ps.executeUpdate() > 0;
+        } catch (Exception e) {
+            System.out.println("Lỗi insert Route: " + e.getMessage());
+        }
+        return false;
+    }
+
+    public boolean update(Route route) {
+        String sql = "UPDATE Routes SET RouteName=?, StartPoint=?, EndPoint=?, OperatingHours=?, Frequency=?, TicketPrice=?, TotalDistance=?, IsActive=? WHERE RouteID=?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, route.getRouteName());
+            ps.setString(2, route.getStartPoint()); // BỔ SUNG
+            ps.setString(3, route.getEndPoint());   // BỔ SUNG
+            ps.setString(4, route.getOperatingHours());
+            ps.setString(5, route.getFrequence());
+            ps.setLong(6, route.getTicketPrice());
+            ps.setDouble(7, route.getTotalDistance());
+            ps.setInt(8, route.isIsActive() ? 1 : 0);
+            ps.setInt(9, route.getRouteID());
+            return ps.executeUpdate() > 0;
+        } catch (Exception e) {
+            System.out.println("Lỗi update Route: " + e.getMessage());
+        }
+        return false;
+    }
+
+    public boolean updateStatus(int routeID, boolean isActive) {
+        String sql = "UPDATE Routes SET IsActive = ? WHERE RouteID = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, isActive ? 1 : 0);
+            ps.setInt(2, routeID);
+            return ps.executeUpdate() > 0;
+        } catch (Exception e) {
+            System.out.println("Lỗi updateStatus Route: " + e.getMessage());
+        }
+        return false;
+    }
+
+    public boolean delete(int routeId) {
+        String sql = "DELETE FROM Routes WHERE RouteID = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, routeId);
+            return ps.executeUpdate() > 0;
+        } catch (Exception e) {
+            System.out.println("Lỗi delete Route: " + e.getMessage());
+        }
+        return false;
     }
 }

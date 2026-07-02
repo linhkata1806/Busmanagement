@@ -3,7 +3,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
  */
 
-package controller.customer;
+package controller.staff;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -11,12 +11,23 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+import model.Account;
+import service.MonthlyPassService;
 
 /**
  *
  * @author Administrator
  */
-public class MonthlyPassServlet extends HttpServlet {
+public class RejectMonthlyPassServlet extends HttpServlet {
+    private MonthlyPassService monthlyPassService;
+
+    @Override
+    public void init() throws ServletException {
+         monthlyPassService = new MonthlyPassService();
+    }
+    
+    
    
     /** 
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code> methods.
@@ -33,10 +44,10 @@ public class MonthlyPassServlet extends HttpServlet {
             out.println("<!DOCTYPE html>");
             out.println("<html>");
             out.println("<head>");
-            out.println("<title>Servlet MonthlyPassServlet</title>");  
+            out.println("<title>Servlet RejectMonthlyPassServlet</title>");  
             out.println("</head>");
             out.println("<body>");
-            out.println("<h1>Servlet MonthlyPassServlet at " + request.getContextPath () + "</h1>");
+            out.println("<h1>Servlet RejectMonthlyPassServlet at " + request.getContextPath () + "</h1>");
             out.println("</body>");
             out.println("</html>");
         }
@@ -53,7 +64,30 @@ public class MonthlyPassServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException {
-        processRequest(request, response);
+        HttpSession session = request.getSession(false);
+        Account currentStaff = (Account) session.getAttribute("USER");
+
+        try {
+            // 2. Lấy ID hồ sơ từ đường dẫn link
+            int passID = Integer.parseInt(request.getParameter("id"));
+            int staffID = currentStaff.getAccountID();
+
+            // 3. Tái sử dụng hàm rejectPass trong Service của bạn (sau khi đã sửa lỗi PENDING thành REJECTED)
+            boolean isSuccess = monthlyPassService.rejectPass(passID, staffID);
+
+            if (isSuccess) {
+                session.setAttribute("msgSuccess", "Đã từ chối đơn đăng ký và gửi thông báo phản hồi tới khách hàng.");
+            } else {
+                session.setAttribute("msgError", "Từ chối thất bại! Vui lòng kiểm tra lại trạng thái hiện tại của hồ sơ.");
+            }
+        } catch (NumberFormatException e) {
+            session.setAttribute("msgError", "Yêu cầu xử lý thất bại: Mã số đơn đăng ký không hợp lệ.");
+        } catch (Exception e) {
+            session.setAttribute("msgError", "Lỗi hệ thống: " + e.getMessage());
+        }
+
+        // 4. Điều hướng ngược lại trang danh sách chính
+        response.sendRedirect(request.getContextPath() + "/staff/monthly-pass");
     } 
 
     /** 

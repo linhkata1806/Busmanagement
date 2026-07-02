@@ -2,30 +2,42 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package model;
+package dto;
 
-/**
- *
- * @author Administrator
- */
-public class Stop {
+public class RouteStopDTO {
+    // Các trường từ bảng Route_Stop
+    private int routeStopID;
+    private int routeID;
     private int stopID;
+    private int stopOrder;
+    
+    // Các trường lấy thêm từ bảng Stops (Qua phép JOIN)
     private String stopName;
     private String address;
     private double latitude;
     private double longitude;
     private boolean isActive;
 
-    public Stop() {
+    // Constructor mặc định
+    public RouteStopDTO() {
     }
 
-    public Stop(int stopID, String stopName, String address, double latitude, double longitude, boolean isActive) {
-        this.stopID = stopID;
-        this.stopName = stopName;
-        this.address = address;
-        this.latitude = latitude;
-        this.longitude = longitude;
-        this.isActive = isActive;
+    // --- CÁC HÀM GETTER & SETTER ---
+
+    public int getRouteStopID() {
+        return routeStopID;
+    }
+
+    public void setRouteStopID(int routeStopID) {
+        this.routeStopID = routeStopID;
+    }
+
+    public int getRouteID() {
+        return routeID;
+    }
+
+    public void setRouteID(int routeID) {
+        this.routeID = routeID;
     }
 
     public int getStopID() {
@@ -34,6 +46,14 @@ public class Stop {
 
     public void setStopID(int stopID) {
         this.stopID = stopID;
+    }
+
+    public int getStopOrder() {
+        return stopOrder;
+    }
+
+    public void setStopOrder(int stopOrder) {
+        this.stopOrder = stopOrder;
     }
 
     public String getStopName() {
@@ -75,11 +95,4 @@ public class Stop {
     public void setIsActive(boolean isActive) {
         this.isActive = isActive;
     }
-
-    @Override
-    public String toString() {
-        return "Stop{" + "stopID=" + stopID + ", stopName=" + stopName + ", address=" + address + ", latitude=" + latitude + ", longitude=" + longitude + ", isActive=" + isActive + '}';
-    }
-
-    
 }
