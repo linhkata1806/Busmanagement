@@ -364,4 +364,64 @@ public class TripDAO extends DBContext {
         }
         return false;
     }
+
+    public List<TripDTO> getTripsByAssistant(int assistantID) {
+        List<TripDTO> list = new ArrayList<>();
+        String sql = "SELECT t.TripID, r.RouteNumber, r.RouteName, b.LicensePlate AS BusPlate, "
+                + "ad.FullName AS DriverName, aa.FullName AS AssistantName, "
+                + "t.TripDate, t.StartTime, t.EndTime, t.Direction, t.Status, "
+                + "t.ActualStartTime, t.ActualEndTime "
+                + "FROM Trips t "
+                + "JOIN Routes r ON t.RouteID = r.RouteID "
+                + "JOIN Buses b ON t.BusID = b.BusID "
+                + "JOIN Accounts ad ON t.DriverID = ad.AccountID "
+                + "LEFT JOIN Accounts aa ON t.AssistantID = aa.AccountID "
+                + "WHERE t.AssistantID = ? "
+                + "ORDER BY t.TripDate DESC, t.StartTime ASC";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, assistantID);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    try {
+                        list.add(mapRowtoDTO(rs));
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                    }
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("Lỗi getTripsByAssistant: " + e.getMessage());
+        }
+        return list;
+    }
+
+    public TripDTO getCurrentTripByAssistant(int assistantID) {
+        String sql = "SELECT TOP 1 t.TripID, r.RouteNumber, r.RouteName, b.LicensePlate AS BusPlate, "
+                + "ad.FullName AS DriverName, aa.FullName AS AssistantName, "
+                + "t.TripDate, t.StartTime, t.EndTime, t.Direction, t.Status, "
+                + "t.ActualStartTime, t.ActualEndTime "
+                + "FROM Trips t "
+                + "JOIN Routes r ON t.RouteID = r.RouteID "
+                + "JOIN Buses b ON t.BusID = b.BusID "
+                + "JOIN Accounts ad ON t.DriverID = ad.AccountID "
+                + "LEFT JOIN Accounts aa ON t.AssistantID = aa.AccountID "
+                + "WHERE t.AssistantID = ? AND t.Status IN ('IN_PROGRESS', 'SCHEDULED') "
+                + "ORDER BY CASE t.Status WHEN 'IN_PROGRESS' THEN 1 WHEN 'SCHEDULED' THEN 2 ELSE 3 END, "
+                + "t.TripDate ASC, t.StartTime ASC";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, assistantID);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    try {
+                        return mapRowtoDTO(rs);
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                    }
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("Lỗi getCurrentTripByAssistant: " + e.getMessage());
+        }
+        return null;
+    }
 }

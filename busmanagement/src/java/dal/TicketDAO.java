@@ -147,4 +147,91 @@ public class TicketDAO extends DBContext {
         return list;
     }
 
+    public Ticket getByCode(String ticketCode) {
+        String sql = "SELECT * FROM Tickets WHERE TicketCode = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, ticketCode);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return mapRowToTicket(rs);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public boolean updateTicketStatus(int ticketID, String status) {
+        String sql = "UPDATE Tickets SET Status = ? WHERE TicketID = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, status);
+            ps.setInt(2, ticketID);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public boolean checkInTicket(int ticketID, int tripID, String status) {
+        String sql = "UPDATE Tickets SET Status = ?, TripID = ?, UsedAt = GETDATE() WHERE TicketID = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, status);
+            ps.setInt(2, tripID);
+            ps.setInt(3, ticketID);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public int countTicketsByTripAndStatus(int tripID, String status) {
+        String sql = "SELECT COUNT(*) FROM Tickets WHERE TripID = ? AND Status = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, tripID);
+            ps.setString(2, status);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
+    public int countUnusedTicketsForRoute(int routeID) {
+        String sql = "SELECT COUNT(*) FROM Tickets WHERE RouteID = ? AND Status = 'UNUSED'";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, routeID);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
+    public List<Ticket> getTicketsByTrip(int tripID) {
+        List<Ticket> list = new ArrayList<>();
+        String sql = "SELECT * FROM Tickets WHERE TripID = ? ORDER BY UsedAt DESC";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, tripID);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    list.add(mapRowToTicket(rs));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
 }

@@ -57,4 +57,7 @@ public class TicketService {
         return ticketDAO.getTicketsByAccount(accountID);
     }
 
+    public List<model.Ticket> getTicketsByTrip(int tripID) {
+        return ticketDAO.getTicketsByTrip(tripID);
+    }
 }
