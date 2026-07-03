@@ -136,10 +136,16 @@
                                         </div>
                                         <h6 class="text-dark fw-bold mb-1">Tuyến áp dụng: ${mp.routeNumber}</h6>
                                         <p class="small text-muted text-truncate mb-3">${mp.routeName}</p>
-                                        <div class="bg-light p-2.5 rounded-2 small text-secondary">
+                                        <div class="bg-light p-2 rounded-2 small text-secondary">
                                             <div class="mb-1"><strong>Đối tượng:</strong> <span class="text-dark">${mp.typeName}</span></div>
                                             <div><strong>Hiệu lực:</strong> <span class="text-dark">${mp.startDate} đến ${mp.endDate}</span></div>
                                         </div>
+                                        <c:if test="${mp.status == 'APPROVED' && not empty mp.qrCodeToken}">
+                                            <div class="mt-2 text-primary fw-semibold small bg-primary bg-opacity-10 p-2 rounded-2 border border-primary border-opacity-25 text-center">
+                                                <i class="fas fa-qrcode me-1"></i>Token soát vé:<br>
+                                                <strong class="text-dark" style="font-size: 0.7rem; letter-spacing: 0.5px; word-break: break-all;">${mp.qrCodeToken}</strong>
+                                            </div>
+                                        </c:if>
                                     </div>
                                 </div>
                             </div>
@@ -171,10 +177,16 @@
                                         </div>
                                         <h5 class="text-success fw-bold mb-1"><i class="fas fa-bus me-1"></i>Toàn mạng lưới</h5>
                                         <p class="small text-muted mb-3">Áp dụng cho mọi tuyến thuộc hệ thống kết nối Bus Hà Nội</p>
-                                        <div class="bg-light p-2.5 rounded-2 small text-secondary">
+                                        <div class="bg-light p-2 rounded-2 small text-secondary">
                                             <div class="mb-1"><strong>Đối tượng ưu đãi:</strong> <span class="text-dark">${amp.typeName}</span></div>
                                             <div><strong>Hiệu lực:</strong> <span class="text-dark">${amp.startDate} đến ${amp.endDate}</span></div>
                                         </div>
+                                        <c:if test="${amp.status == 'APPROVED' && not empty amp.qrCodeToken}">
+                                            <div class="mt-2 text-success fw-semibold small bg-success bg-opacity-10 p-2 rounded-2 border border-success border-opacity-25 text-center">
+                                                <i class="fas fa-qrcode me-1"></i>Token soát vé:<br>
+                                                <strong class="text-dark" style="font-size: 0.7rem; letter-spacing: 0.5px; word-break: break-all;">${amp.qrCodeToken}</strong>
+                                            </div>
+                                        </c:if>
                                     </div>
                                 </div>
                             </div>

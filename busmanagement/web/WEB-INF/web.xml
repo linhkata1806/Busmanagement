@@ -149,6 +149,10 @@
         <servlet-class>controller.staff.RouteViewServlet</servlet-class>
     </servlet>
     <servlet>
+        <servlet-name>CreateRouteServlet</servlet-name>
+        <servlet-class>controller.staff.CreateRouteServlet</servlet-class>
+    </servlet>
+    <servlet>
         <servlet-name>UpdateRouteServlet</servlet-name>
         <servlet-class>controller.staff.UpdateRouteServlet</servlet-class>
     </servlet>
@@ -323,6 +327,10 @@
     <servlet-mapping>
         <servlet-name>RouteViewServlet</servlet-name>
         <url-pattern>/staff/route/view</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>CreateRouteServlet</servlet-name>
+        <url-pattern>/staff/route/create</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>UpdateRouteServlet</servlet-name>

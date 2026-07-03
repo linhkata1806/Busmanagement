@@ -41,7 +41,8 @@ public class TripDAO extends DBContext {
         StringBuilder sql = new StringBuilder(
                 "SELECT t.TripID, r.RouteNumber, r.RouteName, b.LicensePlate AS BusPlate, "
                 + "ad.FullName AS DriverName, aa.FullName AS AssistantName, "
-                + "t.TripDate, t.StartTime, t.EndTime, t.Direction, t.Status "
+                + "t.TripDate, t.StartTime, t.EndTime, t.Direction, t.Status, "
+                + "t.ActualStartTime, t.ActualEndTime "
                 + "FROM Trips t "
                 + "JOIN Routes r ON t.RouteID = r.RouteID "
                 + "JOIN Buses b ON t.BusID = b.BusID "
@@ -265,6 +266,8 @@ public class TripDAO extends DBContext {
 
         dto.setDirection(rs.getInt("Direction"));
         dto.setStatus(rs.getString("Status"));
+        dto.setActualStartTime(rs.getTimestamp("ActualStartTime"));
+        dto.setActualEndTime(rs.getTimestamp("ActualEndTime"));
         return dto;
     }
 

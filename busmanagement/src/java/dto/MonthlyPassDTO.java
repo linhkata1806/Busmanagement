@@ -26,6 +26,7 @@ public class MonthlyPassDTO {
     private int passID;
     private int accountID;
     private String fullName;
+    private String qrCodeToken;
 
     public MonthlyPassDTO() {
     }
@@ -118,6 +119,14 @@ public class MonthlyPassDTO {
 
     public void setFullName(String fullName) {
         this.fullName = fullName;
+    }
+
+    public String getQrCodeToken() {
+        return qrCodeToken;
+    }
+
+    public void setQrCodeToken(String qrCodeToken) {
+        this.qrCodeToken = qrCodeToken;
     }
     
     

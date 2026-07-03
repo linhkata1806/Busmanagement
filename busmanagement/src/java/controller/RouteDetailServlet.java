@@ -6,7 +6,8 @@ package controller;
 
 import dal.FavoriteDAO;
 import dal.RouteDAO;
-import dal.StopDAO;
+import dal.RouteStopDAO;
+import dto.RouteStopDTO;
 import java.io.IOException;
 import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
@@ -17,7 +18,6 @@ import jakarta.servlet.http.HttpSession;
 import java.util.List;
 import model.Account;
 import model.Route;
-import model.Stop;
 import service.FavoriteService;
 
 /**
@@ -27,13 +27,13 @@ import service.FavoriteService;
 public class RouteDetailServlet extends HttpServlet {
 
     private RouteDAO routeDAO;
-    private StopDAO stopDAO;
+    private RouteStopDAO routeStopDAO;
     private FavoriteService favoriteService;
 
     @Override
     public void init() throws ServletException {
         routeDAO = new RouteDAO();
-        stopDAO = new StopDAO();
+        routeStopDAO = new RouteStopDAO();
         favoriteService = new FavoriteService();
     }
 
@@ -56,7 +56,7 @@ public class RouteDetailServlet extends HttpServlet {
                 int routeId = Integer.parseInt(idRaw);
                 
                 Route route = routeDAO.getRouteById(routeId);
-                List<Stop> stops = stopDAO.getStopsByRouteId(routeId);
+                List<RouteStopDTO> stops = routeStopDAO.getStopsByRoute(routeId);
                 
                 // LOGIC MỚI: Gọi qua Service
                 boolean isFavorite = false;

@@ -24,6 +24,8 @@ public class TripDTO {
     private LocalTime endTime;
     private int direction;
     private String status;
+    private java.sql.Timestamp actualStartTime;
+    private java.sql.Timestamp actualEndTime;
 
     public TripDTO() {
     }
@@ -115,6 +117,20 @@ public class TripDTO {
     public void setStatus(String status) {
         this.status = status;
     }
-    
-    
+
+    public java.sql.Timestamp getActualStartTime() {
+        return actualStartTime;
+    }
+
+    public void setActualStartTime(java.sql.Timestamp actualStartTime) {
+        this.actualStartTime = actualStartTime;
+    }
+
+    public java.sql.Timestamp getActualEndTime() {
+        return actualEndTime;
+    }
+
+    public void setActualEndTime(java.sql.Timestamp actualEndTime) {
+        this.actualEndTime = actualEndTime;
+    }
 }

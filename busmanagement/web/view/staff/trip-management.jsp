@@ -151,6 +151,12 @@
                                                 <td class="small">
                                                     <div class="fw-bold text-dark mb-1"><i class="far fa-calendar-alt me-1"></i>${t.tripDate}</div>
                                                     <div class="text-muted fw-semibold"><i class="far fa-clock me-1"></i>${t.startTime} <i class="fas fa-long-arrow-alt-right mx-1"></i> ${t.endTime}</div>
+                                                    <c:if test="${not empty t.actualStartTime}">
+                                                        <div class="text-success fw-semibold mt-1" style="font-size: 0.8rem;"><i class="fas fa-play me-1"></i>Thực tế chạy: ${t.actualStartTime}</div>
+                                                    </c:if>
+                                                    <c:if test="${not empty t.actualEndTime}">
+                                                        <div class="text-secondary fw-semibold mt-1" style="font-size: 0.8rem;"><i class="fas fa-flag-checkered me-1"></i>Kết thúc: ${t.actualEndTime}</div>
+                                                    </c:if>
                                                 </td>
                                                 <td>
                                                     <c:choose>

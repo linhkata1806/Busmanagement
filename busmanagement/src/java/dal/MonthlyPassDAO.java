@@ -137,7 +137,7 @@ public class MonthlyPassDAO extends DBContext {
 
     public List<MonthlyPassDTO> getRoutePasses(int accountID) {
         List<dto.MonthlyPassDTO> list = new ArrayList<>();
-        String sql = "SELECT mp.PassCode, mp.StartDate, mp.EndDate, mp.Status, "
+        String sql = "SELECT mp.PassCode, mp.StartDate, mp.EndDate, mp.Status, mp.QRCodeToken, "
                 + "r.RouteNumber, r.RouteName, mpt.TypeName "
                 + "FROM MonthlyPasses mp "
                 + "LEFT JOIN Routes r ON mp.RouteID = r.RouteID "
@@ -160,7 +160,7 @@ public class MonthlyPassDAO extends DBContext {
 
     public List<MonthlyPassDTO> getAllRoutePasses(int accountID) {
         List<dto.MonthlyPassDTO> list = new ArrayList<>();
-        String sql = "SELECT mp.PassCode, mp.StartDate, mp.EndDate, mp.Status, "
+        String sql = "SELECT mp.PassCode, mp.StartDate, mp.EndDate, mp.Status, mp.QRCodeToken, "
                 + "r.RouteNumber, r.RouteName, mpt.TypeName "
                 + "FROM MonthlyPasses mp "
                 + "LEFT JOIN Routes r ON mp.RouteID = r.RouteID "
@@ -193,6 +193,7 @@ public class MonthlyPassDAO extends DBContext {
         dto.setRouteNumber(rs.getString("RouteNumber"));
         dto.setRouteName(rs.getString("RouteName"));
         dto.setTypeName(rs.getString("TypeName"));
+        dto.setQrCodeToken(rs.getString("QRCodeToken"));
 
         return dto;
     }
