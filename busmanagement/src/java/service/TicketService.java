@@ -40,7 +40,7 @@ public class TicketService {
 
         ticket.setPrice(ticketPrice);
         ticket.setSaleChannel(SaleChannel.ONLINE);
-        ticket.setStatus(TicketStatus.PENDING);
+        ticket.setStatus(TicketStatus.UNUSED); // BỔ SUNG: Vé mới mua bắt đầu ở trạng thái UNUSED
         ticket.setPurchasedAt(LocalDateTime.now());
         ticket.setTripID(null);
         if (!ticketDAO.insert(ticket)) {
@@ -57,4 +57,7 @@ public class TicketService {
         return ticketDAO.getTicketsByAccount(accountID);
     }
 
+    public List<model.Ticket> getTicketsByTrip(int tripID) {
+        return ticketDAO.getTicketsByTrip(tripID);
+    }
 }

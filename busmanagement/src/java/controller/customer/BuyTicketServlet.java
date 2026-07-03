@@ -16,7 +16,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import model.Account;
 import model.Route;
-import model.NotificationType;
+import enums.NotificationType;
 import service.NotificationService;
 
 /**

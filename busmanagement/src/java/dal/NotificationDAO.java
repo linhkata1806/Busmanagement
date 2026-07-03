@@ -8,7 +8,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import model.Notification;
-import model.NotificationType;
+import enums.NotificationType;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;

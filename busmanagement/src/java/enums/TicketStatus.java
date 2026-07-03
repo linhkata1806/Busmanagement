@@ -9,8 +9,10 @@ package enums;
  * @author Administrator
  */
 public enum TicketStatus {
-    PENDING,
     UNUSED,
-    USED,
+    CHECKED_IN,
+    COMPLETED,
     EXPIRED,
+    CANCELLED
 }
+

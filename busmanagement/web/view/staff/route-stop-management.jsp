@@ -64,6 +64,7 @@
                                         <th>Order</th>
                                         <th>Tên điểm dừng</th>
                                         <th>Địa chỉ</th>
+                                        <th>Khoảng cách (km)</th>
                                         <th>Tọa độ</th>
                                         <th class="text-center">Thao tác</th>
                                     </tr>
@@ -74,6 +75,7 @@
                                             <td class="fw-bold fs-5">${rs.stopOrder}</td>
                                             <td>${rs.stopName}</td>
                                             <td>${rs.address}</td>
+                                            <td><span class="badge bg-info text-dark">${rs.distanceFromStart} km</span></td>
                                             <td><small class="text-muted">${rs.latitude}, ${rs.longitude}</small></td>
                                             <td class="text-center">
                                                 <form action="${pageContext.request.contextPath}/staff/route-stop" method="POST" class="d-inline">
@@ -96,7 +98,7 @@
                                     </c:forEach>
                                     <c:if test="${empty routeStops}">
                                         <tr>
-                                            <td colspan="5" class="text-center text-muted py-3">Chưa có trạm nào trong tuyến này.</td>
+                                            <td colspan="6" class="text-center text-muted py-3">Chưa có trạm nào trong tuyến này.</td>
                                         </tr>
                                     </c:if>
                                 </tbody>
@@ -112,7 +114,7 @@
                         <form action="${pageContext.request.contextPath}/staff/route-stop/add" method="POST" class="row g-3 align-items-end">
                             <input type="hidden" name="routeId" value="${routeId}">
                             
-                            <div class="col-md-6">
+                            <div class="col-md-5">
                                 <label class="form-label">Chọn điểm dừng</label>
                                 <select name="stopId" class="form-select" required>
                                     <option value="">-- Chọn điểm dừng --</option>
@@ -121,9 +123,13 @@
                                     </c:forEach>
                                 </select>
                             </div>
-                            <div class="col-md-3">
+                            <div class="col-md-2">
                                 <label class="form-label">Vị trí (Order)</label>
-                                <input type="number" name="position" class="form-control" placeholder="Ví dụ: 1, 2, 3..." required min="1">
+                                <input type="number" name="position" class="form-control" placeholder="Ví dụ: 1, 2..." required min="1">
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label">Khoảng cách (km)</label>
+                                <input type="number" step="0.01" name="distance" class="form-control" placeholder="Ví dụ: 2.5" min="0">
                             </div>
                             <div class="col-md-3">
                                 <button type="submit" class="btn btn-success w-100">

@@ -311,6 +311,14 @@ Author     : Administrator
                                     </div>
                                 </div>
 
+                                <div class="info-item">
+                                    <div class="info-icon"><i class="fas fa-hourglass-half"></i></div>
+                                    <div>
+                                        <small class="text-muted d-block">Thời gian di chuyển dự kiến</small>
+                                        <span class="fw-bold text-dark">${route.estimatedDuration} phút</span>
+                                    </div>
+                                </div>
+
                                 <div class="info-item border-bottom-0 pb-0">
                                     <div class="info-icon"><i class="fas fa-toggle-on"></i></div>
                                     <div>
@@ -367,6 +375,7 @@ Author     : Administrator
                                                         <span class="stop-index">${status.index + 1}.</span>
                                                         <div>
                                                             <span class="stop-name">${stop.stopName}</span>
+                                                            <span class="badge bg-light text-primary border ms-2 small" style="font-size: 0.75rem;"><i class="fas fa-map-signs me-1"></i>+${stop.distanceFromStart} km</span>
                                                             <c:if test="${not empty stop.address}">
                                                                 <small class="text-muted d-block mt-1"><i class="fas fa-map-marker-alt me-1"></i>${stop.address}</small>
                                                             </c:if>

@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import model.MonthlyPassType;
 import model.Notification;
-import model.NotificationType;
+import enums.NotificationType;
 
 public class MonthlyPassService {
 

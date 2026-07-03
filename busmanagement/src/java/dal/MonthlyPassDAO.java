@@ -137,7 +137,7 @@ public class MonthlyPassDAO extends DBContext {
 
     public List<MonthlyPassDTO> getRoutePasses(int accountID) {
         List<dto.MonthlyPassDTO> list = new ArrayList<>();
-        String sql = "SELECT mp.PassCode, mp.StartDate, mp.EndDate, mp.Status, "
+        String sql = "SELECT mp.PassCode, mp.StartDate, mp.EndDate, mp.Status, mp.QRCodeToken, "
                 + "r.RouteNumber, r.RouteName, mpt.TypeName "
                 + "FROM MonthlyPasses mp "
                 + "LEFT JOIN Routes r ON mp.RouteID = r.RouteID "
@@ -160,7 +160,7 @@ public class MonthlyPassDAO extends DBContext {
 
     public List<MonthlyPassDTO> getAllRoutePasses(int accountID) {
         List<dto.MonthlyPassDTO> list = new ArrayList<>();
-        String sql = "SELECT mp.PassCode, mp.StartDate, mp.EndDate, mp.Status, "
+        String sql = "SELECT mp.PassCode, mp.StartDate, mp.EndDate, mp.Status, mp.QRCodeToken, "
                 + "r.RouteNumber, r.RouteName, mpt.TypeName "
                 + "FROM MonthlyPasses mp "
                 + "LEFT JOIN Routes r ON mp.RouteID = r.RouteID "
@@ -193,6 +193,7 @@ public class MonthlyPassDAO extends DBContext {
         dto.setRouteNumber(rs.getString("RouteNumber"));
         dto.setRouteName(rs.getString("RouteName"));
         dto.setTypeName(rs.getString("TypeName"));
+        dto.setQrCodeToken(rs.getString("QRCodeToken"));
 
         return dto;
     }
@@ -233,6 +234,12 @@ public class MonthlyPassDAO extends DBContext {
         java.sql.Date createdAt = rs.getDate("CreatedAt");
         if (createdAt != null) {
             mp.setCreatedAt(createdAt.toLocalDate());
+        }
+        // BỔ SUNG: Đọc QRCodeToken và LastUsedAt
+        mp.setQrCodeToken(rs.getString("QRCodeToken"));
+        java.sql.Timestamp lastUsedAt = rs.getTimestamp("LastUsedAt");
+        if (lastUsedAt != null) {
+            mp.setLastUsedAt(lastUsedAt);
         }
         return mp;
     }
@@ -330,14 +337,29 @@ public class MonthlyPassDAO extends DBContext {
     }
 
     public boolean updateStatus(int passID, PassStatus passStatus, int staffID) {
-        String sql = "UPDATE MonthlyPasses SET Status = ?, ApprovedBy = ?, ApprovedAt = GETDATE() WHERE PassID = ?";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setString(1, passStatus.name());
-            ps.setInt(2, staffID);
-            ps.setInt(3, passID);
-            return ps.executeUpdate() > 0;
-        } catch (SQLException e) {
-            System.out.println("Lỗi updateStatus: " + e.getMessage());
+        String sql;
+        if (passStatus == PassStatus.APPROVED) {
+            // BỔ SUNG: Khi duyệt thẻ, tự động tạo QRCodeToken bảo mật bằng UUID ngẫu nhiên
+            sql = "UPDATE MonthlyPasses SET Status = ?, ApprovedBy = ?, ApprovedAt = GETDATE(), QRCodeToken = ? WHERE PassID = ?";
+            try (PreparedStatement ps = connection.prepareStatement(sql)) {
+                ps.setString(1, passStatus.name());
+                ps.setInt(2, staffID);
+                ps.setString(3, java.util.UUID.randomUUID().toString()); // Tạo UUID ngẫu nhiên
+                ps.setInt(4, passID);
+                return ps.executeUpdate() > 0;
+            } catch (SQLException e) {
+                System.out.println("Lỗi updateStatus (APPROVED): " + e.getMessage());
+            }
+        } else {
+            sql = "UPDATE MonthlyPasses SET Status = ?, ApprovedBy = ?, ApprovedAt = GETDATE() WHERE PassID = ?";
+            try (PreparedStatement ps = connection.prepareStatement(sql)) {
+                ps.setString(1, passStatus.name());
+                ps.setInt(2, staffID);
+                ps.setInt(3, passID);
+                return ps.executeUpdate() > 0;
+            } catch (SQLException e) {
+                System.out.println("Lỗi updateStatus: " + e.getMessage());
+            }
         }
         return false;
     }

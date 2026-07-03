@@ -19,11 +19,12 @@ public class Route {
     private long ticketPrice;
     private double totalDistance;
     private boolean isActive;
+    private int estimatedDuration;
 
     public Route() {
     }
 
-    public Route(int routeID, String routeNumber, String routeName, String startPoint, String endPoint, String operatingHours, String frequence, long ticketPrice, double totalDistance, boolean isActive) {
+    public Route(int routeID, String routeNumber, String routeName, String startPoint, String endPoint, String operatingHours, String frequence, long ticketPrice, double totalDistance, boolean isActive, int estimatedDuration) {
         this.routeID = routeID;
         this.routeNumber = routeNumber;
         this.routeName = routeName;
@@ -34,6 +35,7 @@ public class Route {
         this.ticketPrice = ticketPrice;
         this.totalDistance = totalDistance;
         this.isActive = isActive;
+        this.estimatedDuration = estimatedDuration;
     }
 
     public int getRouteID() {
@@ -116,12 +118,16 @@ public class Route {
         this.isActive = isActive;
     }
 
-    @Override
-    public String toString() {
-        return "Route{" + "routeID=" + routeID + ", routeNumber=" + routeNumber + ", routeName=" + routeName + ", startPoint=" + startPoint + ", endPoint=" + endPoint + ", operatingHours=" + operatingHours + ", frequence=" + frequence + ", ticketPrice=" + ticketPrice + ", totalDistance=" + totalDistance + ", isActive=" + isActive + '}';
+    public int getEstimatedDuration() {
+        return estimatedDuration;
     }
 
-    
-    
-    
+    public void setEstimatedDuration(int estimatedDuration) {
+        this.estimatedDuration = estimatedDuration;
+    }
+
+    @Override
+    public String toString() {
+        return "Route{" + "routeID=" + routeID + ", routeNumber=" + routeNumber + ", routeName=" + routeName + ", startPoint=" + startPoint + ", endPoint=" + endPoint + ", operatingHours=" + operatingHours + ", frequence=" + frequence + ", ticketPrice=" + ticketPrice + ", totalDistance=" + totalDistance + ", isActive=" + isActive + ", estimatedDuration=" + estimatedDuration + '}';
+    }
 }

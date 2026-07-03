@@ -179,4 +179,8 @@ public class TripService {
             throw new IllegalArgumentException("Xung đột lịch trình: Nhân viên phụ xe này đã vướng lịch công tác ở một chuyến chạy khác.");
         }
     }
+
+    public List<TripDTO> getTripsByAssistant(int assistantID) {
+        return tripDAO.getTripsByAssistant(assistantID);
+    }
 }

@@ -34,19 +34,22 @@ public class AddStopToRouteServlet extends HttpServlet {
         String routeIdStr = request.getParameter("routeId");
         String stopIdStr = request.getParameter("stopId");
         String positionStr = request.getParameter("position");
+        String distanceStr = request.getParameter("distance"); // BỔ SUNG: Khoảng cách từ điểm đầu
 
         try {
             int routeId = Integer.parseInt(routeIdStr.trim());
             int stopId = Integer.parseInt(stopIdStr.trim());
             int position = Integer.parseInt(positionStr.trim());
+            double distance = (distanceStr != null && !distanceStr.trim().isEmpty())
+                    ? Double.parseDouble(distanceStr.trim()) : 0.0; // BỔ SUNG
 
             // Gọi Service xử lý Transaction thêm trạm
-            routeStopService.addStopToRoute(routeId, stopId, position);
+            routeStopService.addStopToRoute(routeId, stopId, position, distance);
 
             request.getSession().setAttribute("msgSuccess", "Đã thêm điểm dừng mới vào tuyến thành công!");
 
         } catch (NumberFormatException e) {
-            request.getSession().setAttribute("msgError", "Dữ liệu đầu vào (Tuyến, Trạm, Vị trí) phải là số hợp lệ.");
+            request.getSession().setAttribute("msgError", "Dữ liệu đầu vào (Tuyến, Trạm, Vị trí, Khoảng cách) phải là số hợp lệ.");
         } catch (IllegalArgumentException e) {
             request.getSession().setAttribute("msgError", e.getMessage()); // Hiển thị lỗi do validate Service
         } catch (Exception e) {

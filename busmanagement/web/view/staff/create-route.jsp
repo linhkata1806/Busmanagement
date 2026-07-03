@@ -5,7 +5,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hồ sơ Tuyến xe ${route.routeNumber} - Bus Hà Nội</title>
+    <title>Thêm mới Tuyến xe - Bus Hà Nội</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
@@ -13,23 +13,20 @@
         body { background-color: var(--bg-light); font-family: 'Segoe UI', sans-serif; }
         .main-content { padding: 2rem; }
         .form-card { border: none; border-radius: 1rem; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); }
-        input[readonly] { background-color: #f8f9fa !important; color: #495057; cursor: not-allowed; }
     </style>
 </head>
 <body>
 
-<c:set var="valName" value="${not empty r_routeName ? r_routeName : route.routeName}" />
-<c:set var="valStart" value="${not empty r_startPoint ? r_startPoint : route.startPoint}" />
-<c:set var="valEnd" value="${not empty r_endPoint ? r_endPoint : route.endPoint}" />
-<c:set var="valHours" value="${not empty r_operatingHours ? r_operatingHours : route.operatingHours}" />
-<c:set var="valFreq" value="${not empty r_frequency ? r_frequency : route.frequence}" />
-<c:set var="valPrice" value="${not empty r_ticketPrice ? r_ticketPrice : route.ticketPrice}" />
-<c:set var="valDist" value="${not empty r_distance ? r_distance : route.totalDistance}" />
-<c:set var="valDuration" value="${not empty r_estimatedDuration ? r_estimatedDuration : route.estimatedDuration}" />
-<c:choose>
-    <c:when test="${not empty r_status}"><c:set var="valStatus" value="${r_status}" /></c:when>
-    <c:otherwise><c:set var="valStatus" value="${route.isActive ? 'ACTIVE' : 'INACTIVE'}" /></c:otherwise>
-</c:choose>
+<c:set var="valNumber" value="${not empty route.routeNumber ? route.routeNumber : ''}" />
+<c:set var="valName" value="${not empty route.routeName ? route.routeName : ''}" />
+<c:set var="valStart" value="${not empty route.startPoint ? route.startPoint : ''}" />
+<c:set var="valEnd" value="${not empty route.endPoint ? route.endPoint : ''}" />
+<c:set var="valHours" value="${not empty route.operatingHours ? route.operatingHours : ''}" />
+<c:set var="valFreq" value="${not empty route.frequence ? route.frequence : ''}" />
+<c:set var="valPrice" value="${not empty route.ticketPrice ? route.ticketPrice : ''}" />
+<c:set var="valDist" value="${not empty route.totalDistance ? route.totalDistance : ''}" />
+<c:set var="valDuration" value="${not empty route.estimatedDuration ? route.estimatedDuration : ''}" />
+<c:set var="valStatus" value="${route.isActive ? 'ACTIVE' : 'INACTIVE'}" />
 
 <datalist id="stopSuggestions">
     <c:forEach var="s" items="${stops}">
@@ -46,8 +43,8 @@
         <main class="col-md-9 ms-sm-auto col-lg-10 main-content">
             <div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom">
                 <div>
-                    <h2 class="fw-bold text-dark m-0">Hồ sơ & Cập nhật Tuyến xe [${route.routeNumber}]</h2>
-                    <p class="text-muted small m-0">Xem chi tiết, cập nhật thông số vận hành hoặc ngừng hoạt động tuyến đường.</p>
+                    <h2 class="fw-bold text-dark m-0">Thêm mới Tuyến xe</h2>
+                    <p class="text-muted small m-0">Tạo hành trình khai thác mới cho hệ thống xe buýt.</p>
                 </div>
                 <a href="${pageContext.request.contextPath}/staff/route" class="btn btn-light border fw-semibold">
                     <i class="fas fa-arrow-left me-2"></i>Quay lại danh sách
@@ -65,20 +62,19 @@
                     </c:if>
 
                     <div class="card form-card bg-white p-4 p-sm-5">
-                        <form id="updateForm" action="${pageContext.request.contextPath}/staff/route/update" method="POST" class="row g-4">
-                            <input type="hidden" name="id" value="${route.routeID}">
-
+                        <form id="createForm" action="${pageContext.request.contextPath}/staff/route/create" method="POST" class="row g-4">
+                            
                             <div class="col-md-12">
                                 <label class="form-label small fw-bold text-secondary">Trạng thái vận hành</label>
                                 <select name="status" class="form-select py-2 fw-bold" required>
                                     <option value="ACTIVE" class="text-success" ${valStatus == 'ACTIVE' ? 'selected' : ''}>ACTIVE (Đang khai thác)</option>
-                                    <option value="INACTIVE" class="text-secondary" ${valStatus == 'INACTIVE' ? 'selected' : ''}>INACTIVE (Ngừng hoạt động)</option>
+                                    <option value="INACTIVE" class="text-secondary" ${valStatus == 'INACTIVE' ? 'selected' : ''}>INACTIVE (Chưa hoạt động)</option>
                                 </select>
                             </div>
 
                             <div class="col-md-4">
                                 <label class="form-label small fw-bold text-secondary">Mã số tuyến</label>
-                                <input type="text" name="routeNumber" class="form-control py-2 fw-bold text-muted" value="${route.routeNumber}" readonly>
+                                <input type="text" name="routeNumber" class="form-control py-2 fw-bold" value="${valNumber}" placeholder="Ví dụ: 01, 107..." required>
                             </div>
 
                             <div class="col-md-4">
@@ -92,7 +88,7 @@
 
                             <div class="col-md-12">
                                 <label class="form-label small fw-bold text-secondary">Tên tuyến đường</label>
-                                <input type="text" name="routeName" class="form-control py-2" value="${valName}" required>
+                                <input type="text" name="routeName" class="form-control py-2" value="${valName}" placeholder="Ví dụ: Kim Mã - Nhổn" required>
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label small fw-bold text-secondary">Thời gian hoạt động</label>
@@ -100,33 +96,26 @@
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label small fw-bold text-secondary">Tần suất giãn cách</label>
-                                <input type="text" name="frequency" class="form-control py-2" value="${valFreq}">
+                                <input type="text" name="frequency" class="form-control py-2" value="${valFreq}" placeholder="Ví dụ: 10-15 phút/lượt">
                             </div>
                             <div class="col-md-4">
                                 <label class="form-label small fw-bold text-secondary">Giá vé lượt (VNĐ)</label>
-                                <input type="number" name="ticketPrice" class="form-control py-2" value="${valPrice}" required>
+                                <input type="number" name="ticketPrice" class="form-control py-2" value="${valPrice}" placeholder="Ví dụ: 7000" required min="0">
                             </div>
                             <div class="col-md-4">
                                 <label class="form-label small fw-bold text-secondary">Tổng chiều dài (km)</label>
-                                <input type="number" step="0.1" name="distance" class="form-control py-2" value="${valDist}" required>
+                                <input type="number" step="0.1" name="distance" class="form-control py-2" value="${valDist}" placeholder="Ví dụ: 15.5" required min="0">
                             </div>
                             <div class="col-md-4">
                                 <label class="form-label small fw-bold text-secondary">Thời gian dự kiến (phút)</label>
-                                <input type="number" name="estimatedDuration" class="form-control py-2" value="${valDuration}" min="1" required>
+                                <input type="number" name="estimatedDuration" class="form-control py-2" value="${valDuration}" placeholder="Ví dụ: 45" min="1" required>
                             </div>
                         </form>
 
                         <div class="d-flex gap-2 justify-content-end border-top pt-4 mt-4">
-                            <form action="${pageContext.request.contextPath}/staff/route/delete" method="POST" class="m-0 me-auto" onsubmit="return confirm('CẢNH BÁO: Xác nhận Xóa/Ngừng hoạt động tuyến ${route.routeNumber}?')">
-                                <input type="hidden" name="id" value="${route.routeID}">
-                                <button type="submit" class="btn btn-outline-danger px-3 py-2 fw-semibold shadow-sm">
-                                    <i class="fas fa-trash-alt me-2"></i>Xóa tuyến
-                                </button>
-                            </form>
-
                             <a href="${pageContext.request.contextPath}/staff/route" class="btn btn-light px-4 py-2 border fw-semibold">Quay lại</a>
-                            <button type="button" onclick="document.getElementById('updateForm').submit()" class="btn btn-primary px-4 py-2 fw-semibold shadow-sm">
-                                <i class="fas fa-save me-2"></i>Lưu thay đổi
+                            <button type="button" onclick="document.getElementById('createForm').submit()" class="btn btn-success px-4 py-2 fw-semibold shadow-sm">
+                                <i class="fas fa-save me-2"></i>Tạo tuyến đường
                             </button>
                         </div>
                     </div>
