@@ -204,6 +204,34 @@
         <servlet-name>PaymentQRJSP</servlet-name>
         <jsp-file>/view/customer/payment-qr.jsp</jsp-file>
     </servlet>
+    <servlet>
+        <servlet-name>AssistantDashboardServlet</servlet-name>
+        <servlet-class>controller.assistant.AssistantDashboardServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>MyTripServlet</servlet-name>
+        <servlet-class>controller.assistant.MyTripServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>TripDetailServlet</servlet-name>
+        <servlet-class>controller.assistant.TripDetailServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>PassengerCheckServlet</servlet-name>
+        <servlet-class>controller.assistant.PassengerCheckServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>AssistantNotificationServlet</servlet-name>
+        <servlet-class>controller.assistant.NotificationServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>AssistantProfileServlet</servlet-name>
+        <servlet-class>controller.assistant.ProfileServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>AssistantChangePasswordServlet</servlet-name>
+        <servlet-class>controller.assistant.ChangePasswordServlet</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>LoginServlet</servlet-name>
         <url-pattern>/login</url-pattern>
@@ -383,6 +411,34 @@
     <servlet-mapping>
         <servlet-name>PaymentQRJSP</servlet-name>
         <url-pattern>/customer/payment-qr</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>AssistantDashboardServlet</servlet-name>
+        <url-pattern>/assistant/dashboard</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>MyTripServlet</servlet-name>
+        <url-pattern>/assistant/trip</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>TripDetailServlet</servlet-name>
+        <url-pattern>/assistant/trip/detail</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>PassengerCheckServlet</servlet-name>
+        <url-pattern>/assistant/passenger-check</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>AssistantNotificationServlet</servlet-name>
+        <url-pattern>/assistant/notification</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>AssistantProfileServlet</servlet-name>
+        <url-pattern>/assistant/profile</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>AssistantChangePasswordServlet</servlet-name>
+        <url-pattern>/assistant/change-password</url-pattern>
     </servlet-mapping>
     <welcome-file-list>
         <welcome-file>home</welcome-file>
