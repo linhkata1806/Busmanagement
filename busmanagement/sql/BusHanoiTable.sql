@@ -1,5 +1,3 @@
-
-
 USE master;
 GO
 
@@ -47,38 +45,25 @@ CREATE TABLE Accounts (
 
 CREATE TABLE Stops (
     StopID      INT           PRIMARY KEY IDENTITY(1,1),
-    StopName    NVARCHAR(150) NOT NULL UNIQUE,
-    Address     NVARCHAR(255),
+    StopName    NVARCHAR(255) NOT NULL UNIQUE,
+    Address     NVARCHAR(500),
     Latitude    DECIMAL(10,7),
     Longitude   DECIMAL(10,7),
     IsActive    BIT           NOT NULL DEFAULT 1
 );
 
 CREATE TABLE Routes (
-<<<<<<< HEAD
-    RouteID           INT           PRIMARY KEY IDENTITY(1,1),
-    RouteNumber       VARCHAR(10)   NOT NULL UNIQUE,
-    RouteName         NVARCHAR(200) NOT NULL,
-    StartPoint        NVARCHAR(150) NOT NULL,
-    EndPoint          NVARCHAR(150) NOT NULL,
-    OperatingHours    VARCHAR(50)   NOT NULL,
-    Frequency         NVARCHAR(50),
-    TicketPrice       DECIMAL(10,0) NOT NULL,
-    TotalDistance     DECIMAL(6,2),
-    EstimatedDuration INT, 
-    IsActive          BIT           NOT NULL DEFAULT 1,
-=======
-    RouteID       INT           PRIMARY KEY IDENTITY(1,1),
-    RouteNumber   VARCHAR(10)   NOT NULL UNIQUE,
-    RouteName     NVARCHAR(200) NOT NULL,
-    StartPoint    NVARCHAR(150) NOT NULL,
-    EndPoint      NVARCHAR(150) NOT NULL,
+    RouteID        INT           PRIMARY KEY IDENTITY(1,1),
+    RouteNumber    VARCHAR(10)   NOT NULL UNIQUE,
+    RouteName      NVARCHAR(255) NOT NULL,
+    StartPoint     NVARCHAR(255) NOT NULL,
+    EndPoint       NVARCHAR(255) NOT NULL,
     OperatingHours NVARCHAR(150) NOT NULL,
-    Frequency     NVARCHAR(150),
-    TicketPrice   DECIMAL(10,0) NOT NULL,
-    TotalDistance DECIMAL(6,2),
-    IsActive      BIT           NOT NULL DEFAULT 1,
->>>>>>> 36454c5b7303d5f9f4610da0cfeff3d2edfb1d24
+    Frequency      NVARCHAR(150),
+    TicketPrice    DECIMAL(10,0) NOT NULL,
+    TotalDistance  DECIMAL(6,2),
+    EstimatedDuration INT, 
+    IsActive       BIT           NOT NULL DEFAULT 1,
     CONSTRAINT CHK_Routes_Price CHECK (TicketPrice >= 0)
 );
 
@@ -156,11 +141,7 @@ CREATE TABLE Tickets (
     CONSTRAINT FK_Tickets_Route   FOREIGN KEY (RouteID)   REFERENCES Routes(RouteID),
     CONSTRAINT CHK_Tickets_Price  CHECK (Price >= 0),
     CONSTRAINT CHK_Tickets_SaleChannel CHECK (SaleChannel IN ('ONLINE', 'COUNTER', 'ON_BUS')),
-<<<<<<< HEAD
-    CONSTRAINT CHK_Tickets_Status CHECK (Status IN ('UNUSED', 'CHECKED_IN', 'COMPLETED', 'EXPIRED', 'CANCELLED')) 
-=======
-    CONSTRAINT CHK_Tickets_Status CHECK (Status IN ('PENDING', 'UNUSED', 'USED', 'EXPIRED'))
->>>>>>> 36454c5b7303d5f9f4610da0cfeff3d2edfb1d24
+    CONSTRAINT CHK_Tickets_Status CHECK (Status IN ('UNUSED', 'CHECKED_IN', 'COMPLETED', 'EXPIRED', 'CANCELLED'))
 );
 
 CREATE TABLE MonthlyPassTypes (
@@ -177,7 +158,7 @@ CREATE TABLE MonthlyPasses (
     RouteID      INT,
     PassTypeID   INT           NOT NULL,
     PassCode     VARCHAR(50)   UNIQUE, 
-    QRCodeToken  VARCHAR(255)  UNIQUE, 
+    QRCodeToken  VARCHAR(255), 
     StartDate    DATE          NOT NULL,
     EndDate      DATE          NOT NULL,
     Price        DECIMAL(10,0) NOT NULL,
@@ -259,6 +240,7 @@ CREATE TABLE Notifications (
     NotificationType VARCHAR(50) NOT NULL,
     Title            NVARCHAR(150) NOT NULL,
     Content          NVARCHAR(500) NOT NULL,
+    IsRead           BIT NOT NULL DEFAULT 0,
     CreatedAt        DATETIME NOT NULL DEFAULT GETDATE(),
     CONSTRAINT FK_Notifications_Account FOREIGN KEY (AccountID) REFERENCES Accounts(AccountID) ON DELETE CASCADE
 );
@@ -344,10 +326,10 @@ INSERT INTO Stops (StopName, Address, Latitude, Longitude) VALUES
 (N'Bến xe Giáp Bát', N'Giải Phóng, Hoàng Mai', 20.9808, 105.8415);
 
 INSERT INTO Routes (RouteNumber, RouteName, StartPoint, EndPoint, OperatingHours, Frequency, TicketPrice, TotalDistance, EstimatedDuration) VALUES
-('107', N'Kim Mã - Làng Văn Hóa', N'Bến xe Kim Mã', N'Làng Văn Hóa', '05:00 - 20:30', N'15-20 phút/chuyến', 9000, 45.5, 90),
-('32', N'Nhổn - Giáp Bát', N'Nhổn', N'Bến xe Giáp Bát', '05:00 - 22:30', N'10-15 phút/chuyến', 7000, 18.5, 60),
-('21A', N'Bến xe Giáp Bát - Yên Nghĩa', N'Bến xe Giáp Bát', N'Bến xe Yên Nghĩa', '05:00 - 21:00', N'15 phút/chuyến', 7000, 16.0, 50),
-('74', N'Mỹ Đình - Xuân Khanh', N'Bến xe Mỹ Đình', N'Xuân Khanh', '05:00 - 20:30', N'20 phút/chuyến', 9000, 40.0, 85);
+('107',  N'Kim Mã - Làng Văn Hóa',          N'Bến xe Kim Mã',    N'Làng Văn Hóa',       N'05:00 - 20:30', N'15-20 phút/chuyến', 9000, 45.5, 90),
+('32',   N'Nhổn - Giáp Bát',                 N'Nhổn',             N'Bến xe Giáp Bát',    N'05:00 - 22:30', N'10-15 phút/chuyến', 7000, 18.5, 50),
+('21A',  N'Bến xe Giáp Bát - Yên Nghĩa',     N'Bến xe Giáp Bát',  N'Bến xe Yên Nghĩa',   N'05:00 - 21:00', N'15 phút/chuyến',    7000, 16.0, 45),
+('74',   N'Mỹ Đình - Xuân Khanh',            N'Bến xe Mỹ Đình',   N'Xuân Khanh',         N'05:00 - 20:30', N'20 phút/chuyến',    9000, 40.0, 80);
 
 INSERT INTO Route_Stop (RouteID, StopID, StopOrder, DistanceFromStart) VALUES
 (1, 1, 1, 0.0), (1, 2, 2, 3.5), (1, 5, 3, 8.0), (1, 6, 4, 15.2), (1, 7, 5, 35.0), (1, 8, 6, 38.5), (1, 9, 7, 45.5),
@@ -379,20 +361,20 @@ INSERT INTO Attendance (TripID, AccountID, CheckInTime, CheckOutTime, Note) VALU
 (4, 6, DATEADD(minute, -20, GETDATE()), DATEADD(minute, 70, GETDATE()), N'Kẹt xe ở Cầu Giấy');
 
 INSERT INTO Tickets (AccountID, TripID, RouteID, TicketCode, Price, SaleChannel, Status, PurchasedAt) VALUES
-(12, 1, 1, 'TK-107-AA01', 9000, 'ONLINE', 'COMPLETED', DATEADD(day, -1, GETDATE())),
-(13, 2, 1, 'TK-107-BB02', 9000, 'ON_BUS', 'CHECKED_IN', GETDATE()),
-(14, 4, 2, 'TK-032-CC03', 7000, 'ONLINE', 'COMPLETED', DATEADD(day, -2, GETDATE())),
+(12, 1, 1, 'TK-107-AA01', 9000, 'ONLINE', 'COMPLETED',   DATEADD(day, -1, GETDATE())),
+(13, 2, 1, 'TK-107-BB02', 9000, 'ON_BUS', 'COMPLETED',   GETDATE()),
+(14, 4, 2, 'TK-032-CC03', 7000, 'ONLINE', 'COMPLETED',   DATEADD(day, -2, GETDATE())),
 (12, 3, 1, 'TK-107-DD04', 9000, 'ONLINE', 'UNUSED', GETDATE()),
-(15, 6, 3, 'TK-021-EE05', 7000, 'ONLINE', 'CANCELLED', DATEADD(hour, -2, GETDATE()));
+(15, 6, 3, 'TK-021-EE05', 7000, 'ONLINE', 'EXPIRED',DATEADD(hour, -2, GETDATE()));
 
 INSERT INTO MonthlyPassTypes (TypeName, DiscountPercentage, Description) VALUES
 (N'Sinh viên (1 Tuyến)', 50.00, N'HSSV đi 1 tuyến cố định'),
 (N'Phổ thông (Liên Tuyến)', 0.00, N'Đi tất cả các tuyến');
 
-INSERT INTO MonthlyPasses (AccountID, RouteID, PassTypeID, PassCode, QRCodeToken, StartDate, EndDate, Price, Status, ApprovedBy, ApprovedAt, LastUsedAt) VALUES
-(12, 1, 1, 'MP-SV-107-A1', 'QR-LINHKATA-107', '2026-07-01', '2026-07-31', 50000, 'APPROVED', 2, DATEADD(day, -5, GETDATE()), GETDATE()),
-(13, 2, 1, 'MP-SV-032-A2', 'QR-NAM-032', '2026-07-01', '2026-07-31', 50000, 'APPROVED', 3, DATEADD(day, -3, GETDATE()), DATEADD(day, -1, GETDATE())),
-(15, NULL, 2, 'MP-PT-ALL-B1', 'QR-HUNG-ALL', '2026-07-01', '2026-07-31', 200000, 'PENDING', NULL, NULL, NULL);
+INSERT INTO MonthlyPasses (AccountID, RouteID, PassTypeID, PassCode, QRCodeToken, StartDate, EndDate, Price, Status, ImageProof, ApprovedBy, ApprovedAt, LastUsedAt) VALUES
+(12, 1, 1, 'MP-SV-107-A1', 'QR-LINHKATA-107', '2026-07-01', '2026-07-31', 50000, 'APPROVED', NULL, 2, DATEADD(day, -5, GETDATE()), GETDATE()),
+(13, 2, 1, 'MP-SV-032-A2', 'QR-NAM-032', '2026-07-01', '2026-07-31', 50000, 'APPROVED', NULL, 3, DATEADD(day, -3, GETDATE()), DATEADD(day, -1, GETDATE())),
+(15, NULL, 2, 'MP-PT-ALL-B1', 'QR-HUNG-ALL', '2026-07-01', '2026-07-31', 200000, 'PENDING', NULL, NULL, NULL, NULL);
 
 INSERT INTO Payments (AccountID, TicketID, PassID, Amount, PaymentMethod, TransactionCode, PaymentStatus, PaidAt) VALUES
 (12, 1, NULL, 9000, 'VNPAY', 'VNP20260701_01', 'SUCCESS', DATEADD(day, -1, GETDATE())),
@@ -412,10 +394,10 @@ INSERT INTO SearchHistory (AccountID, FromStopID, ToStopID, SearchedAt) VALUES
 (12, 2, 8, DATEADD(hour, -2, GETDATE())), 
 (14, 1, 15, DATEADD(day, -1, GETDATE())); 
 
-INSERT INTO Notifications (AccountID, TargetRole, NotificationType, Title, Content, CreatedAt) VALUES
-(NULL, 'ALL', 'SYSTEM_MAINTENANCE', N'Bảo trì app', N'Hệ thống bảo trì lúc 00:00 - 02:00 ngày 05/07.', GETDATE()),
-(NULL, 'CUSTOMER', 'ROUTE_CHANGE', N'Phân luồng tuyến 107', N'Do sửa đường ĐL Thăng Long, 107 tạm đi ngõ tránh.', GETDATE()),
-(12, 'CUSTOMER', 'PASS_APPROVED', N'Vé tháng đã duyệt', N'Thẻ SV của bạn đã duyệt thành công. Bắt đầu QR.', GETDATE());
+INSERT INTO Notifications (AccountID, TargetRole, NotificationType, Title, Content, IsRead, CreatedAt) VALUES
+(NULL, 'ALL', 'SYSTEM_MAINTENANCE', N'Bảo trì app', N'Hệ thống bảo trì lúc 00:00 - 02:00 ngày 05/07.', 0, GETDATE()),
+(NULL, 'CUSTOMER', 'ROUTE_CHANGE', N'Phân luồng tuyến 107', N'Do sửa đường ĐL Thăng Long, 107 tạm đi ngõ tránh.', 0, GETDATE()),
+(12, 'CUSTOMER', 'PASS_APPROVED', N'Vé tháng đã duyệt', N'Thẻ SV của bạn đã duyệt thành công. Bắt đầu QR.', 0, GETDATE());
 
 INSERT INTO NotificationReads (NotificationID, AccountID, ReadAt) VALUES
 (1, 12, GETDATE()), (1, 13, GETDATE()), (2, 12, GETDATE()), (3, 12, GETDATE());
