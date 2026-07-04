@@ -130,7 +130,7 @@
     </div>
 </div>
 
-<div class="container min-vh-50 mb-5">
+<div class="container mb-5" style="min-height: 700px;">
     <div class="mb-4">
         <span class="badge bg-light text-dark p-2 border fs-6">
             Hiện có tổng cộng: <strong class="text-primary">${routes != null ? routes.size() : 0}</strong> tuyến đang phục vụ

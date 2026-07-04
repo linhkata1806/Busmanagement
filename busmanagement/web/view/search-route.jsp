@@ -87,7 +87,7 @@
     </div>
 </div>
 
-<div class="container min-vh-50">
+<div class="container" style="min-height: 700px;">
     <div class="mb-4">
         <h4 class="fw-bold">Kết quả tìm kiếm cho: <span class="text-primary">"${keyword}"</span></h4>
         <p class="text-muted">Tìm thấy <strong>${routes != null ? routes.size() : 0}</strong> tuyến phù hợp.</p>

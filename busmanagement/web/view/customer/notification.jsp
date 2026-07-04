@@ -93,7 +93,7 @@
     <!-- ===== HEADER NAVIGATION ===== -->
     <jsp:include page="/common/navbar.jsp" />
 
-    <div class="container my-5" style="max-width: 850px;">
+    <div class="container my-5" style="max-width: 850px; min-height: 700px;">
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h4 class="fw-bold text-dark m-0">
                 <i class="fas fa-bell text-warning me-2"></i>Trung tâm thông báo

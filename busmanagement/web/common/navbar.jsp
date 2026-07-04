@@ -16,11 +16,6 @@
                 <li class="nav-item">
                     <a class="nav-link ${activePage == 'route' ? 'active' : ''}" href="${pageContext.request.contextPath}/route-list">Tuyến xe</a>
                 </li>
-                <c:if test="${not empty USER and USER.roleName == 'CUSTOMER'}">
-                    <li class="nav-item">
-                        <a class="nav-link ${activePage == 'dashboard' ? 'active' : ''}" href="${pageContext.request.contextPath}/customer/dashboard">Dashboard</a>
-                    </li>
-                </c:if>
             </ul>
             <ul class="navbar-nav ms-auto align-items-center">
                 <c:choose>

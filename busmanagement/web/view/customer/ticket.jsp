@@ -16,12 +16,31 @@
     <jsp:include page="/common/head_imports.jsp" />
     <style>
         :root {
-            --primary: #1a73e8;
-            --bg-light: #f8f9fa;
+            --primary: #0d47a1;
+            --primary-light: #1565c0;
+            --accent: #fbbc04;
+            --bg-light: #f4f6f9;
         }
         body { 
             background-color: var(--bg-light); 
         }
+        
+        /* ===== NAVBAR ===== */
+        .navbar {
+            background: var(--primary) !important;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.3rem;
+            color: white !important;
+        }
+        .navbar-brand span { color: var(--accent); }
+        .nav-link { color: rgba(255,255,255,0.9) !important; font-weight: 500; }
+        .navbar .dropdown-menu {
+            border: none;
+        }
+
         .nav-pills .nav-link.active {
             background-color: var(--primary);
         }
@@ -44,14 +63,15 @@
 </head>
 <body class="d-flex flex-column min-vh-100">
 
-<div class="container my-5 flex-grow-1">
-    <div class="d-flex align-items-center justify-content-between mb-4">
+    <!-- ===== HEADER NAVIGATION ===== -->
+    <c:set var="activePage" value="ticket" />
+    <jsp:include page="/common/navbar.jsp" />
+
+<div class="container my-5 flex-grow-1" style="min-height: 700px;">
+    <div class="d-flex align-items-center mb-4">
         <h3 class="fw-bold text-secondary m-0">
             <i class="fas fa-wallet me-2 text-primary"></i>Lịch sử mua & Đăng ký dịch vụ vé
         </h3>
-        <a href="${pageContext.request.contextPath}/customer/profile" class="btn btn-light rounded-pill px-4 fw-bold text-dark shadow-sm">
-            <i class="fas fa-arrow-left me-2"></i>Quay lại
-        </a>
     </div>
 
     <ul class="nav nav-pills mb-4 shadow-sm bg-white p-2 rounded-3">

@@ -216,11 +216,6 @@ Author     : Administrator
                                     <i class="fas fa-map-marked-alt me-1"></i> Chi tiết lộ trình hành trình xe buýt công cộng
                                 </p>
                             </div>
-                            <div class="col-md-auto text-md-end text-center mt-3 mt-md-0">
-                                <a href="javascript:history.back()" class="btn btn-light rounded-pill px-4 fw-bold text-dark shadow-sm">
-                                    <i class="fas fa-arrow-left me-2"></i>Quay lại
-                                </a>
-                            </div>
                         </div>
                     </div>
                 </div>
