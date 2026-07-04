@@ -149,7 +149,25 @@ public class AuthFilter implements Filter {
             res.sendRedirect(req.getContextPath()+"/home");
             return;
         }
-        
+        // Set unread count for notifications to render in sidebars/headers
+        if ("ASSISTANT".equals(role)) {
+            try {
+                service.NotificationService notiService = new service.NotificationService();
+                int unreadCount = notiService.countUnreadByAccountAndRole(user.getAccountID(), "ASSISTANT");
+                req.setAttribute("unreadCount", unreadCount);
+            } catch (Exception e) {
+                System.out.println("Error setting unreadCount in AuthFilter for Assistant: " + e.getMessage());
+            }
+        } else if ("CUSTOMER".equals(role)) {
+            try {
+                service.NotificationService notiService = new service.NotificationService();
+                int unreadCount = notiService.countUnreadNotifications(user.getAccountID());
+                req.setAttribute("unreadCount", unreadCount);
+            } catch (Exception e) {
+                System.out.println("Error setting unreadCount in AuthFilter for Customer: " + e.getMessage());
+            }
+        }
+
         //If valid then continue access to other page
         chain.doFilter(request, response);
         
