@@ -424,4 +424,37 @@ public class TripDAO extends DBContext {
         }
         return null;
     }
+
+    /**
+     * Lấy thông tin TripDTO (có JOIN Route, Bus, Driver, Assistant) theo TripID.
+     * Dùng để truyền dữ liệu hiển thị có ý nghĩa (tên tuyến, biển số xe, tên lái xe)
+     * thay cho các raw ID trong trang chi tiết chuyến xe.
+     */
+    public TripDTO getTripDTOById(int tripID) {
+        String sql = "SELECT t.TripID, r.RouteNumber, r.RouteName, b.LicensePlate AS BusPlate, "
+                + "ad.FullName AS DriverName, aa.FullName AS AssistantName, "
+                + "t.TripDate, t.StartTime, t.EndTime, t.Direction, t.Status, "
+                + "t.ActualStartTime, t.ActualEndTime "
+                + "FROM Trips t "
+                + "JOIN Routes r ON t.RouteID = r.RouteID "
+                + "JOIN Buses b ON t.BusID = b.BusID "
+                + "JOIN Accounts ad ON t.DriverID = ad.AccountID "
+                + "LEFT JOIN Accounts aa ON t.AssistantID = aa.AccountID "
+                + "WHERE t.TripID = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, tripID);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    try {
+                        return mapRowtoDTO(rs);
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                    }
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("Lỗi getTripDTOById: " + e.getMessage());
+        }
+        return null;
+    }
 }
