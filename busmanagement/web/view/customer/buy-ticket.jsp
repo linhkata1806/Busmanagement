@@ -14,8 +14,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Xác nhận đăng ký dịch vụ vé - Bus Hà Nội</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <jsp:include page="/common/head_imports.jsp" />
 
     <style>
         :root {
@@ -99,24 +98,8 @@
 </head>
 <body>
 
-    <nav class="navbar navbar-expand-lg">
-        <div class="container">
-            <a class="navbar-brand" href="${pageContext.request.contextPath}/home">
-                🚌 Bus <span>Hà Nội</span>
-            </a>
-            <div class="collapse navbar-collapse" id="navMenu">
-                <ul class="navbar-nav me-auto">
-                    <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/guide">Hướng dẫn</a></li>
-                    <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/route-list">Tuyến xe</a></li>
-                </ul>
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item text-white fw-semibold">
-                        <i class="fas fa-user-circle me-1"></i> Chào, ${sessionScope.USER.fullName}
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </nav>
+    <!-- ===== HEADER NAVIGATION ===== -->
+    <jsp:include page="/common/navbar.jsp" />
 
     <div class="container my-5">
         <div class="ticket-container">
@@ -195,10 +178,8 @@
                     <div class="info-row align-items-center mt-4 pt-3 border-top border-2">
                         <span class="info-label fw-bold text-dark fs-6">Tổng chi phí:</span>
 
-                        <span class="info-value text-success fs-3 fw-bold">
-                            <fmt:formatNumber value="${displayPrice}" pattern="#,###"/> đ
                         <span class="info-value text-success fs-3 fw-bold" id="priceDisplay">
-                            <fmt:formatNumber value="${basePrice}" pattern="#,###"/> đ
+                            <fmt:formatNumber value="${displayPrice}" pattern="#,###"/> đ
                         </span>
                     </div>
 
@@ -272,6 +253,7 @@
         </div>
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <!-- ===== FOOTER ===== -->
+    <jsp:include page="/common/footer.jsp" />
 </body>
 </html>
