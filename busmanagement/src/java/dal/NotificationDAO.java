@@ -34,6 +34,31 @@ public class NotificationDAO extends DBContext {
         return 0;
     }
 
+    /**
+     * Đếm thông báo chưa đọc dành cho một tài khoản VÀ các thông báo broadcast
+     * gửi tới nhóm vai trò (roleName) hoặc gửi cho tất cả ('ALL').
+     * Dành cho Phụ xe: roleName = "ASSISTANT"
+     */
+    public int countUnreadByAccountAndRole(int accountId, String roleName) {
+        String sql = "SELECT COUNT(*) FROM Notifications "
+                + "WHERE IsRead = 0 AND ("
+                + "  AccountID = ? "
+                + "  OR (AccountID IS NULL AND TargetRole IN (?, 'ALL'))"
+                + ")";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, accountId);
+            ps.setString(2, roleName);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
     public boolean insert(Notification noti) {
         String sql = "INSERT INTO Notifications (AccountID, NotificationType, Title, Content, IsRead, CreatedAt) "
                 + "VALUES (?, ?, ?, ?, ?, ?)";
@@ -73,6 +98,31 @@ public class NotificationDAO extends DBContext {
                     // Xử lý LocalDateTime
                     n.setCreatedAt(rs.getTimestamp("CreatedAt").toLocalDateTime());
                     list.add(n);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
+    /**
+     * Lấy thông báo cho Phụ xe: bao gồm thông báo đích danh (AccountID = accountID)
+     * VÀ thông báo broadcast gửi tới nhóm vai trò (roleName) hoặc gửi tất cả ('ALL').
+     * Spec Sprint 6 – Mục V: "xem thông báo được gửi đích danh HOẶC gửi hàng loạt dành cho nhóm Phụ xe".
+     */
+    public List<Notification> getByAccountAndRole(int accountID, String roleName) {
+        List<Notification> list = new ArrayList<>();
+        String sql = "SELECT * FROM Notifications "
+                + "WHERE AccountID = ? "
+                + "   OR (AccountID IS NULL AND TargetRole IN (?, 'ALL')) "
+                + "ORDER BY CreatedAt DESC";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, accountID);
+            ps.setString(2, roleName);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    list.add(mapRow(rs));
                 }
             }
         } catch (SQLException e) {
