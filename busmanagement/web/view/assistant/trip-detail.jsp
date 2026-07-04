@@ -96,11 +96,17 @@
                                         </div>
                                         <div>
                                             <small class="text-secondary fw-semibold">Tuyến đường</small>
-                                            <div class="mt-1 fw-bold text-dark">Tuyến #${trip.routeID}</div>
+                                            <div class="mt-1 fw-bold text-dark">
+                                                ${tripDTO.routeNumber} – ${tripDTO.routeName}
+                                            </div>
                                         </div>
                                         <div>
                                             <small class="text-secondary fw-semibold">Biển kiểm soát xe</small>
-                                            <div class="mt-1 fw-bold text-dark">Mã xe #${trip.busID}</div>
+                                            <div class="mt-1 fw-bold text-dark">${tripDTO.busPlate}</div>
+                                        </div>
+                                        <div>
+                                            <small class="text-secondary fw-semibold">Tài xế</small>
+                                            <div class="mt-1 text-dark">${tripDTO.driverName}</div>
                                         </div>
                                         <div>
                                             <small class="text-secondary fw-semibold">Ngày chạy</small>
