@@ -12,6 +12,8 @@ import enums.NotificationType;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -124,6 +126,8 @@ public class NotificationDAO extends DBContext {
                 while (rs.next()) {
                     list.add(mapRow(rs));
                 }
+            } catch (Exception ex) {
+                Logger.getLogger(NotificationDAO.class.getName()).log(Level.SEVERE, null, ex);
             }
         } catch (SQLException e) {
             e.printStackTrace();

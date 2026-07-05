@@ -405,4 +405,30 @@ public class MonthlyPassDAO extends DBContext {
         }
         return null;
     }
+
+    public MonthlyPass getByCode(String passCode) {
+        String sql = "SELECT * FROM MonthlyPasses WHERE PassCode = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, passCode);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return mapRowToMonthlyPass(rs);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public boolean updateLastUsed(int passID) {
+        String sql = "UPDATE MonthlyPasses SET LastUsedAt = GETDATE() WHERE PassID = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, passID);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
 }
