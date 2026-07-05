@@ -90,7 +90,7 @@
                                             <small class="text-secondary uppercase fw-semibold">Trạng thái</small>
                                             <div class="mt-1">
                                                 <span class="badge ${trip.status == 'IN_PROGRESS' ? 'bg-success' : (trip.status == 'SCHEDULED' ? 'bg-warning text-dark' : 'bg-secondary')} px-2.5 py-1.5 rounded">
-                                                    ${trip.status}
+                                                    ${trip.vietnameseStatus}
                                                 </span>
                                             </div>
                                         </div>

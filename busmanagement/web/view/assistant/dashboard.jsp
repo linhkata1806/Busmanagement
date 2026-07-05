@@ -96,7 +96,7 @@
                             </div>
                             <c:if test="${not empty currentTrip}">
                                 <div class="mt-2 text-primary fw-semibold fs-7">
-                                    Tuyến ${currentTrip.routeNumber} (${currentTrip.status})
+                                    Tuyến ${currentTrip.routeNumber} (${currentTrip.vietnameseStatus})
                                 </div>
                             </c:if>
                         </div>
@@ -156,7 +156,7 @@
                                                     <div><strong>Thời gian xuất phát dự kiến:</strong> ${currentTrip.startTime}</div>
                                                     <div><strong>Trạng thái:</strong> 
                                                         <span class="badge ${currentTrip.status == 'IN_PROGRESS' ? 'bg-success' : 'bg-warning'} px-2.5 py-1.5 rounded">
-                                                            ${currentTrip.status}
+                                                            ${currentTrip.vietnameseStatus}
                                                         </span>
                                                     </div>
                                                 </div>
