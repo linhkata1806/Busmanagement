@@ -118,6 +118,17 @@ public class TripDTO {
         this.status = status;
     }
 
+    public String getVietnameseStatus() {
+        if (status == null) return "";
+        switch (status) {
+            case "SCHEDULED": return "Chuẩn bị";
+            case "IN_PROGRESS": return "Đang chạy";
+            case "COMPLETED": return "Hoàn thành";
+            case "CANCELLED": return "Đã huỷ";
+            default: return status;
+        }
+    }
+
     public java.sql.Timestamp getActualStartTime() {
         return actualStartTime;
     }

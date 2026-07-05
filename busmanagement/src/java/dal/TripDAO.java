@@ -35,6 +35,14 @@ public class TripDAO extends DBContext {
 
     // HÀM TÌM KIẾM ĐỘNG (Gộp tất cả các bộ lọc vào làm 1)
     public List<TripDTO> searchTrips(String date, int routeID, String plate, String status) {
+        // Tự động hủy các chuyến đi đã quá hạn nhưng chưa chạy
+        try {
+            String updateSql = "UPDATE Trips SET Status = 'CANCELLED' WHERE Status = 'SCHEDULED' AND CAST(TripDate AS DATE) < CAST(GETDATE() AS DATE)";
+            connection.prepareStatement(updateSql).executeUpdate();
+        } catch (Exception e) {
+            System.out.println("Lỗi auto-cancel chuyến đi quá hạn: " + e.getMessage());
+        }
+
         List<TripDTO> list = new ArrayList<>();
 
         // 1. Câu SQL gốc (Có thêm WHERE 1=1 để dễ dàng nối chuỗi bằng AND)
@@ -366,6 +374,14 @@ public class TripDAO extends DBContext {
     }
 
     public List<TripDTO> getTripsByAssistant(int assistantID) {
+        // Tự động hủy các chuyến đi đã quá hạn nhưng chưa chạy
+        try {
+            String updateSql = "UPDATE Trips SET Status = 'CANCELLED' WHERE Status = 'SCHEDULED' AND CAST(TripDate AS DATE) < CAST(GETDATE() AS DATE)";
+            connection.prepareStatement(updateSql).executeUpdate();
+        } catch (Exception e) {
+            System.out.println("Lỗi auto-cancel chuyến đi quá hạn: " + e.getMessage());
+        }
+
         List<TripDTO> list = new ArrayList<>();
         String sql = "SELECT t.TripID, r.RouteNumber, r.RouteName, b.LicensePlate AS BusPlate, "
                 + "ad.FullName AS DriverName, aa.FullName AS AssistantName, "
@@ -405,7 +421,7 @@ public class TripDAO extends DBContext {
                 + "JOIN Buses b ON t.BusID = b.BusID "
                 + "JOIN Accounts ad ON t.DriverID = ad.AccountID "
                 + "LEFT JOIN Accounts aa ON t.AssistantID = aa.AccountID "
-                + "WHERE t.AssistantID = ? AND t.Status IN ('IN_PROGRESS', 'SCHEDULED') "
+                + "WHERE t.AssistantID = ? AND t.Status IN ('IN_PROGRESS', 'SCHEDULED') AND CAST(t.TripDate AS DATE) = CAST(GETDATE() AS DATE) "
                 + "ORDER BY CASE t.Status WHEN 'IN_PROGRESS' THEN 1 WHEN 'SCHEDULED' THEN 2 ELSE 3 END, "
                 + "t.TripDate ASC, t.StartTime ASC";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
