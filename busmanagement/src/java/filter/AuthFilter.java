@@ -126,27 +126,27 @@ public class AuthFilter implements Filter {
         //authorization
         //admin
         if(path.startsWith("/admin")&&!"ADMIN".equals(role)){
-            res.sendRedirect(req.getContextPath()+"/home");
+            res.sendRedirect(req.getContextPath()+"/access-denied");
             return;
         }
         //staff
         if(path.startsWith("/staff")&&!"STAFF".equals(role)){
-            res.sendRedirect(req.getContextPath()+"/home");
+            res.sendRedirect(req.getContextPath()+"/access-denied");
             return;
         }
         //driver
         if(path.startsWith("/driver")&&!"DRIVER".equals(role)){
-            res.sendRedirect(req.getContextPath()+"/home");
+            res.sendRedirect(req.getContextPath()+"/access-denied");
             return;
         }
         //assistant
         if(path.startsWith("/assistant")&&!"ASSISTANT".equals(role)){
-            res.sendRedirect(req.getContextPath()+"/home");
+            res.sendRedirect(req.getContextPath()+"/access-denied");
             return;
         }
         //customer
         if(path.startsWith("/customer")&&!"CUSTOMER".equals(role)){
-            res.sendRedirect(req.getContextPath()+"/home");
+            res.sendRedirect(req.getContextPath()+"/access-denied");
             return;
         }
         

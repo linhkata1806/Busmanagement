@@ -1,5 +1,78 @@
 <%@ page pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<style>
+    /* ===== GLOBAL NAVBAR BUTTON STYLES (DESKTOP & MOBILE) ===== */
+    .navbar-nav .btn-nav-login, 
+    .navbar-nav .btn-nav-register {
+        min-width: 105px !important;
+        text-align: center !important;
+    }
+
+    /* ===== RESPONSIVE NAVBAR FOR TABLET & MOBILE VIEW ===== */
+    @media (max-width: 991.98px) {
+        .navbar-collapse.show, 
+        .navbar-collapse.collapsing {
+            display: flex !important;
+            flex-direction: row !important;
+            justify-content: space-between !important;
+            align-items: flex-start !important;
+            width: 100%;
+        }
+        .navbar-collapse.show {
+            padding-top: 15px;
+            padding-bottom: 10px;
+        }
+        .navbar-nav.me-auto {
+            align-items: flex-start !important;
+            width: 50% !important;
+            margin-bottom: 0 !important;
+        }
+        .navbar-nav.ms-auto {
+            align-items: flex-end !important;
+            width: 50% !important;
+        }
+        .navbar-nav .nav-item {
+            width: 100%;
+            height: 45px; /* Giữ chiều cao cố định để 2 bên song song */
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px !important;
+        }
+        .navbar-nav.me-auto .nav-item {
+            justify-content: flex-start;
+        }
+        .navbar-nav.ms-auto .nav-item {
+            justify-content: flex-end;
+        }
+        /* Fix lỗi dropdown menu đẩy chữ tên người dùng trên mobile */
+        .navbar-nav .nav-item.dropdown {
+            display: block !important;
+            height: 45px !important;
+            position: relative;
+        }
+        .navbar-nav .nav-item.dropdown .nav-link {
+            height: 45px;
+            display: flex !important;
+            align-items: center;
+            justify-content: flex-end;
+            padding: 0 !important;
+            width: 100%;
+        }
+        .navbar-nav.me-auto .nav-link {
+            display: inline-block !important;
+            padding: 0 !important;
+        }
+        .navbar-nav .nav-link.btn-nav-login, 
+        .navbar-nav .nav-link.btn-nav-register {
+            margin-left: 0 !important;
+            margin-top: 0 !important;
+            padding: 6px 14px !important; /* Thu nhỏ padding để ôm sát chữ hơn */
+            min-width: 105px;             /* Thu nhỏ chiều rộng tối thiểu */
+            text-align: center;
+            display: inline-block !important;
+        }
+    }
+</style>
 <nav class="navbar navbar-expand-lg">
     <div class="container">
         <a class="navbar-brand" href="${pageContext.request.contextPath}/home">

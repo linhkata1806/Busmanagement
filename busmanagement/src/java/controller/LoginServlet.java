@@ -44,8 +44,8 @@ public class LoginServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         HttpSession session = request.getSession(false);
-        //check if session has not existed attribute  user is null
-        if (session == null || session.getAttribute("USER") != null) {
+        // Nếu người dùng đã đăng nhập (session khác null và USER khác null), chuyển hướng về home
+        if (session != null && session.getAttribute("USER") != null) {
             response.sendRedirect("home");
             return;
         }
