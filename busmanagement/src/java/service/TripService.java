@@ -183,4 +183,12 @@ public class TripService {
     public List<TripDTO> getTripsByAssistant(int assistantID) {
         return tripDAO.getTripsByAssistant(assistantID);
     }
+
+    public List<TripDTO> getTripsByDriver(int driverID) {
+        return tripDAO.getTripsByDriver(driverID);
+    }
+
+    public TripDTO getTripDTOByIDAndDriver(int tripID, int driverID) {
+        return tripDAO.getTripByIDAndDriver(tripID, driverID);
+    }
 }
