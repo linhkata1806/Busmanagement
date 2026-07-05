@@ -204,42 +204,6 @@ public class TripDAO extends DBContext {
         return false;
     }
 
-    // BỔ SUNG: Tài xế bắt đầu chuyến đi (SCHEDULED -> IN_PROGRESS, ghi ActualStartTime)
-    public void startTrip(int tripID) throws Exception {
-        String sql = "UPDATE Trips SET Status = 'IN_PROGRESS', ActualStartTime = GETDATE() WHERE TripID = ?";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setInt(1, tripID);
-            if (ps.executeUpdate() == 0) {
-                throw new Exception("Không tìm thấy chuyến xe để bắt đầu.");
-            }
-        }
-    }
-
-    // BỔ SUNG: Tài xế kết thúc chuyến đi (IN_PROGRESS -> COMPLETED, ghi ActualEndTime, cập nhật vé CHECKED_IN -> COMPLETED)
-    public void finishTrip(int tripID) throws Exception {
-        String sqlTrip = "UPDATE Trips SET Status = 'COMPLETED', ActualEndTime = GETDATE() WHERE TripID = ?";
-        String sqlTickets = "UPDATE Tickets SET Status = 'COMPLETED' WHERE TripID = ? AND Status = 'CHECKED_IN'";
-        try {
-            connection.setAutoCommit(false);
-            try (PreparedStatement psTrip = connection.prepareStatement(sqlTrip)) {
-                psTrip.setInt(1, tripID);
-                if (psTrip.executeUpdate() == 0) {
-                    throw new Exception("Không tìm thấy chuyến xe để kết thúc.");
-                }
-            }
-            try (PreparedStatement psTickets = connection.prepareStatement(sqlTickets)) {
-                psTickets.setInt(1, tripID);
-                psTickets.executeUpdate();
-            }
-            connection.commit();
-        } catch (Exception e) {
-            connection.rollback();
-            throw new Exception("Lỗi khi kết thúc chuyến xe: " + e.getMessage());
-        } finally {
-            connection.setAutoCommit(true);
-        }
-    }
-
     private TripDTO mapRowtoDTO(ResultSet rs) throws Exception {
         TripDTO dto = new TripDTO();
         dto.setTripID(rs.getInt("TripID"));
@@ -423,5 +387,192 @@ public class TripDAO extends DBContext {
             System.out.println("Lỗi getCurrentTripByAssistant: " + e.getMessage());
         }
         return null;
+    }
+
+    // ==========================================
+    // DRIVER MODULE METHODS
+    // ==========================================
+    public List<TripDTO> getTripsByDriver(int driverID) {
+        List<TripDTO> list = new ArrayList<>();
+        String sql = "SELECT t.TripID, r.RouteNumber, r.RouteName, b.LicensePlate AS BusPlate, "
+                + "ad.FullName AS DriverName, aa.FullName AS AssistantName, "
+                + "t.TripDate, t.StartTime, t.EndTime, t.Direction, t.Status, "
+                + "t.ActualStartTime, t.ActualEndTime "
+                + "FROM Trips t "
+                + "JOIN Routes r ON t.RouteID = r.RouteID "
+                + "JOIN Buses b ON t.BusID = b.BusID "
+                + "JOIN Accounts ad ON t.DriverID = ad.AccountID "
+                + "LEFT JOIN Accounts aa ON t.AssistantID = aa.AccountID "
+                + "WHERE t.DriverID = ? "
+                + "ORDER BY t.TripDate DESC, t.StartTime ASC";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, driverID);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    try {
+                        list.add(mapRowtoDTO(rs));
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                    }
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("Lỗi getTripsByDriver: " + e.getMessage());
+        }
+        return list;
+    }
+
+    public TripDTO getTripByIDAndDriver(int tripID, int driverID) {
+        String sql = "SELECT t.TripID, r.RouteNumber, r.RouteName, b.LicensePlate AS BusPlate, "
+                + "ad.FullName AS DriverName, aa.FullName AS AssistantName, "
+                + "t.TripDate, t.StartTime, t.EndTime, t.Direction, t.Status, "
+                + "t.ActualStartTime, t.ActualEndTime "
+                + "FROM Trips t "
+                + "JOIN Routes r ON t.RouteID = r.RouteID "
+                + "JOIN Buses b ON t.BusID = b.BusID "
+                + "JOIN Accounts ad ON t.DriverID = ad.AccountID "
+                + "LEFT JOIN Accounts aa ON t.AssistantID = aa.AccountID "
+                + "WHERE t.TripID = ? AND t.DriverID = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, tripID);
+            ps.setInt(2, driverID);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    try {
+                        return mapRowtoDTO(rs);
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                    }
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("Lỗi getTripByIDAndDriver: " + e.getMessage());
+        }
+        return null;
+    }
+
+    public boolean updateTripStatus(int tripID, String status) {
+        String sql = "UPDATE Trips SET Status = ? WHERE TripID = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, status);
+            ps.setInt(2, tripID);
+            return ps.executeUpdate() > 0;
+        } catch (Exception e) {
+            System.out.println("Lỗi updateTripStatus: " + e.getMessage());
+        }
+        return false;
+    }
+
+    public int countDriverTripsToday(int driverID) {
+        String sql = "SELECT COUNT(*) FROM Trips WHERE DriverID = ? AND TripDate = CAST(GETDATE() AS DATE)";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, driverID);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("Lỗi countDriverTripsToday: " + e.getMessage());
+        }
+        return 0;
+    }
+
+    public TripDTO getCurrentTripByDriver(int driverID) {
+        String sql = "SELECT TOP 1 t.TripID, r.RouteNumber, r.RouteName, b.LicensePlate AS BusPlate, "
+                + "ad.FullName AS DriverName, aa.FullName AS AssistantName, "
+                + "t.TripDate, t.StartTime, t.EndTime, t.Direction, t.Status, "
+                + "t.ActualStartTime, t.ActualEndTime "
+                + "FROM Trips t "
+                + "JOIN Routes r ON t.RouteID = r.RouteID "
+                + "JOIN Buses b ON t.BusID = b.BusID "
+                + "JOIN Accounts ad ON t.DriverID = ad.AccountID "
+                + "LEFT JOIN Accounts aa ON t.AssistantID = aa.AccountID "
+                + "WHERE t.DriverID = ? AND t.Status IN ('IN_PROGRESS', 'SCHEDULED') "
+                + "ORDER BY CASE t.Status WHEN 'IN_PROGRESS' THEN 1 WHEN 'SCHEDULED' THEN 2 ELSE 3 END, "
+                + "t.TripDate ASC, t.StartTime ASC";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, driverID);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    try {
+                        return mapRowtoDTO(rs);
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                    }
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("Lỗi getCurrentTripByDriver: " + e.getMessage());
+        }
+        return null;
+    }
+
+    /**
+     * Bắt đầu chuyến xe: cập nhật Status = 'IN_PROGRESS' và ghi ActualStartTime
+     * = NOW().
+     *
+     * @throws SQLException khi có lỗi kết nối hoặc thực thi DB
+     * @throws Exception khi không tìm thấy chuyến xe hợp lệ
+     */
+    public void startTrip(int tripID) throws Exception {
+        String sql = "UPDATE Trips SET Status = 'IN_PROGRESS', ActualStartTime = GETDATE() WHERE TripID = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, tripID);
+            if (ps.executeUpdate() == 0) {
+                throw new Exception("Không tìm thấy chuyến xe để bắt đầu hoặc trạng thái không hợp lệ.");
+            }
+        }
+    }
+
+    /**
+     * Kết thúc chuyến xe: cập nhật Status = 'COMPLETED' và ghi ActualEndTime =
+     * NOW(). Đồng thời cập nhật tất cả vé CHECKED_IN của chuyến thành
+     * COMPLETED.
+     *
+     * @throws SQLException khi có lỗi kết nối hoặc thực thi DB
+     * @throws Exception khi không tìm thấy chuyến xe hợp lệ để kết thúc
+     */
+    public void finishTrip(int tripID) throws Exception {
+        String sqlTrip = "UPDATE Trips SET Status = 'COMPLETED', ActualEndTime = GETDATE() WHERE TripID = ?";
+        String sqlTickets = "UPDATE Tickets SET Status = 'COMPLETED' WHERE TripID = ? AND Status = 'CHECKED_IN'";
+
+        try {
+            connection.setAutoCommit(false);
+
+            // 1. Cập nhật trạng thái chuyến xe
+            try (PreparedStatement psTrip = connection.prepareStatement(sqlTrip)) {
+                psTrip.setInt(1, tripID);
+                if (psTrip.executeUpdate() == 0) {
+                    throw new Exception("Không tìm thấy chuyến xe để kết thúc.");
+                }
+            }
+
+            // 2. Cập nhật trạng thái các vé liên quan (có thể có hoặc không có vé nào checked_in nên không cần check == 0)
+            try (PreparedStatement psTickets = connection.prepareStatement(sqlTickets)) {
+                psTickets.setInt(1, tripID);
+                psTickets.executeUpdate();
+            }
+
+            connection.commit();
+        } catch (Exception e) {
+            if (connection != null) {
+                try {
+                    connection.rollback();
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+            }
+            // Rethrow lỗi để tầng Service/Controller bắt được và xử lý hiển thị thông báo
+            throw new Exception("Lỗi khi kết thúc chuyến xe: " + e.getMessage());
+        } finally {
+            if (connection != null) {
+                try {
+                    connection.setAutoCommit(true);
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+            }
+        }
     }
 }
