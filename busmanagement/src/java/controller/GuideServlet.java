@@ -23,7 +23,7 @@ public class GuideServlet extends HttpServlet {
         try {
             List<Route> suspendedRoutes = routeDAO.getSuspendedRoutes();
             request.setAttribute("suspendedRoutes", suspendedRoutes);
-            request.getRequestDispatcher("/view/guide.jsp").forward(request, response);
+            request.getRequestDispatcher("/view/guest/guide.jsp").forward(request, response);
         } catch (Exception e) {
             response.setContentType("text/plain;charset=UTF-8");
             response.getWriter().println("Error executing GuideServlet: " + e.getMessage());

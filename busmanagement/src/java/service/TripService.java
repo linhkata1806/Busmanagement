@@ -120,7 +120,6 @@ public class TripService {
         }
     }
 
-    // ================= KHU VỰC PHÒNG THỦ VALIDATE TOÀN DIỆN =================
     private void validateTripBusinessRules(int routeID, int busID, int driverID, Integer assistantID,
             LocalDate tripDate, LocalTime startTime, LocalTime endTime,
             int direction, Integer excludeTripID) {
@@ -143,7 +142,7 @@ public class TripService {
         // 4. Test Route Inactive (Chặn bypass qua HTML)
         model.Route route = routeDAO.getRouteById(routeID);
         // Vì RouteDAO.getRouteById đã lọc sẵn WHERE IsActive = 1 nên nếu trả về null tức là tuyến không tồn tại hoặc đã bị khóa.
-        if (route == null) {
+        if (route == null&&!route.isIsActive()) {
             throw new IllegalArgumentException("Yêu cầu bị từ chối: Tuyến đường này không khả dụng hoặc đã bị ngừng hoạt động (Inactive).");
         }
 
@@ -190,5 +189,13 @@ public class TripService {
 
     public List<TripDTO> getTripsByAssistant(int assistantID) {
         return tripDAO.getTripsByAssistant(assistantID);
+    }
+
+    public List<TripDTO> getTripsByDriver(int driverID) {
+        return tripDAO.getTripsByDriver(driverID);
+    }
+
+    public TripDTO getTripDTOByIDAndDriver(int tripID, int driverID) {
+        return tripDAO.getTripByIDAndDriver(tripID, driverID);
     }
 }

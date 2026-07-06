@@ -21,4 +21,9 @@ public class PasswordEncoder {
     public static boolean checkPassword(String plainPassword, String hashedPassword) {
         return BCrypt.checkpw(plainPassword, hashedPassword);
     }
+    public static void main(String[] args) {
+        String myHash = hashPassword("123456");
+        System.out.println("Copy chuỗi này dán vào SQL nhé các bảo bối:");
+        System.out.println(myHash);
+    }
 }

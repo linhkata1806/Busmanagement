@@ -26,19 +26,19 @@
     </filter-mapping>
     <servlet>
         <servlet-name>LoginServlet</servlet-name>
-        <servlet-class>controller.LoginServlet</servlet-class>
+        <servlet-class>controller.authen.LoginServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>LogOutServlet</servlet-name>
-        <servlet-class>controller.LogOutServlet</servlet-class>
+        <servlet-class>controller.authen.LogOutServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>RegisterServlet</servlet-name>
-        <servlet-class>controller.RegisterServlet</servlet-class>
+        <servlet-class>controller.authen.RegisterServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>HomeServlet</servlet-name>
-        <servlet-class>controller.HomeServlet</servlet-class>
+        <servlet-class>controller.guest.HomeServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>GuideServlet</servlet-name>
@@ -46,19 +46,19 @@
     </servlet>
     <servlet>
         <servlet-name>SearchRouteServlet</servlet-name>
-        <servlet-class>controller.SearchRouteServlet</servlet-class>
+        <servlet-class>controller.guest.SearchRouteServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>RouteDetailServlet</servlet-name>
-        <servlet-class>controller.RouteDetailServlet</servlet-class>
+        <servlet-class>controller.guest.RouteDetailServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>FindRoundServlet</servlet-name>
-        <servlet-class>controller.FindRoundServlet</servlet-class>
+        <servlet-class>controller.guest.FindRoundServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>RouteListServlet</servlet-name>
-        <servlet-class>controller.RouteListServlet</servlet-class>
+        <servlet-class>controller.guest.RouteListServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>DashboardServlet</servlet-name>
@@ -98,107 +98,103 @@
     </servlet>
     <servlet>
         <servlet-name>MonthlyPassServlet</servlet-name>
-        <servlet-class>controller.staff.MonthlyPassServlet</servlet-class>
+        <servlet-class>controller.staff.pass.MonthlyPassServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>ApproveMonthlyPassServlet</servlet-name>
-        <servlet-class>controller.staff.ApproveMonthlyPassServlet</servlet-class>
+        <servlet-class>controller.staff.pass.ApproveMonthlyPassServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>RejectMonthlyPassServlet</servlet-name>
-        <servlet-class>controller.staff.RejectMonthlyPassServlet</servlet-class>
+        <servlet-class>controller.staff.pass.RejectMonthlyPassServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>NotificationManagementServlet</servlet-name>
-        <servlet-class>controller.staff.NotificationManagementServlet</servlet-class>
+        <servlet-class>controller.staff.notification.NotificationManagementServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>CreateNotificationServlet</servlet-name>
-        <servlet-class>controller.staff.CreateNotificationServlet</servlet-class>
+        <servlet-class>controller.staff.notification.CreateNotificationServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>EditNotificationServlet</servlet-name>
-        <servlet-class>controller.staff.EditNotificationServlet</servlet-class>
+        <servlet-class>controller.staff.notification.EditNotificationServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>DeleteNotificationServlet</servlet-name>
-        <servlet-class>controller.staff.DeleteNotificationServlet</servlet-class>
+        <servlet-class>controller.staff.notification.DeleteNotificationServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>TripManagementServlet</servlet-name>
-        <servlet-class>controller.staff.TripManagementServlet</servlet-class>
+        <servlet-class>controller.staff.trip.TripManagementServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>CreateTripServlet</servlet-name>
-        <servlet-class>controller.staff.CreateTripServlet</servlet-class>
+        <servlet-class>controller.staff.trip.CreateTripServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>UpdateTripServlet</servlet-name>
-        <servlet-class>controller.staff.UpdateTripServlet</servlet-class>
+        <servlet-class>controller.staff.trip.UpdateTripServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>DeleteTripServlet</servlet-name>
-        <servlet-class>controller.staff.DeleteTripServlet</servlet-class>
+        <servlet-class>controller.staff.trip.DeleteTripServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>RouteManagementServlet</servlet-name>
-        <servlet-class>controller.staff.RouteManagementServlet</servlet-class>
+        <servlet-class>controller.staff.route.RouteManagementServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>RouteViewServlet</servlet-name>
-        <servlet-class>controller.staff.RouteViewServlet</servlet-class>
+        <servlet-class>controller.staff.route.RouteViewServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>CreateRouteServlet</servlet-name>
-        <servlet-class>controller.staff.CreateRouteServlet</servlet-class>
+        <servlet-class>controller.staff.route.CreateRouteServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>UpdateRouteServlet</servlet-name>
-        <servlet-class>controller.staff.UpdateRouteServlet</servlet-class>
+        <servlet-class>controller.staff.route.UpdateRouteServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>DeleteRouteServlet</servlet-name>
-        <servlet-class>controller.staff.DeleteRouteServlet</servlet-class>
+        <servlet-class>controller.staff.route.DeleteRouteServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>BusManagementServlet</servlet-name>
-        <servlet-class>controller.staff.BusManagementServlet</servlet-class>
+        <servlet-class>controller.staff.bus.BusManagementServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>CreateBusServlet</servlet-name>
-        <servlet-class>controller.staff.CreateBusServlet</servlet-class>
+        <servlet-class>controller.staff.bus.CreateBusServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>UpdateBusServlet</servlet-name>
-        <servlet-class>controller.staff.UpdateBusServlet</servlet-class>
+        <servlet-class>controller.staff.bus.UpdateBusServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>DeleteBusServlet</servlet-name>
-        <servlet-class>controller.staff.DeleteBusServlet</servlet-class>
+        <servlet-class>controller.staff.bus.DeleteBusServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>StopManagementServlet</servlet-name>
-        <servlet-class>controller.staff.StopManagementServlet</servlet-class>
+        <servlet-class>controller.staff.stop.StopManagementServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>CreateStopServlet</servlet-name>
-        <servlet-class>controller.staff.CreateStopServlet</servlet-class>
+        <servlet-class>controller.staff.stop.CreateStopServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>UpdateStopServlet</servlet-name>
-        <servlet-class>controller.staff.UpdateStopServlet</servlet-class>
+        <servlet-class>controller.staff.stop.UpdateStopServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>DeleteStopServlet</servlet-name>
-        <servlet-class>controller.staff.DeleteStopServlet</servlet-class>
+        <servlet-class>controller.staff.stop.DeleteStopServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>RouteStopManagementServlet</servlet-name>
-        <servlet-class>controller.staff.RouteStopManagementServlet</servlet-class>
-    </servlet>
-    <servlet>
-        <servlet-name>AddStopToRouteServlet</servlet-name>
-        <servlet-class>controller.staff.AddStopToRouteServlet</servlet-class>
+        <servlet-class>controller.staff.stop.RouteStopManagementServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>PaymentQRJSP</servlet-name>
@@ -231,6 +227,42 @@
     <servlet>
         <servlet-name>AssistantChangePasswordServlet</servlet-name>
         <servlet-class>controller.assistant.ChangePasswordServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>DriverDashboardServlet</servlet-name>
+        <servlet-class>controller.driver.DriverDashboardServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>DriverMyTripServlet</servlet-name>
+        <servlet-class>controller.driver.MyTripServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>DriverTripDetailServlet</servlet-name>
+        <servlet-class>controller.driver.TripDetailServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>DriverStartTripServlet</servlet-name>
+        <servlet-class>controller.driver.StartTripServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>DriverFinishTripServlet</servlet-name>
+        <servlet-class>controller.driver.FinishTripServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>DriverNotificationServlet</servlet-name>
+        <servlet-class>controller.driver.NotificationServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>DriverProfileServlet</servlet-name>
+        <servlet-class>controller.driver.ProfileServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>DriverChangePasswordServlet</servlet-name>
+        <servlet-class>controller.driver.ChangePasswordServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>AddStopToRouteServlet</servlet-name>
+        <servlet-class>controller.staff.stop.AddStopToRouteServlet</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>LoginServlet</servlet-name>
@@ -405,10 +437,6 @@
         <url-pattern>/staff/route-stop</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>AddStopToRouteServlet</servlet-name>
-        <url-pattern>/staff/route-stop/add</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
         <servlet-name>PaymentQRJSP</servlet-name>
         <url-pattern>/customer/payment-qr</url-pattern>
     </servlet-mapping>
@@ -439,6 +467,42 @@
     <servlet-mapping>
         <servlet-name>AssistantChangePasswordServlet</servlet-name>
         <url-pattern>/assistant/change-password</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>DriverDashboardServlet</servlet-name>
+        <url-pattern>/driver/dashboard</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>DriverMyTripServlet</servlet-name>
+        <url-pattern>/driver/trip</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>DriverTripDetailServlet</servlet-name>
+        <url-pattern>/driver/trip/detail</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>DriverStartTripServlet</servlet-name>
+        <url-pattern>/driver/trip/start</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>DriverFinishTripServlet</servlet-name>
+        <url-pattern>/driver/trip/finish</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>DriverNotificationServlet</servlet-name>
+        <url-pattern>/driver/notification</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>DriverProfileServlet</servlet-name>
+        <url-pattern>/driver/profile</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>DriverChangePasswordServlet</servlet-name>
+        <url-pattern>/driver/change-password</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>AddStopToRouteServlet</servlet-name>
+        <url-pattern>/staff/route-stop/add</url-pattern>
     </servlet-mapping>
     <welcome-file-list>
         <welcome-file>home</welcome-file>

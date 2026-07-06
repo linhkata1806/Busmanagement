@@ -187,6 +187,7 @@ public class NotificationDAO extends DBContext {
                 list.add(mapRow(rs));
             }
         } catch (Exception e) {
+            e.printStackTrace();
         }
         return list;
     }
@@ -236,6 +237,12 @@ public class NotificationDAO extends DBContext {
         Notification n = new Notification();
         n.setNotificationID(rs.getInt("NotificationID"));
         n.setAccountID(rs.getInt("AccountID"));
+        int accountID = rs.getInt("AccountID");
+        if (rs.wasNull()) {
+            n.setAccountID(0);
+        } else {
+            n.setAccountID(accountID);
+    }
         n.setNotificationType(NotificationType.valueOf(rs.getString("NotificationType")));
         n.setTitle(rs.getString("Title"));
         n.setContent(rs.getString("Content"));

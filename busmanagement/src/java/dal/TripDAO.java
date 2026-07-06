@@ -6,6 +6,7 @@ package dal;
 
 import dto.TripDTO;
 import enums.TripStatus;
+import java.sql.Timestamp;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -210,42 +211,6 @@ public class TripDAO extends DBContext {
             System.out.println("Lỗi delete Trip: " + e.getMessage());
         }
         return false;
-    }
-
-    // BỔ SUNG: Tài xế bắt đầu chuyến đi (SCHEDULED -> IN_PROGRESS, ghi ActualStartTime)
-    public void startTrip(int tripID) throws Exception {
-        String sql = "UPDATE Trips SET Status = 'IN_PROGRESS', ActualStartTime = GETDATE() WHERE TripID = ?";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setInt(1, tripID);
-            if (ps.executeUpdate() == 0) {
-                throw new Exception("Không tìm thấy chuyến xe để bắt đầu.");
-            }
-        }
-    }
-
-    // BỔ SUNG: Tài xế kết thúc chuyến đi (IN_PROGRESS -> COMPLETED, ghi ActualEndTime, cập nhật vé CHECKED_IN -> COMPLETED)
-    public void finishTrip(int tripID) throws Exception {
-        String sqlTrip = "UPDATE Trips SET Status = 'COMPLETED', ActualEndTime = GETDATE() WHERE TripID = ?";
-        String sqlTickets = "UPDATE Tickets SET Status = 'COMPLETED' WHERE TripID = ? AND Status = 'CHECKED_IN'";
-        try {
-            connection.setAutoCommit(false);
-            try (PreparedStatement psTrip = connection.prepareStatement(sqlTrip)) {
-                psTrip.setInt(1, tripID);
-                if (psTrip.executeUpdate() == 0) {
-                    throw new Exception("Không tìm thấy chuyến xe để kết thúc.");
-                }
-            }
-            try (PreparedStatement psTickets = connection.prepareStatement(sqlTickets)) {
-                psTickets.setInt(1, tripID);
-                psTickets.executeUpdate();
-            }
-            connection.commit();
-        } catch (Exception e) {
-            connection.rollback();
-            throw new Exception("Lỗi khi kết thúc chuyến xe: " + e.getMessage());
-        } finally {
-            connection.setAutoCommit(true);
-        }
     }
 
     private TripDTO mapRowtoDTO(ResultSet rs) throws Exception {

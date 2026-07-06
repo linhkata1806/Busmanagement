@@ -17,6 +17,7 @@ import java.sql.SQLException;
  */
 public class StopDAO extends DBContext {
 
+    //======= Hàm cho guest- hiển thị lên home servlet
     public List<Stop> getAllStops() {
         List<Stop> list = new ArrayList<>();
         String sql = "SELECT * FROM Stops WHERE IsActive = 1";
@@ -29,6 +30,22 @@ public class StopDAO extends DBContext {
             e.printStackTrace();
         }
         return list;
+    }
+
+    //============hàm cho guest Lấy chi tiết thông tin 1 trạm dừng dựa vào ID
+    public Stop getStopById(int stopId) {
+        String sql = "SELECT * FROM Stops WHERE StopID = ? AND IsActive = 1";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, stopId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return mapStop(rs); // Gọi lại hàm mapStop có sẵn cực tiện
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     private Stop mapStop(ResultSet rs) throws SQLException {
@@ -69,23 +86,7 @@ public class StopDAO extends DBContext {
         return list;
     }
 
-    // Lấy chi tiết thông tin 1 trạm dừng dựa vào ID
-    public Stop getStopById(int stopId) {
-        String sql = "SELECT * FROM Stops WHERE StopID = ? AND IsActive = 1";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setInt(1, stopId);
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    return mapStop(rs); // Gọi lại hàm mapStop có sẵn cực tiện
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
 // 1. TÌM KIẾM VÀ LỌC ĐIỂM DỪNG (Xử lý chuỗi ALL/ACTIVE/INACTIVE sang BIT)
-
     public List<Stop> searchAndFilter(String keyword, String status) {
         List<Stop> list = new ArrayList<>();
         StringBuilder sql = new StringBuilder("SELECT * FROM Stops WHERE (StopName LIKE ? OR Address LIKE ?) ");
@@ -194,18 +195,18 @@ public class StopDAO extends DBContext {
 
     public List<Stop> getAvailableStops(int routeID) {
         List<Stop> list = new ArrayList<>();
-        
+
         // Truy vấn lấy các trạm ACTIVE và CHƯA nằm trong Route_Stop của tuyến hiện tại
         String sql = "SELECT * FROM Stops "
-                   + "WHERE IsActive = 1 "
-                   + "AND StopID NOT IN ("
-                   + "    SELECT StopID FROM Route_Stop WHERE RouteID = ?"
-                   + ") "
-                   + "ORDER BY StopName ASC";
-                   
+                + "WHERE IsActive = 1 "
+                + "AND StopID NOT IN ("
+                + "    SELECT StopID FROM Route_Stop WHERE RouteID = ?"
+                + ") "
+                + "ORDER BY StopName ASC";
+
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, routeID);
-            
+
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     Stop stop = new Stop();
@@ -215,7 +216,7 @@ public class StopDAO extends DBContext {
                     stop.setLatitude(rs.getDouble("Latitude"));
                     stop.setLongitude(rs.getDouble("Longitude"));
                     stop.setIsActive(rs.getBoolean("IsActive"));
-                    
+
                     list.add(stop);
                 }
             }
@@ -223,7 +224,7 @@ public class StopDAO extends DBContext {
             System.out.println("Lỗi tại getAvailableStops (StopDAO): " + e.getMessage());
             e.printStackTrace();
         }
-        
+
         return list;
     }
 }

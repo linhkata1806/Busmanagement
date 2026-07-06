@@ -2,59 +2,92 @@ package service;
 
 import dal.TripDAO;
 import enums.TripStatus;
+import java.sql.Timestamp;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.temporal.ChronoUnit;
 import model.Trip;
 
-/**
- * Service xử lý các nghiệp vụ chuyến đi của Tài xế:
- * - Bắt đầu chuyến (startTrip): SCHEDULED -> IN_PROGRESS, ghi ActualStartTime
- * - Kết thúc chuyến (finishTrip): IN_PROGRESS -> COMPLETED, ghi ActualEndTime,
- *   đồng thời cập nhật trạng thái tất cả vé CHECKED_IN của chuyến thành COMPLETED
- */
 public class DriverTripService {
 
-    private final TripDAO tripDAO;
+    private TripDAO tripDAO;
 
     public DriverTripService() {
         this.tripDAO = new TripDAO();
     }
 
-    /**
-     * Tài xế bắt đầu chuyến xe.
-     * Điều kiện: chuyến phải ở trạng thái SCHEDULED.
-     * @param tripID ID của chuyến xe cần bắt đầu
-     * @throws Exception nếu chuyến không tồn tại hoặc không ở trạng thái SCHEDULED
-     */
-    public void startTrip(int tripID) throws Exception {
+    public void startTrip(int tripID, int driverID) throws Exception {
         Trip trip = tripDAO.getById(tripID);
+
         if (trip == null) {
-            throw new IllegalArgumentException("Chuyến xe #" + tripID + " không tồn tại.");
+            throw new Exception("Chuyến xe không tồn tại.");
         }
+
+        // 1. Validate quyền
+        if (trip.getDriverID() != driverID) {
+            throw new Exception("Bạn không có quyền bắt đầu chuyến xe của nhân sự khác.");
+        }
+
+        // 2. Validate trạng thái
         if (trip.getStatus() != TripStatus.SCHEDULED) {
-            throw new IllegalArgumentException(
-                "Không thể bắt đầu chuyến. Trạng thái hiện tại: " + trip.getStatus()
-                + " (Chỉ có thể bắt đầu khi SCHEDULED)."
-            );
+            throw new Exception("Chuyến xe không ở trạng thái chờ khởi hành.");
         }
-        tripDAO.startTrip(tripID);
+
+        // 3. Validate ngày (Chỉ cho phép chạy trong ngày hôm nay)
+        LocalDate today = LocalDate.now();
+        if (!trip.getTripDate().equals(today)) {
+            throw new Exception("Chỉ có thể bắt đầu chuyến xe trong đúng ngày được phân công.");
+        }
+
+        // 4. Validate thời gian (Khoảng thời gian cho phép: -30 phút đến +30 phút so với giờ StartTime)
+        LocalTime now = LocalTime.now();
+        LocalTime scheduledTime = trip.getStartTime();
+
+        // Tính chênh lệch phút giữa bây giờ và lịch trình
+        long minutesDifference = ChronoUnit.MINUTES.between(scheduledTime, now);
+
+        if (minutesDifference < -5) {
+            // Sớm hơn 5 phút
+            throw new Exception("Chuyến xe chưa tới giờ (chỉ chạy sớm trước 5 phút), chưa thể bắt đầu.");
+        } else if (minutesDifference > 30) {
+            // Trễ hơn 30 phút
+            // (Tuỳ nghiệp vụ, bạn có thể gọi updateTripStatus thành CANCELLED ở đây luôn nếu muốn)
+            throw new Exception("Chuyến xe đã lỡ (chỉ chạy sau giờ tối đa 30 phút), liên hệ với nhân viên.");
+        }
+
+        // Đủ điều kiện -> Tiến hành bắt đầu chuyến
+        Timestamp actualStart = new Timestamp(System.currentTimeMillis());
+        boolean isSuccess = tripDAO.startTripActual(tripID, actualStart);
+
+        if (!isSuccess) {
+            throw new Exception("Lỗi hệ thống khi cập nhật chuyến xe.");
+        }
     }
 
-    /**
-     * Tài xế kết thúc chuyến xe.
-     * Điều kiện: chuyến phải ở trạng thái IN_PROGRESS.
-     * @param tripID ID của chuyến xe cần kết thúc
-     * @throws Exception nếu chuyến không tồn tại hoặc không ở trạng thái IN_PROGRESS
-     */
-    public void finishTrip(int tripID) throws Exception {
+    // Bổ sung vào service/DriverTripService.java
+    public void finishTrip(int tripID, int driverID) throws Exception {
         Trip trip = tripDAO.getById(tripID);
+
         if (trip == null) {
-            throw new IllegalArgumentException("Chuyến xe #" + tripID + " không tồn tại.");
+            throw new Exception("Chuyến xe không tồn tại.");
         }
+
+        // 1. Validate quyền sở hữu chuyến xe
+        if (trip.getDriverID() != driverID) {
+            throw new Exception("Bạn không có quyền kết thúc chuyến xe của nhân sự khác.");
+        }
+
+        // 2. Validate trạng thái (Chỉ xe đang chạy mới được kết thúc)
         if (trip.getStatus() != TripStatus.IN_PROGRESS) {
-            throw new IllegalArgumentException(
-                "Không thể kết thúc chuyến. Trạng thái hiện tại: " + trip.getStatus()
-                + " (Chỉ có thể kết thúc khi IN_PROGRESS)."
-            );
+            throw new Exception("Chuyến xe không ở trạng thái đang chạy, không thể kết thúc.");
         }
-        tripDAO.finishTrip(tripID);
+
+        // 3. Tiến hành kết thúc chuyến đi và ghi nhận giờ thực tế
+        Timestamp actualEnd = new Timestamp(System.currentTimeMillis());
+        boolean isSuccess = tripDAO.finishTripActual(tripID, actualEnd);
+
+        if (!isSuccess) {
+            throw new Exception("Lỗi hệ thống khi cập nhật kết thúc chuyến xe.");
+        }
     }
 }

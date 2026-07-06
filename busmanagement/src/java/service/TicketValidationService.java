@@ -24,6 +24,8 @@ public class TicketValidationService {
      * 4. Ngày chạy của chuyến đi phải là hôm nay (đúng ngày chạy)
      */
     public Ticket validateTicketForCheckIn(String ticketCode, int tripID) {
+        
+        ticketDAO.updateExpiredTickets(); 
         if (ticketCode == null || ticketCode.trim().isEmpty()) {
             throw new IllegalArgumentException("Mã vé không được để trống.");
         }
