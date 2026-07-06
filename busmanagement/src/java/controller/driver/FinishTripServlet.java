@@ -7,18 +7,16 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import model.Account;
-import model.Trip;
 import service.DriverTripService;
-import service.TripService;
 
 public class FinishTripServlet extends HttpServlet {
+
     private DriverTripService driverTripService;
-    private TripService tripService;
 
     @Override
     public void init() throws ServletException {
         driverTripService = new DriverTripService();
-        tripService = new TripService();
+        // Đã bỏ TripService ở đây vì logic tìm kiếm và validate đã được chuyển hết vào DriverTripService
     }
 
     @Override
@@ -29,44 +27,31 @@ public class FinishTripServlet extends HttpServlet {
             response.sendRedirect(request.getContextPath() + "/login");
             return;
         }
+
         Account user = (Account) session.getAttribute("USER");
         int driverID = user.getAccountID();
 
         String tripIDStr = request.getParameter("tripID");
         if (tripIDStr == null || tripIDStr.trim().isEmpty()) {
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Thiếu mã chuyến xe.");
+            session.setAttribute("error", "Thiếu mã chuyến xe.");
+            response.sendRedirect(request.getContextPath() + "/driver/dashboard");
             return;
         }
 
         try {
             int tripID = Integer.parseInt(tripIDStr);
-            Trip trip = tripService.getTripById(tripID);
 
-            if (trip == null) {
-                session.setAttribute("error", "Chuyến xe không tồn tại.");
-                response.sendRedirect(request.getContextPath() + "/driver/dashboard");
-                return;
-            }
-
-            // Security constraint: Check ownership
-            if (trip.getDriverID() != driverID) {
-                session.setAttribute("error", "Bạn không có quyền kết thúc chuyến xe của nhân sự khác.");
-                response.sendRedirect(request.getContextPath() + "/driver/dashboard");
-                return;
-            }
-
-            driverTripService.finishTrip(tripID);
+            // Gọi Service để xử lý nghiệp vụ kết thúc chuyến xe (truyền thêm driverID để validate)
+            driverTripService.finishTrip(tripID, driverID);
 
             session.setAttribute("successMsg", "Kết thúc chuyến đi #" + tripID + " thành công!");
-            response.sendRedirect(request.getContextPath() + "/driver/dashboard");
-        } catch (IllegalArgumentException e) {
-            session.setAttribute("error", e.getMessage());
-            response.sendRedirect(request.getContextPath() + "/driver/dashboard");
         } catch (Exception e) {
-            e.printStackTrace();
-            session.setAttribute("error", "Có lỗi xảy ra: " + e.getMessage());
-            response.sendRedirect(request.getContextPath() + "/driver/dashboard");
+            // Bắt trúng các thông báo lỗi từ Service và hiển thị cho tài xế
+            e.printStackTrace(); // Giữ lại để log ra console khi debug
+            session.setAttribute("error", e.getMessage());
         }
+
+        response.sendRedirect(request.getContextPath() + "/driver/dashboard");
     }
 
     @Override
