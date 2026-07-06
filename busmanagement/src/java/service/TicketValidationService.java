@@ -16,6 +16,8 @@ public class TicketValidationService {
     }
 
     public Ticket validateTicketForCheckIn(String ticketCode, int tripID) {
+        
+        ticketDAO.updateExpiredTickets(); 
         if (ticketCode == null || ticketCode.trim().isEmpty()) {
             throw new IllegalArgumentException("Mã vé không được để trống.");
         }

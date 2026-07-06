@@ -22,8 +22,9 @@ import java.util.List;
  */
 public class TicketDAO extends DBContext {
 
+    //===========customer(hien thi trong thong ke o profile)
     public int countUnusedTickets(int accountId) {
-        String sql = "SELECT COUNT(*) FROM Tickets WHERE AccountID = ? AND Status = 'UNUSED'";
+        String sql = "SELECT COUNT(*) FROM Tickets WHERE AccountID = ? AND Status = 'UNUSED' AND CAST(PurchasedAt AS DATE) = CAST(GETDATE() AS DATE)";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, accountId);
             try (ResultSet rs = ps.executeQuery()) {
@@ -37,6 +38,7 @@ public class TicketDAO extends DBContext {
         return 0;
     }
 
+    ///===== customer(dung khi cus mua ve luot)
     public boolean insert(Ticket ticket) {
         String sql = "INSERT INTO Tickets (AccountID, TripID, RouteID, TicketCode, Price, SaleChannel, Status, PurchasedAt) "
                 + "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
@@ -70,6 +72,7 @@ public class TicketDAO extends DBContext {
         }
     }
 
+    //==========customer(dung trong trang ve cua toi)
     public List<TicketDTO> getTicketsByAccount(int accountID) {
         List<TicketDTO> list = new ArrayList<>();
         String sql = "SELECT t.TicketCode, t.Price, t.Status, t.PurchasedAt, "
@@ -117,7 +120,8 @@ public class TicketDAO extends DBContext {
         }
         return t;
     }
-    
+
+    //======customer(dung khi  vao lich su chuyen di)
     public List<dto.TripHistoryDTO> getRecentTripsByAccount(int accountID) {
         List<dto.TripHistoryDTO> list = new ArrayList<>();
         String sql = "SELECT tr.TripDate, r.RouteNumber, b.LicensePlate, r.StartPoint, r.EndPoint "
@@ -145,6 +149,16 @@ public class TicketDAO extends DBContext {
             e.printStackTrace();
         }
         return list;
+    }
+
+    //=====customer(hủy vé quá ngày)
+    public void updateExpiredTickets() {
+        String sql = "UPDATE Tickets SET Status = 'EXPIRED' WHERE Status = 'UNUSED' AND CAST(PurchasedAt AS DATE) < CAST(GETDATE() AS DATE)";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     public Ticket getByCode(String ticketCode) {
