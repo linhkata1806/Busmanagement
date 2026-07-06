@@ -2,8 +2,9 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
  */
-package controller;
+package controller.authen;
 
+import controller.*;
 import service.AuthService;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -56,7 +57,7 @@ public class RegisterServlet extends HttpServlet {
             return;
         }
 
-        request.getRequestDispatcher("view/register.jsp").forward(request, response);
+        request.getRequestDispatcher("view/authen/register.jsp").forward(request, response);
     }
 
     /**

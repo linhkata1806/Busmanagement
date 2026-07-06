@@ -2,8 +2,9 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
  */
-package controller;
+package controller.guest;
 
+import controller.*;
 import dal.RouteDAO;
 import dal.StopDAO;
 import java.io.IOException;
@@ -91,7 +92,7 @@ public class FindRoundServlet extends HttpServlet {
             }
         }
 
-        request.getRequestDispatcher("view/find-route.jsp")
+        request.getRequestDispatcher("view/guest/find-route.jsp")
                 .forward(request, response);
     }
 

@@ -3,11 +3,12 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
  */
 
-package controller;
+package controller.authen;
 
 
 
 
+import controller.*;
 import service.AuthService;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -49,7 +50,7 @@ public class LoginServlet extends HttpServlet {
             response.sendRedirect("home");
             return;
         }
-        request.getRequestDispatcher("view/login.jsp").forward(request, response);
+        request.getRequestDispatcher("view/authen/login.jsp").forward(request, response);
     }
 
     /**
@@ -99,7 +100,7 @@ public class LoginServlet extends HttpServlet {
                     break;
             }
         } else {
-            request.setAttribute("error", "Tên đăng nhập, mật khẩu không đúng hoặc tài khoản bị khóa!");
+            request.setAttribute("error", "Tên đăng nhập, email,mật khẩu không đúng hoặc tài khoản bị khóa!");
             request.setAttribute("username", user);
             request.getRequestDispatcher("view/login.jsp").forward(request, response);
         }

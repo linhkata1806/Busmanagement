@@ -24,9 +24,7 @@ public class RouteDAO extends DBContext {
         return route;
     }
 
-    // =========================================================================
-    // KHU VỰC 1: CÁC HÀM CŨ ĐƯỢC GIỮ LẠI (ĐỂ KHÔNG BỊ LỖI ĐỎ Ở CÁC SERVLET CŨ)
-    // =========================================================================
+    //==== hàm cho guest sau sẽ đổi thành poppular
     public List<Route> getPopularRoutes(int limit) {
         List<Route> list = new ArrayList<>();
         String sql = "SELECT TOP (?) * FROM Routes WHERE IsActive = 1 ORDER BY RouteNumber ASC";
@@ -43,6 +41,7 @@ public class RouteDAO extends DBContext {
         return list;
     }
 
+    //=== ham cho guest dẩy lên routeList-Servlet
     public List<Route> getAllActiveRoutes() {
         List<Route> list = new ArrayList<>();
         String sql = "SELECT * FROM Routes WHERE IsActive = 1 ORDER BY RouteNumber ASC";
@@ -55,7 +54,7 @@ public class RouteDAO extends DBContext {
         }
         return list;
     }
-
+    //==== ham cho guest
     public Route getRouteById(int routeId) {
         String sql = "SELECT * FROM Routes WHERE RouteID = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -70,19 +69,7 @@ public class RouteDAO extends DBContext {
         }
         return null;
     }
-
-    public List<Route> getSuspendedRoutes() {
-        List<Route> list = new ArrayList<>();
-        String sql = "SELECT * FROM Routes WHERE IsActive = 0 ORDER BY RouteNumber ASC";
-        try (PreparedStatement ps = connection.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
-            while (rs.next()) {
-                list.add(mapRoute(rs));
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return list;
-    }
+    //==== ham cho guest
 
     public List<Route> searchRoutes(String keyword) {
         List<Route> list = new ArrayList<>();
@@ -102,6 +89,41 @@ public class RouteDAO extends DBContext {
                 while (rs.next()) {
                     list.add(mapRoute(rs));
                 }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
+        //==== ham cho guest
+    public List<Route> findRoutesBetweenStops(int fromStopID, int toStopID) {
+        List<Route> list = new ArrayList<>();
+        String sql = "SELECT r.* FROM Routes r "
+                + "JOIN Route_Stop rs1 ON r.RouteID = rs1.RouteID "
+                + "JOIN Route_Stop rs2 ON r.RouteID = rs2.RouteID "
+                + "WHERE rs1.StopID = ? AND rs2.StopID = ? "
+                + "AND rs1.StopOrder < rs2.StopOrder AND r.IsActive = 1";
+        try (PreparedStatement st = connection.prepareStatement(sql)) {
+            st.setInt(1, fromStopID);
+            st.setInt(2, toStopID);
+            try (ResultSet rs = st.executeQuery()) {
+                while (rs.next()) {
+                    list.add(mapRoute(rs));
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("Lỗi findRoutesBetweenStops: " + e.getMessage());
+        }
+        return list;
+    }
+
+    public List<Route> getSuspendedRoutes() {
+        List<Route> list = new ArrayList<>();
+        String sql = "SELECT * FROM Routes WHERE IsActive = 0";
+        try (PreparedStatement ps = connection.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                list.add(mapRoute(rs));
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -135,27 +157,6 @@ public class RouteDAO extends DBContext {
             e.printStackTrace();
         }
         return null;
-    }
-
-    public List<Route> findRoutesBetweenStops(int fromStopID, int toStopID) {
-        List<Route> list = new ArrayList<>();
-        String sql = "SELECT r.* FROM Routes r "
-                + "JOIN Route_Stop rs1 ON r.RouteID = rs1.RouteID "
-                + "JOIN Route_Stop rs2 ON r.RouteID = rs2.RouteID "
-                + "WHERE rs1.StopID = ? AND rs2.StopID = ? "
-                + "AND rs1.StopOrder < rs2.StopOrder AND r.IsActive = 1";
-        try (PreparedStatement st = connection.prepareStatement(sql)) {
-            st.setInt(1, fromStopID);
-            st.setInt(2, toStopID);
-            try (ResultSet rs = st.executeQuery()) {
-                while (rs.next()) {
-                    list.add(mapRoute(rs));
-                }
-            }
-        } catch (Exception e) {
-            System.out.println("Lỗi findRoutesBetweenStops: " + e.getMessage());
-        }
-        return list;
     }
 
     public List<Route> searchAndFilter(String keyword, String status) {
