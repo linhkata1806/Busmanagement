@@ -342,10 +342,53 @@
             registerForm.addEventListener('submit', function (e) {
                 e.preventDefault();
 
+                const fullNameVal = document.getElementsByName('fullName')[0].value.trim();
+                const usernameVal = document.getElementsByName('username')[0].value.trim();
                 const passwordVal = document.getElementById('password').value;
                 const repasswordVal = document.getElementById('repassword').value;
+                const emailVal = document.getElementsByName('email')[0].value.trim();
+                const phoneVal = document.getElementsByName('phone')[0].value.trim();
 
-                // Client-side passwords match validation
+                // 1. Kiểm tra rỗng
+                if (!fullNameVal || !usernameVal || !passwordVal || !repasswordVal || !emailVal || !phoneVal) {
+                    alertContainer.innerHTML = `
+                        <div class="alert alert-danger alert-dismissible fade show d-flex align-items-center mb-3" role="alert">
+                            <i class="fas fa-exclamation-circle me-2"></i>
+                            <div>Vui lòng nhập đầy đủ các trường thông tin bắt buộc!</div>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    `;
+                    alertContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    return;
+                }
+
+                // 2. Validate định dạng tên đăng nhập
+                if (!/^[a-zA-Z0-9_]{5,30}$/.test(usernameVal)) {
+                    alertContainer.innerHTML = `
+                        <div class="alert alert-danger alert-dismissible fade show d-flex align-items-center mb-3" role="alert">
+                            <i class="fas fa-exclamation-circle me-2"></i>
+                            <div>Tên đăng nhập phải từ 5-30 ký tự, chỉ chứa chữ cái, chữ số và dấu gạch dưới.</div>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    `;
+                    alertContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    return;
+                }
+
+                // 3. Validate mật khẩu tối thiểu
+                if (passwordVal.length < 6) {
+                    alertContainer.innerHTML = `
+                        <div class="alert alert-danger alert-dismissible fade show d-flex align-items-center mb-3" role="alert">
+                            <i class="fas fa-exclamation-circle me-2"></i>
+                            <div>Mật khẩu phải có ít nhất 6 ký tự.</div>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    `;
+                    alertContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    return;
+                }
+
+                // 4. Mật khẩu nhập lại khớp
                 if (passwordVal !== repasswordVal) {
                     alertContainer.innerHTML = `
                         <div class="alert alert-danger alert-dismissible fade show d-flex align-items-center mb-3" role="alert">
@@ -354,12 +397,35 @@
                             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                         </div>
                     `;
+                    alertContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
                     return;
                 }
 
-                // Validate form inputs
-                if (!registerForm.checkValidity()) {
-                    registerForm.classList.add('was-validated');
+                // 5. Validate định dạng email
+                const emailRegex = /^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
+                if (!emailRegex.test(emailVal)) {
+                    alertContainer.innerHTML = `
+                        <div class="alert alert-danger alert-dismissible fade show d-flex align-items-center mb-3" role="alert">
+                            <i class="fas fa-exclamation-circle me-2"></i>
+                            <div>Địa chỉ Email không đúng định dạng (Vd: email@domain.com).</div>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    `;
+                    alertContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    return;
+                }
+
+                // 6. Validate định dạng số điện thoại
+                const phoneRegex = /^0[0-9]{9}$/;
+                if (!phoneRegex.test(phoneVal)) {
+                    alertContainer.innerHTML = `
+                        <div class="alert alert-danger alert-dismissible fade show d-flex align-items-center mb-3" role="alert">
+                            <i class="fas fa-exclamation-circle me-2"></i>
+                            <div>Số điện thoại phải gồm đúng 10 chữ số bắt đầu bằng số 0.</div>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    `;
+                    alertContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
                     return;
                 }
 
@@ -409,6 +475,7 @@
                                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                             </div>
                         `;
+                        alertContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
                     }
                 })
                 .catch(error => {
@@ -422,6 +489,7 @@
                             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                         </div>
                     `;
+                    alertContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
                 });
             });
         </script>

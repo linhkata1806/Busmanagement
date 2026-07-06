@@ -306,10 +306,48 @@
             loginForm.addEventListener('submit', function (e) {
                 e.preventDefault();
 
-                // Validate form inputs
-                if (!loginForm.checkValidity()) {
-                    loginForm.classList.add('was-validated');
+                const usernameVal = document.getElementsByName('username')[0].value.trim();
+                const passwordVal = document.getElementById('password').value;
+
+                // 1. Kiểm tra rỗng
+                if (!usernameVal) {
+                    alertContainer.innerHTML = `
+                        <div class="alert alert-danger alert-dismissible fade show d-flex align-items-center mb-3" role="alert">
+                            <i class="fas fa-exclamation-circle me-2"></i>
+                            <div>Tên đăng nhập hoặc Email không được để trống.</div>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    `;
+                    alertContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
                     return;
+                }
+
+                if (!passwordVal) {
+                    alertContainer.innerHTML = `
+                        <div class="alert alert-danger alert-dismissible fade show d-flex align-items-center mb-3" role="alert">
+                            <i class="fas fa-exclamation-circle me-2"></i>
+                            <div>Mật khẩu không được để trống.</div>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    `;
+                    alertContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    return;
+                }
+
+                // 2. Kiểm tra định dạng nếu đăng nhập bằng Email
+                if (usernameVal.includes('@')) {
+                    const emailRegex = /^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
+                    if (!emailRegex.test(usernameVal)) {
+                        alertContainer.innerHTML = `
+                            <div class="alert alert-danger alert-dismissible fade show d-flex align-items-center mb-3" role="alert">
+                                <i class="fas fa-exclamation-circle me-2"></i>
+                                <div>Định dạng Email nhập vào không hợp lệ.</div>
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        `;
+                        alertContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        return;
+                    }
                 }
 
                 // Show loading spinner, disable button
@@ -358,6 +396,7 @@
                                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                             </div>
                         `;
+                        alertContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
                     }
                 })
                 .catch(error => {
@@ -371,6 +410,7 @@
                             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                         </div>
                     `;
+                    alertContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
                 });
             });
         </script>

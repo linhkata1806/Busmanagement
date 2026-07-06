@@ -140,10 +140,13 @@
                     <div class="card-body p-4 text-center">
 
                         <div class="qr-wrapper">
-                            <!-- Gọi API tạo mã QR động thực tế của QRServer -->
-                            <c:set var="qrData" value="Chuyen khoan Bus Ha Noi: Loai ve ${requestScope.qrType}, So tien ${requestScope.qrAmount}đ, Tuyen ${requestScope.qrRoute}"/>
+                            <!-- Gọi API tạo mã QR động thực tế của QRServer với tham số được URL-encode -->
+                            <c:url var="qrCodeUrl" value="https://api.qrserver.com/v1/create-qr-code/">
+                                <c:param name="size" value="250x250" />
+                                <c:param name="data" value="Chuyen khoan Bus Ha Noi: Loai ve ${requestScope.qrType}, So tien ${requestScope.qrAmount}đ, Tuyen ${requestScope.qrRoute}" />
+                            </c:url>
                             <img class="qr-image" 
-                                 src="https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${qrData}" 
+                                 src="${qrCodeUrl}" 
                                  alt="Mã QR chuyển khoản ngân hàng" />
                         </div>
 

@@ -76,6 +76,7 @@
             display: flex;
             align-items: center;
             transition: all 0.2s ease;
+            min-height: 80px; /* Thêm chiều cao tối thiểu chống lệch hàng khi co giãn màn hình */
         }
         .mini-stat-card:hover {
             transform: translateY(-2px);
@@ -133,8 +134,8 @@
                     <img src="https://ui-avatars.com/api/?name=${account.fullName}&background=ffffff&color=0d47a1&size=120" alt="Avatar" class="profile-avatar">
                 </c:otherwise>
             </c:choose>
-            <h2 class="fw-bold mb-1">${account.fullName}</h2>
-            <p class="mb-0 text-white-50">@${account.username}</p>
+            <h2 class="fw-bold mb-1"><c:out value="${account.fullName}" /></h2>
+            <p class="mb-0 text-white-50">@<c:out value="${account.username}" /></p>
         </div>
     </div>
 
@@ -250,19 +251,19 @@
                             <tbody>
                                 <tr>
                                     <th>Tên đăng nhập</th>
-                                    <td class="fw-bold text-secondary">${account.username}</td>
+                                    <td class="fw-bold text-secondary"><c:out value="${account.username}" /></td>
                                 </tr>
                                 <tr>
                                     <th>Họ và tên</th>
-                                    <td>${account.fullName}</td>
+                                    <td><c:out value="${account.fullName}" /></td>
                                 </tr>
                                 <tr>
                                     <th>Địa chỉ Email</th>
-                                    <td>${account.email}</td>
+                                    <td><c:out value="${account.email}" /></td>
                                 </tr>
                                 <tr>
                                     <th>Số điện thoại</th>
-                                    <td>${account.phone}</td>
+                                    <td><c:out value="${account.phone}" /></td>
                                 </tr>
                                 <tr>
                                     <th>Vai trò</th>
@@ -302,11 +303,11 @@
                                     <c:when test="${not empty recentTrips}">
                                         <c:forEach var="trip" items="${recentTrips}">
                                             <tr>
-                                                <td>${trip.date}</td>
-                                                <td><span class="badge bg-primary px-2">${trip.routeNumber}</span></td>
-                                                <td>${trip.busPlate}</td>
-                                                <td class="text-start">${trip.startPoint}</td>
-                                                <td class="text-start">${trip.endPoint}</td>
+                                                <td><c:out value="${trip.date}" /></td>
+                                                <td><span class="badge bg-primary px-2"><c:out value="${trip.routeNumber}" /></span></td>
+                                                <td><c:out value="${trip.busPlate}" /></td>
+                                                <td class="text-start"><c:out value="${trip.startPoint}" /></td>
+                                                <td class="text-start"><c:out value="${trip.endPoint}" /></td>
                                             </tr>
                                         </c:forEach>
                                     </c:when>

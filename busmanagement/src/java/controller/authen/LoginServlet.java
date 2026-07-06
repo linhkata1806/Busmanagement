@@ -64,45 +64,52 @@ public class LoginServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        request.setCharacterEncoding("UTF-8");
         String user = request.getParameter("username");
         String pass = request.getParameter("password");
 
-        Account account = authService.login(user, pass);
+        try {
+            Account account = authService.login(user, pass);
 
-        if (account != null) {
-            // prevent Session Fixation Attack
-            HttpSession oldSession = request.getSession(false);
-            if (oldSession != null) {
-                oldSession.invalidate();
+            if (account != null) {
+                // prevent Session Fixation Attack
+                HttpSession oldSession = request.getSession(false);
+                if (oldSession != null) {
+                    oldSession.invalidate();
+                }
+
+                // start a new session
+                HttpSession newSession = request.getSession(true);
+                newSession.setAttribute("USER", account);
+
+                // perfomed navigation base on role
+                switch (account.getRoleName()) {
+                    case "ADMIN":
+                        response.sendRedirect("admin/dashboard");
+                        break;
+                    case "STAFF":
+                        response.sendRedirect("staff/dashboard");
+                        break;
+                    case "DRIVER":
+                        response.sendRedirect("driver/dashboard");
+                        break;
+                    case "ASSISTANT":
+                        response.sendRedirect("assistant/dashboard");
+                        break;
+
+                    default:                  
+                        response.sendRedirect(request.getContextPath() + "/home");
+                        break;
+                }
+            } else {
+                request.setAttribute("error", "Đăng nhập thất bại. Vui lòng thử lại.");
+                request.setAttribute("username", user);
+                request.getRequestDispatcher("view/authen/login.jsp").forward(request, response);
             }
-
-            // start a new session
-            HttpSession newSession = request.getSession(true);
-            newSession.setAttribute("USER", account);
-
-            // perfomed navigation base on role
-            switch (account.getRoleName()) {
-                case "ADMIN":
-                    response.sendRedirect("admin/dashboard");
-                    break;
-                case "STAFF":
-                    response.sendRedirect("staff/dashboard");
-                    break;
-                case "DRIVER":
-                    response.sendRedirect("driver/dashboard");
-                    break;
-                case "ASSISTANT":
-                    response.sendRedirect("assistant/dashboard");
-                    break;
-
-                default:                  
-                    response.sendRedirect(request.getContextPath() + "/home");
-                    break;
-            }
-        } else {
-            request.setAttribute("error", "Tên đăng nhập, email,mật khẩu không đúng hoặc tài khoản bị khóa!");
+        } catch (IllegalArgumentException e) {
+            request.setAttribute("error", e.getMessage());
             request.setAttribute("username", user);
-            request.getRequestDispatcher("view/login.jsp").forward(request, response);
+            request.getRequestDispatcher("view/authen/login.jsp").forward(request, response);
         }
     }
 

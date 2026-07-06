@@ -71,7 +71,7 @@
 <jsp:include page="/common/navbar.jsp" />
 
 <div class="search-section">
-    <div class="container">
+    <div class="container-fluid px-md-5">
         <form action="${pageContext.request.contextPath}/find-route" method="get" class="search-card">
             <div class="row g-3 align-items-center">
                 <div class="col-md-5">
@@ -79,7 +79,7 @@
                     <select class="form-select" name="fromStopID" required>
                         <option value="">-- Chọn trạm xuất phát --</option>
                         <c:forEach var="stop" items="${stopNames}">
-                            <option value="${stop.stopID}" ${param.fromStopID == stop.stopID ? 'selected' : ''}>
+                            <option value="${stop.stopID}" ${selectedFrom.stopID == stop.stopID ? 'selected' : ''}>
                                 ${stop.stopName.length() > 45 ? stop.stopName.substring(0, 45).concat('...') : stop.stopName}
                             </option>
                         </c:forEach>
@@ -96,7 +96,7 @@
                     <select class="form-select" name="toStopID" required>
                         <option value="">-- Chọn bến đích --</option>
                         <c:forEach var="stop" items="${stopNames}">
-                            <option value="${stop.stopID}" ${param.toStopID == stop.stopID ? 'selected' : ''}>
+                            <option value="${stop.stopID}" ${selectedTo.stopID == stop.stopID ? 'selected' : ''}>
                                 ${stop.stopName.length() > 45 ? stop.stopName.substring(0, 45).concat('...') : stop.stopName}
                             </option>
                         </c:forEach>
@@ -113,7 +113,7 @@
     </div>
 </div>
 
-<div class="container min-vh-50 mb-5">
+<div class="container-fluid px-md-5 min-vh-50 mb-5">
 
     <c:if test="${not empty error}">
         <div class="alert alert-danger text-center fw-bold my-4 p-3 shadow-sm rounded-3" role="alert">

@@ -8,7 +8,7 @@ public class Validator {
     public static boolean isValidRegisterInfo(Account account) {
 
         if (account.getUsername() == null
-                || account.getUsername().trim().isEmpty()) {
+                || !account.getUsername().trim().matches("^[a-zA-Z0-9_]{5,30}$")) {
             return false;
         }
 

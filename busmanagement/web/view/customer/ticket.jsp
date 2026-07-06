@@ -117,7 +117,8 @@
                                         <hr class="text-muted opacity-25 my-2">
                                         <div class="d-flex justify-content-between align-items-center text-secondary small">
                                             <span>Giá vé: <strong class="text-success"><fmt:formatNumber value="${t.price}" pattern="#,###"/> đ</strong></span>
-                                            <button class="btn btn-sm btn-outline-primary py-0.5 px-2 rounded-2">
+                                            <button class="btn btn-sm btn-outline-primary py-0.5 px-2 rounded-2" 
+                                                    onclick="showTicketQR('${t.ticketCode}', '${t.routeNumber}', '${t.status}')">
                                                 <i class="fas fa-qrcode me-1"></i>Xem QR
                                             </button>
                                         </div>
@@ -217,6 +218,53 @@
         
     </div>
 </div>
+
+    <!-- Bootstrap Modal for ticket QR -->
+    <div class="modal fade" id="ticketQRModal" tabindex="-1" aria-labelledby="ticketQRModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" style="max-width: 380px;">
+            <div class="modal-content border-0 shadow rounded-4">
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title fw-bold text-secondary" id="ticketQRModalLabel">MÃ VÉ CHI TIẾT</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center pt-2">
+                    <div class="bg-light p-3 rounded-4 mb-3 d-inline-block">
+                        <img id="modalQRImage" src="" alt="Mã QR soát vé" style="width: 220px; height: 220px; object-fit: contain;" />
+                    </div>
+                    <h4 class="fw-bold text-primary mb-1" id="modalTicketCode"></h4>
+                    <p class="text-secondary small mb-3">Tuyến: <span id="modalRouteNumber" class="fw-bold"></span></p>
+                    <div class="badge px-3 py-2 fs-6 mb-2" id="modalTicketStatus"></div>
+                    <p class="text-muted small mt-3 mb-1"><i class="fas fa-info-circle me-1"></i>Đưa mã này cho phụ xe quét khi lên xe bus.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showTicketQR(ticketCode, routeNumber, status) {
+            document.getElementById('modalTicketCode').innerText = ticketCode;
+            document.getElementById('modalRouteNumber').innerText = "Tuyến " + routeNumber;
+            
+            const statusBadge = document.getElementById('modalTicketStatus');
+            statusBadge.innerText = status;
+            statusBadge.className = "badge px-3 py-2 fs-6 mb-2";
+            if (status === 'UNUSED') {
+                statusBadge.classList.add('bg-success');
+            } else if (status === 'CHECKED_IN') {
+                statusBadge.classList.add('bg-primary');
+            } else if (status === 'COMPLETED') {
+                statusBadge.classList.add('bg-secondary');
+            } else {
+                statusBadge.classList.add('bg-danger');
+            }
+            
+            const qrUrl = "https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=" + encodeURIComponent(ticketCode);
+            document.getElementById('modalQRImage').src = qrUrl;
+            
+            const myModal = new bootstrap.Modal(document.getElementById('ticketQRModal'));
+            myModal.show();
+        }
+    </script>
 
 <!-- ===== FOOTER ===== -->
 <jsp:include page="/common/footer.jsp" />

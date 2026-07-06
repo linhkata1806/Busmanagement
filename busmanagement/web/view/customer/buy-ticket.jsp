@@ -210,15 +210,29 @@
 
                             <div class="mb-3">
                                 <label class="form-label fw-bold text-secondary small">MÃ HSSV / SỐ CCCD</label>
-                                <input type="text" name="cardNumber" class="form-control rounded-3" placeholder="Nhập mã thẻ hoặc số định danh..." required>
+                                <input type="text" name="cardNumber" class="form-control rounded-3" placeholder="Nhập 12 số CCCD định danh..." pattern="[0-9]{12}" maxlength="12" title="Số CCCD phải gồm đúng 12 chữ số" required>
                             </div>
 
                             <div class="mb-3" id="proofUploadSection">
-                                <label class="form-label fw-bold text-secondary small">ẢNH THẺ HSSV / CCCD (MINH CHỨNG ƯU TIÊN)</label>
-                                <input type="text" name="imageProof" class="form-control rounded-3" placeholder="Dán link ảnh thẻ/minh chứng ưu tiên..." required value="https://hanoibus.vn/images/proof_default.jpg">
-                                <div class="form-text small text-muted">Nhập link ảnh thẻ để nhân viên quầy kiểm tra duyệt trước khi cấp vé.</div>
+                                <label class="form-label fw-bold text-secondary small">TẢI ẢNH THẺ HSSV / CCCD (MINH CHỨNG ƯU TIÊN)</label>
+                                <input type="file" id="imageProofFile" class="form-control rounded-3" accept="image/*" required>
+                                <input type="hidden" name="imageProof" id="imageProofBase64" value="https://hanoibus.vn/images/proof_default.jpg">
+                                <div class="form-text small text-muted">Vui lòng tải ảnh minh chứng lên để nhân viên quầy kiểm tra duyệt trước khi cấp vé.</div>
                             </div>
                         </c:if>
+
+                        <script>
+                            document.getElementById('imageProofFile')?.addEventListener('change', function(e) {
+                                const file = e.target.files[0];
+                                if (file) {
+                                    const reader = new FileReader();
+                                    reader.onload = function(evt) {
+                                        document.getElementById('imageProofBase64').value = evt.target.result;
+                                    };
+                                    reader.readAsDataURL(file);
+                                }
+                            });
+                        </script>
 
                         <div class="d-grid gap-2">
                             <button type="submit" class="btn btn-success fw-bold py-2.5 shadow-sm rounded-3 fs-6">

@@ -77,7 +77,7 @@
             </div>
             <div class="col-md-7 col-lg-6 ms-auto">
                 <form action="${pageContext.request.contextPath}/search-route" method="GET" class="d-flex shadow-sm">
-                    <input type="text" name="keyword" class="form-control border-0 px-3 py-2 bg-white" placeholder="Tìm kiếm nhanh số tuyến hoặc tên tuyến..." style="font-size: 0.9rem; border-radius: 8px 0 0 8px;" value="${keyword}" required>
+                    <input type="text" name="keyword" class="form-control border-0 px-3 py-2 bg-white" placeholder="Tìm kiếm nhanh số tuyến hoặc tên tuyến..." style="font-size: 0.9rem; border-radius: 8px 0 0 8px;" value="<c:out value='${keyword}'/>" required>
                     <button type="submit" class="btn btn-warning border-0 px-4 fw-semibold text-white d-flex align-items-center" style="background: var(--accent); border-radius: 0 8px 8px 0; font-size: 0.9rem;">
                         <i class="fas fa-search me-2"></i>Tìm kiếm
                     </button>
@@ -89,7 +89,7 @@
 
 <div class="container" style="min-height: 700px;">
     <div class="mb-4">
-        <h4 class="fw-bold">Kết quả tìm kiếm cho: <span class="text-primary">"${keyword}"</span></h4>
+        <h4 class="fw-bold">Kết quả tìm kiếm cho: <span class="text-primary">"<c:out value="${keyword}"/>"</span></h4>
         <p class="text-muted">Tìm thấy <strong>${routes != null ? routes.size() : 0}</strong> tuyến phù hợp.</p>
     </div>
 

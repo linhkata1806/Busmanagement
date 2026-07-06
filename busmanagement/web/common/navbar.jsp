@@ -99,7 +99,24 @@
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end shadow">
                                 <li>
-                                    <a class="dropdown-item ${activePage == 'profile' ? 'active' : ''}" href="${pageContext.request.contextPath}/customer/profile">
+                                    <c:choose>
+                                        <c:when test="${USER.roleName == 'ADMIN'}">
+                                            <c:set var="profileUrl" value="${pageContext.request.contextPath}/admin/dashboard" />
+                                        </c:when>
+                                        <c:when test="${USER.roleName == 'STAFF'}">
+                                            <c:set var="profileUrl" value="${pageContext.request.contextPath}/staff/dashboard" />
+                                        </c:when>
+                                        <c:when test="${USER.roleName == 'DRIVER'}">
+                                            <c:set var="profileUrl" value="${pageContext.request.contextPath}/driver/dashboard" />
+                                        </c:when>
+                                        <c:when test="${USER.roleName == 'ASSISTANT'}">
+                                            <c:set var="profileUrl" value="${pageContext.request.contextPath}/assistant/dashboard" />
+                                        </c:when>
+                                        <c:otherwise>
+                                            <c:set var="profileUrl" value="${pageContext.request.contextPath}/customer/profile" />
+                                        </c:otherwise>
+                                    </c:choose>
+                                    <a class="dropdown-item ${activePage == 'profile' ? 'active' : ''}" href="${profileUrl}">
                                         <i class="fas fa-user me-2 text-primary"></i>Hồ sơ
                                     </a>
                                 </li>
@@ -107,6 +124,11 @@
                                     <li>
                                         <a class="dropdown-item ${activePage == 'ticket' ? 'active' : ''}" href="${pageContext.request.contextPath}/customer/ticket">
                                             <i class="fas fa-ticket-alt me-2 text-primary"></i>Vé của tôi
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item ${activePage == 'trip-history' ? 'active' : ''}" href="${pageContext.request.contextPath}/customer/trip-history">
+                                            <i class="fas fa-history me-2 text-primary"></i>Lịch sử chuyến đi
                                         </a>
                                     </li>
                                 </c:if>

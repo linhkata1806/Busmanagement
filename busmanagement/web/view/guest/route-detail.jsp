@@ -12,8 +12,9 @@ Author     : Administrator
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Chi tiết lộ trình - Xe Bus Hà Nội</title>
         <jsp:include page="/common/head_imports.jsp" />
+        <!-- Leaflet CSS for Map -->
+        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
         <style>
             :root {
                 --primary: #1a73e8;
@@ -220,7 +221,7 @@ Author     : Administrator
                     </div>
                 </div>
 
-                <div class="container mb-5">
+                <div class="container-fluid px-md-5 mb-5">
                     <div class="row g-4">
                         <div class="col-lg-5">
                             <div class="card info-card p-4">
@@ -312,15 +313,41 @@ Author     : Administrator
                                                class="btn btn-outline-primary btn-sm fw-bold w-50">
                                                 <i class="fas fa-route me-1"></i> Liên chuyến
                                             </a>
-                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        </div>
+                            </div> <!-- closes mt-3 pt-3 border-top -->
+                        </div> <!-- closes card info-card p-4 -->
+                    </div> <!-- closes col-lg-5 -->
 
-                        <div class="col-lg-7">
+                    <div class="col-lg-7">
+                            <c:if test="${not empty stops}">
+                                <div class="card info-card p-0 overflow-hidden mb-4" style="border: 1px solid #ced4da;">
+                                    <div class="bg-primary text-white p-3 d-flex justify-content-between align-items-center" style="background: linear-gradient(135deg, var(--primary) 0%, #0d47a1 100%) !important;">
+                                        <h5 class="fw-bold m-0" style="font-size: 1.05rem;"><i class="fas fa-map-marked-alt me-2"></i>Bản đồ & Giả lập xe đang chạy</h5>
+                                        <span class="badge bg-success"><i class="fas fa-sync-alt fa-spin me-1"></i> Live</span>
+                                    </div>
+                                    <div id="busMap" style="height: 380px; width: 100%;"></div>
+                                </div>
+
+                                <div class="card info-card p-4 mb-4">
+                                    <h4 class="fw-bold mb-3 text-dark d-flex justify-content-between align-items-center" style="font-size: 1.15rem;">
+                                        <span><i class="fas fa-bus-alt text-primary me-2"></i>Xe bus sắp tới</span>
+                                        <span class="badge bg-success-subtle text-success fs-7 fw-normal" style="font-size: 0.8rem;"><i class="fas fa-satellite-dish me-1 animate-pulse"></i> Trực tuyến</span>
+                                    </h4>
+                                    <div class="d-flex flex-column gap-3" id="upcomingBusesList">
+                                        <!-- Sẽ được điền động bằng JS giả lập -->
+                                    </div>
+                                </div>
+                            </c:if>
+
+                        </div>
+                    </div> <!-- closes row g-4 -->
+
+                    <!-- Section 2: Lộ trình các trạm dừng - Full Width -->
+                    <div class="row mt-4">
+                        <div class="col-12">
                             <div class="card info-card p-4">
-                                <h4 class="fw-bold mb-4 text-dark">Lộ trình các trạm dừng</h4>
+                                <h4 class="fw-bold mb-4 text-dark"><i class="fas fa-map-signs text-primary me-2"></i>Lộ trình các trạm dừng</h4>
 
                                 <c:choose>
                                     <c:when test="${not empty stops}">
@@ -351,7 +378,6 @@ Author     : Administrator
                                 </c:choose>
                             </div>
                         </div>
-
                     </div> 
                 </div> 
             </c:when>
@@ -371,6 +397,146 @@ Author     : Administrator
 
         <!-- ===== FOOTER ===== -->
         <jsp:include page="/common/footer.jsp" />
+        
+        <c:if test="${not empty stops}">
+            <!-- Leaflet JS -->
+            <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+            <script>
+                // 1. Chuyển đổi trạm dừng JSP thành dữ liệu JS
+                const routeStops = [
+                    <c:forEach var="stop" items="${stops}" varStatus="status">
+                        {
+                            id: ${stop.stopID},
+                            name: "<c:out value='${stop.stopName}'/>",
+                            distance: ${stop.distanceFromStart},
+                            lat: 21.0285 + (${status.index} * 0.005) - (Math.sin(${status.index} * 0.5) * 0.003),
+                            lng: 105.8542 + (${status.index} * 0.008) + (Math.cos(${status.index} * 0.5) * 0.002)
+                        }<c:if test="${!status.last}">,</c:if>
+                    </c:forEach>
+                ];
+
+                // 2. Khởi tạo Leaflet Map
+                const map = L.map('busMap').setView([routeStops[0].lat, routeStops[0].lng], 13);
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '© OpenStreetMap contributors'
+                }).addTo(map);
+
+                // 3. Vẽ lộ trình
+                const latlngs = routeStops.map(s => [s.lat, s.lng]);
+                const polyline = L.polyline(latlngs, {color: '#1a73e8', weight: 5, opacity: 0.8}).addTo(map);
+                map.fitBounds(polyline.getBounds());
+
+                // 4. Vẽ Marker các trạm dừng
+                routeStops.forEach((stop, index) => {
+                    let fillColor = '#1a73e8'; // Bến trung gian
+                    if (index === 0) fillColor = '#2e7d32'; // Bến đi
+                    else if (index === routeStops.length - 1) fillColor = '#d32f2f'; // Bến cuối
+                    
+                    const marker = L.circleMarker([stop.lat, stop.lng], {
+                        radius: 7,
+                        fillColor: fillColor,
+                        color: '#ffffff',
+                        weight: 2,
+                        fillOpacity: 1
+                    }).addTo(map);
+                    marker.bindPopup(`<b>\${index + 1}. \${stop.name}</b><br>Lộ trình: +\${stop.distance} km`);
+                });
+
+                // 5. Khởi tạo xe bus giả lập
+                const busIcon = L.divIcon({
+                    className: 'custom-bus-icon',
+                    html: `<div style="background-color: #fbbc04; border: 2px solid #0d47a1; border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 5px rgba(0,0,0,0.3);"><i class="fas fa-bus" style="color: #0d47a1; font-size: 13px;"></i></div>`,
+                    iconSize: [32, 32],
+                    iconAnchor: [16, 16]
+                });
+
+                let buses = [
+                    {
+                        id: 1,
+                        plate: "29B-145.88",
+                        currentSegment: 0,
+                        progress: 0.1,
+                        speed: 40,
+                        marker: null
+                    },
+                    {
+                        id: 2,
+                        plate: "29B-289.33",
+                        currentSegment: Math.max(1, Math.floor(routeStops.length / 2)),
+                        progress: 0.3,
+                        speed: 35,
+                        marker: null
+                    }
+                ];
+
+                function updateSimulation() {
+                    buses.forEach(bus => {
+                        // Tăng tiến độ dựa trên tốc độ
+                        bus.progress += 0.015 * (bus.speed / 40);
+                        if (bus.progress >= 1.0) {
+                            bus.progress = 0;
+                            bus.currentSegment = (bus.currentSegment + 1) % (routeStops.length - 1);
+                        }
+                        
+                        const startStop = routeStops[bus.currentSegment];
+                        const endStop = routeStops[bus.currentSegment + 1];
+                        
+                        const currentLat = startStop.lat + (endStop.lat - startStop.lat) * bus.progress;
+                        const currentLng = startStop.lng + (endStop.lng - startStop.lng) * bus.progress;
+                        
+                        if (!bus.marker) {
+                            bus.marker = L.marker([currentLat, currentLng], {icon: busIcon}).addTo(map);
+                            bus.marker.bindPopup(`<b>Xe bus \${bus.plate}</b><br>Tốc độ: \${bus.speed} km/h<br>Đang di chuyển tới: \${endStop.name}`);
+                        } else {
+                            bus.marker.setLatLng([currentLat, currentLng]);
+                            bus.marker.getPopup().setContent(`<b>Xe bus \${bus.plate}</b><br>Tốc độ: \${bus.speed} km/h<br>Đang di chuyển tới: \${endStop.name}`);
+                        }
+                    });
+                    
+                    updateBusesList();
+                }
+
+                function updateBusesList() {
+                    const listContainer = document.getElementById('upcomingBusesList');
+                    if (!listContainer) return;
+                    
+                    let html = '';
+                    buses.forEach(bus => {
+                        const nextStop = routeStops[bus.currentSegment + 1];
+                        const totalDist = nextStop.distance - routeStops[bus.currentSegment].distance;
+                        const remainingDist = Math.max(0.1, (totalDist * (1.0 - bus.progress))).toFixed(1);
+                        const eta = Math.ceil((remainingDist / bus.speed) * 60);
+                        
+                        html += `
+                            <div class="p-3 bg-light rounded-3 border-start border-warning border-4 d-flex justify-content-between align-items-center shadow-sm" style="cursor:pointer; transition: all 0.2s;" onclick="focusBus(\${bus.id})">
+                                <div>
+                                    <div class="fw-bold text-dark mb-1"><i class="fas fa-bus me-2 text-primary"></i>\${bus.plate}</div>
+                                    <div class="small text-muted mb-1" style="font-size: 0.85rem;">Trạm tiếp theo: <strong>\${nextStop.name}</strong></div>
+                                    <div class="small text-secondary" style="font-size: 0.8rem;">Cách bến: \${remainingDist} km | Tốc độ: \${bus.speed} km/h</div>
+                                </div>
+                                <div class="text-end">
+                                    <span class="badge bg-warning text-dark px-2 py-1 mb-1" style="font-size: 0.75rem;">Sắp tới</span>
+                                    <strong class="text-success d-block fs-5">\${eta} phút</strong>
+                                </div>
+                            </div>
+                        `;
+                    });
+                    listContainer.innerHTML = html;
+                }
+
+                window.focusBus = function(busId) {
+                    const bus = buses.find(b => b.id === busId);
+                    if (bus && bus.marker) {
+                        map.setView(bus.marker.getLatLng(), 15);
+                        bus.marker.openPopup();
+                    }
+                };
+
+                // Chạy vòng lặp giả lập mỗi 1 giây
+                setInterval(updateSimulation, 1000);
+                updateSimulation();
+            </script>
+        </c:if>
         
         <script>
             function toggleFavorite(routeId, isLoggedIn, iconElement) {
