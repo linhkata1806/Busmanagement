@@ -6,6 +6,7 @@ package dal;
 
 import dto.TripDTO;
 import enums.TripStatus;
+import java.sql.Timestamp;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -450,18 +451,18 @@ public class TripDAO extends DBContext {
         }
         return null;
     }
-
-    public boolean updateTripStatus(int tripID, String status) {
-        String sql = "UPDATE Trips SET Status = ? WHERE TripID = ?";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setString(1, status);
-            ps.setInt(2, tripID);
-            return ps.executeUpdate() > 0;
-        } catch (Exception e) {
-            System.out.println("Lỗi updateTripStatus: " + e.getMessage());
-        }
-        return false;
-    }
+//
+//    public boolean updateTripStatus(int tripID, String status) {
+//        String sql = "UPDATE Trips SET Status = ? WHERE TripID = ?";
+//        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+//            ps.setString(1, status);
+//            ps.setInt(2, tripID);
+//            return ps.executeUpdate() > 0;
+//        } catch (Exception e) {
+//            System.out.println("Lỗi updateTripStatus: " + e.getMessage());
+//        }
+//        return false;
+//    }
 
     public int countDriverTripsToday(int driverID) {
         String sql = "SELECT COUNT(*) FROM Trips WHERE DriverID = ? AND TripDate = CAST(GETDATE() AS DATE)";
@@ -574,5 +575,44 @@ public class TripDAO extends DBContext {
                 }
             }
         }
+    }
+
+    // Cập nhật riêng trạng thái (Dành cho việc Huỷ hoặc Hoàn thành)
+    public boolean updateTripStatus(int tripID, String status) {
+        String sql = "UPDATE Trips SET Status = ? WHERE TripID = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, status);
+            ps.setInt(2, tripID);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            System.out.println("Lỗi updateTripStatus: " + e.getMessage());
+        }
+        return false;
+    }
+
+    // Cập nhật trạng thái VÀ thời gian bắt đầu thực tế (Dành cho nút Bắt đầu)
+    public boolean startTripActual(int tripID, Timestamp actualStartTime) {
+        String sql = "UPDATE Trips SET Status = 'IN_PROGRESS', ActualStartTime = ? WHERE TripID = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setTimestamp(1, actualStartTime);
+            ps.setInt(2, tripID);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            System.out.println("Lỗi startTripActual: " + e.getMessage());
+        }
+        return false;
+    }
+
+    // Bổ sung vào dal/TripDAO.java
+    public boolean finishTripActual(int tripID, Timestamp actualEndTime) {
+        String sql = "UPDATE Trips SET Status = 'COMPLETED', ActualEndTime = ? WHERE TripID = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setTimestamp(1, actualEndTime);
+            ps.setInt(2, tripID);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            System.out.println("Lỗi finishTripActual: " + e.getMessage());
+        }
+        return false;
     }
 }
