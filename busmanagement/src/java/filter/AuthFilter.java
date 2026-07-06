@@ -130,7 +130,8 @@ public class AuthFilter implements Filter {
             return;
         }
         //staff
-        if(path.startsWith("/staff")&&!"STAFF".equals(role)){
+        //staff (Cho phép cả STAFF và ADMIN truy cập)
+        if(path.startsWith("/staff") && !("STAFF".equals(role) || "ADMIN".equals(role))){
             res.sendRedirect(req.getContextPath()+"/home");
             return;
         }
