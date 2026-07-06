@@ -119,6 +119,17 @@ public class Trip {
         this.status = status;
     }
 
+    public String getVietnameseStatus() {
+        if (status == null) return "";
+        switch (status) {
+            case SCHEDULED: return "Chuẩn bị";
+            case IN_PROGRESS: return "Đang chạy";
+            case COMPLETED: return "Hoàn thành";
+            case CANCELLED: return "Đã huỷ";
+            default: return status.toString();
+        }
+    }
+
     public Timestamp getActualStartTime() {
         return actualStartTime;
     }

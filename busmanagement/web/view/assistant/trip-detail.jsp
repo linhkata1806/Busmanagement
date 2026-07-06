@@ -90,17 +90,23 @@
                                             <small class="text-secondary uppercase fw-semibold">Trạng thái</small>
                                             <div class="mt-1">
                                                 <span class="badge ${trip.status == 'IN_PROGRESS' ? 'bg-success' : (trip.status == 'SCHEDULED' ? 'bg-warning text-dark' : 'bg-secondary')} px-2.5 py-1.5 rounded">
-                                                    ${trip.status}
+                                                    ${trip.vietnameseStatus}
                                                 </span>
                                             </div>
                                         </div>
                                         <div>
                                             <small class="text-secondary fw-semibold">Tuyến đường</small>
-                                            <div class="mt-1 fw-bold text-dark">Tuyến #${trip.routeID}</div>
+                                            <div class="mt-1 fw-bold text-dark">
+                                                ${tripDTO.routeNumber} – ${tripDTO.routeName}
+                                            </div>
                                         </div>
                                         <div>
                                             <small class="text-secondary fw-semibold">Biển kiểm soát xe</small>
-                                            <div class="mt-1 fw-bold text-dark">Mã xe #${trip.busID}</div>
+                                            <div class="mt-1 fw-bold text-dark">${tripDTO.busPlate}</div>
+                                        </div>
+                                        <div>
+                                            <small class="text-secondary fw-semibold">Tài xế</small>
+                                            <div class="mt-1 text-dark">${tripDTO.driverName}</div>
                                         </div>
                                         <div>
                                             <small class="text-secondary fw-semibold">Ngày chạy</small>

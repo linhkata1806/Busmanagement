@@ -38,8 +38,8 @@ public class AssistantDashboardService {
             stats.put("passengersRemaining", 0);
         }
 
-        // Count pending notifications
-        int pendingNotifications = notificationDAO.countUnreadNotifications(assistantID);
+        // Count pending notifications (including broadcast for ASSISTANT)
+        int pendingNotifications = notificationDAO.countUnreadByAccountAndRole(assistantID, "ASSISTANT");
         stats.put("pendingNotifications", pendingNotifications);
 
         return stats;

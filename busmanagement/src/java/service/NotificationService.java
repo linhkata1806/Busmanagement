@@ -98,6 +98,21 @@ public class NotificationService {
         return notificationDAO.countUnreadNotifications(accountID);
     }
 
+    /**
+     * Dành cho Phụ xe: lấy thông báo đích danh + broadcast cho nhóm roleName.
+     * Ví dụ: roleName = "ASSISTANT"
+     */
+    public List<Notification> getByAccountAndRole(int accountID, String roleName) {
+        return notificationDAO.getByAccountAndRole(accountID, roleName);
+    }
+
+    /**
+     * Dành cho Phụ xe: đếm thông báo chưa đọc đích danh + broadcast cho nhóm roleName.
+     */
+    public int countUnreadByAccountAndRole(int accountID, String roleName) {
+        return notificationDAO.countUnreadByAccountAndRole(accountID, roleName);
+    }
+
     public int countNotifications() {
         return notificationDAO.countNotifications();
     }

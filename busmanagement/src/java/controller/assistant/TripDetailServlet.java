@@ -1,6 +1,7 @@
 package controller.assistant;
 
 import dto.RouteStopDTO;
+import dto.TripDTO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -38,19 +39,27 @@ public class TripDetailServlet extends HttpServlet {
 
         try {
             int tripID = Integer.parseInt(idStr);
+
+            // Lấy Trip model để kiểm tra quyền sở hữu (chứa assistantID)
             Trip trip = tripService.getTripById(tripID);
 
             if (trip == null) {
                 throw new IllegalArgumentException("Chuyến xe không tồn tại.");
             }
 
-            // Security constraint: trip.getAssistantID() must match current assistantID
+            // Security constraint: AssistantID == CurrentUserID
             if (trip.getAssistantID() == null || trip.getAssistantID() != assistantID) {
                 throw new IllegalArgumentException("Bạn không có quyền truy cập thông tin chuyến xe của nhân sự khác.");
             }
 
+            // Lấy TripDTO (đã JOIN) để hiển thị tên tuyến, biển số xe, tên lái xe
+            TripDTO tripDTO = tripService.getTripDTOById(tripID);
+
             List<RouteStopDTO> routeStops = routeStopService.getStopsByRoute(trip.getRouteID());
+
+            // Truyền cả trip (cho tripID/status/ngày) và tripDTO (cho route name, bus plate)
             request.setAttribute("trip", trip);
+            request.setAttribute("tripDTO", tripDTO);
             request.setAttribute("routeStops", routeStops);
 
             request.getRequestDispatcher("/view/assistant/trip-detail.jsp").forward(request, response);

@@ -37,6 +37,14 @@ public class TripService {
         return tripDAO.getById(tripID);
     }
 
+    /**
+     * Lấy TripDTO (đã JOIN route name, bus plate, driver name) theo TripID.
+     * Dùng để hiển thị thông tin có ý nghĩa (không dùng raw ID) trong trang chi tiết chuyến xe.
+     */
+    public TripDTO getTripDTOById(int tripID) {
+        return tripDAO.getTripDTOById(tripID);
+    }
+
     public int countTripsToday() {
         return tripDAO.countTripsToday();
     }

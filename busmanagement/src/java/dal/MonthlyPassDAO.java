@@ -435,4 +435,52 @@ public class MonthlyPassDAO extends DBContext {
         return dto;
     }
 
+    public MonthlyPassDTO getActivePassByAccountId(int accountID) {
+        String sql = "SELECT TOP 1 mp.PassCode, mp.StartDate, mp.EndDate, mp.Status, "
+                + "r.RouteNumber, r.RouteName, mpt.TypeName "
+                + "FROM MonthlyPasses mp "
+                + "LEFT JOIN Routes r ON mp.RouteID = r.RouteID "
+                + "JOIN MonthlyPassTypes mpt ON mp.PassTypeID = mpt.PassTypeID "
+                + "WHERE mp.AccountID = ? AND mp.Status = 'APPROVED' AND mp.EndDate >= CAST(GETDATE() AS DATE) "
+                + "ORDER BY mp.EndDate DESC";
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, accountID);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return mapRowToMonthlyPassDTO(rs);
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("Lỗi getActivePassByAccountId: " + e.getMessage());
+        }
+        return null;
+    }
+
+    public MonthlyPass getByCode(String passCode) {
+        String sql = "SELECT * FROM MonthlyPasses WHERE PassCode = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, passCode);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return mapRowToMonthlyPass(rs);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public boolean updateLastUsed(int passID) {
+        String sql = "UPDATE MonthlyPasses SET LastUsedAt = GETDATE() WHERE PassID = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, passID);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+  
 }
