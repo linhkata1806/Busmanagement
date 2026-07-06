@@ -13,16 +13,34 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quản lý vé của tôi - Bus Hà Nội</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <jsp:include page="/common/head_imports.jsp" />
     <style>
         :root {
-            --primary: #1a73e8;
-            --bg-light: #f8f9fa;
+            --primary: #0d47a1;
+            --primary-light: #1565c0;
+            --accent: #fbbc04;
+            --bg-light: #f4f6f9;
         }
         body { 
             background-color: var(--bg-light); 
         }
+        
+        /* ===== NAVBAR ===== */
+        .navbar {
+            background: var(--primary) !important;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.3rem;
+            color: white !important;
+        }
+        .navbar-brand span { color: var(--accent); }
+        .nav-link { color: rgba(255,255,255,0.9) !important; font-weight: 500; }
+        .navbar .dropdown-menu {
+            border: none;
+        }
+
         .nav-pills .nav-link.active {
             background-color: var(--primary);
         }
@@ -45,14 +63,15 @@
 </head>
 <body class="d-flex flex-column min-vh-100">
 
-<div class="container my-5 flex-grow-1">
-    <div class="d-flex align-items-center justify-content-between mb-4">
+    <!-- ===== HEADER NAVIGATION ===== -->
+    <c:set var="activePage" value="ticket" />
+    <jsp:include page="/common/navbar.jsp" />
+
+<div class="container my-5 flex-grow-1" style="min-height: 700px;">
+    <div class="d-flex align-items-center mb-4">
         <h3 class="fw-bold text-secondary m-0">
             <i class="fas fa-wallet me-2 text-primary"></i>Lịch sử mua & Đăng ký dịch vụ vé
         </h3>
-        <a href="${pageContext.request.contextPath}/customer/profile" class="btn btn-light rounded-pill px-4 fw-bold text-dark shadow-sm">
-            <i class="fas fa-arrow-left me-2"></i>Quay lại
-        </a>
     </div>
 
     <ul class="nav nav-pills mb-4 shadow-sm bg-white p-2 rounded-3">
@@ -98,7 +117,8 @@
                                         <hr class="text-muted opacity-25 my-2">
                                         <div class="d-flex justify-content-between align-items-center text-secondary small">
                                             <span>Giá vé: <strong class="text-success"><fmt:formatNumber value="${t.price}" pattern="#,###"/> đ</strong></span>
-                                            <button class="btn btn-sm btn-outline-primary py-0.5 px-2 rounded-2">
+                                            <button class="btn btn-sm btn-outline-primary py-0.5 px-2 rounded-2" 
+                                                    onclick="showTicketQR('${t.ticketCode}', '${t.routeNumber}', '${t.status}')">
                                                 <i class="fas fa-qrcode me-1"></i>Xem QR
                                             </button>
                                         </div>
@@ -199,35 +219,54 @@
     </div>
 </div>
 
-<!-- ===== FOOTER ===== -->
-<footer>
-    <div class="container">
-        <div class="row">
-            <div class="col-md-4 mb-3 text-start">
-                <h6 class="text-white fw-bold">🚌 Bus Hà Nội</h6>
-                <small class="text-white-50">Hệ thống quản lý xe bus công cộng thành phố Hà Nội.</small>
-            </div>
-            <div class="col-md-4 mb-3 text-start">
-                <h6 class="text-white fw-bold">Liên kết</h6>
-                <ul class="list-unstyled small">
-                    <li><a href="${pageContext.request.contextPath}/home">Trang chủ</a></li>
-                    <li><a href="${pageContext.request.contextPath}/route-list">Danh sách tuyến</a></li>
-                    <li><a href="${pageContext.request.contextPath}/login">Đăng nhập</a></li>
-                </ul>
-            </div>
-            <div class="col-md-4 mb-3 text-start">
-                <h6 class="text-white fw-bold">Liên hệ</h6>
-                <small class="text-white-50">
-                    <i class="fas fa-phone me-1"></i>1900 xxxx<br>
-                    <i class="fas fa-envelope me-1"></i>support@bushanoi.vn
-                </small>
+    <!-- Bootstrap Modal for ticket QR -->
+    <div class="modal fade" id="ticketQRModal" tabindex="-1" aria-labelledby="ticketQRModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" style="max-width: 380px;">
+            <div class="modal-content border-0 shadow rounded-4">
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title fw-bold text-secondary" id="ticketQRModalLabel">MÃ VÉ CHI TIẾT</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center pt-2">
+                    <div class="bg-light p-3 rounded-4 mb-3 d-inline-block">
+                        <img id="modalQRImage" src="" alt="Mã QR soát vé" style="width: 220px; height: 220px; object-fit: contain;" />
+                    </div>
+                    <h4 class="fw-bold text-primary mb-1" id="modalTicketCode"></h4>
+                    <p class="text-secondary small mb-3">Tuyến: <span id="modalRouteNumber" class="fw-bold"></span></p>
+                    <div class="badge px-3 py-2 fs-6 mb-2" id="modalTicketStatus"></div>
+                    <p class="text-muted small mt-3 mb-1"><i class="fas fa-info-circle me-1"></i>Đưa mã này cho phụ xe quét khi lên xe bus.</p>
+                </div>
             </div>
         </div>
-        <hr style="border-color: rgba(255,255,255,0.1)">
-        <div class="text-center small text-white-50">© 2024 Bus Hà Nội. All rights reserved.</div>
     </div>
-</footer>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function showTicketQR(ticketCode, routeNumber, status) {
+            document.getElementById('modalTicketCode').innerText = ticketCode;
+            document.getElementById('modalRouteNumber').innerText = "Tuyến " + routeNumber;
+            
+            const statusBadge = document.getElementById('modalTicketStatus');
+            statusBadge.innerText = status;
+            statusBadge.className = "badge px-3 py-2 fs-6 mb-2";
+            if (status === 'UNUSED') {
+                statusBadge.classList.add('bg-success');
+            } else if (status === 'CHECKED_IN') {
+                statusBadge.classList.add('bg-primary');
+            } else if (status === 'COMPLETED') {
+                statusBadge.classList.add('bg-secondary');
+            } else {
+                statusBadge.classList.add('bg-danger');
+            }
+            
+            const qrUrl = "https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=" + encodeURIComponent(ticketCode);
+            document.getElementById('modalQRImage').src = qrUrl;
+            
+            const myModal = new bootstrap.Modal(document.getElementById('ticketQRModal'));
+            myModal.show();
+        }
+    </script>
+
+<!-- ===== FOOTER ===== -->
+<jsp:include page="/common/footer.jsp" />
 </body>
 </html>

@@ -89,6 +89,10 @@
         <servlet-class>controller.customer.EditProfileServlet</servlet-class>
     </servlet>
     <servlet>
+        <servlet-name>TripHistoryServlet</servlet-name>
+        <servlet-class>controller.customer.TripHistoryServlet</servlet-class>
+    </servlet>
+    <servlet>
         <servlet-name>BuyTicketServlet</servlet-name>
         <servlet-class>controller.customer.BuyTicketServlet</servlet-class>
     </servlet>
@@ -327,6 +331,10 @@
     <servlet-mapping>
         <servlet-name>EditProfileServlet</servlet-name>
         <url-pattern>/customer/editProfile</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>TripHistoryServlet</servlet-name>
+        <url-pattern>/customer/trip-history</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>BuyTicketServlet</servlet-name>

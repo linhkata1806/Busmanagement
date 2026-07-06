@@ -11,8 +11,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Tuyến xe yêu thích - Bus Hà Nội</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <jsp:include page="/common/head_imports.jsp" />
     <style>
         body { background-color: #f8f9fa; }
         .route-card {
@@ -117,6 +116,7 @@
     }
 </script>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+<!-- ===== FOOTER ===== -->
+<jsp:include page="/common/footer.jsp" />
 </body>
 </html>

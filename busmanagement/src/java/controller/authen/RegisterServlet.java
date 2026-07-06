@@ -71,6 +71,7 @@ public class RegisterServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        request.setCharacterEncoding("UTF-8");
         String username = request.getParameter("username");
         String pass = request.getParameter("password");
         String rePass = request.getParameter("repassword");
@@ -91,15 +92,18 @@ public class RegisterServlet extends HttpServlet {
         acc.setEmail(email);
         acc.setPhone(phone);
 
-        boolean isSuccess = AuthService.register(acc);
-
-        if (isSuccess) {
-            // Áp dụng PRG (Post-Redirect-Get)
-            HttpSession session = request.getSession();
-            session.setAttribute("success", "Đăng ký thành công, vui lòng đăng nhập!");
-            response.sendRedirect("login");
-        } else {
-            forwardError(request, response, "Tên đăng nhập hoặc Email đã tồn tại!", username, fullName, email, phone);
+        try {
+            boolean isSuccess = AuthService.register(acc);
+            if (isSuccess) {
+                // Áp dụng PRG (Post-Redirect-Get)
+                HttpSession session = request.getSession();
+                session.setAttribute("success", "Đăng ký thành công, vui lòng đăng nhập!");
+                response.sendRedirect("login");
+            } else {
+                forwardError(request, response, "Đăng ký thất bại. Vui lòng thử lại sau.", username, fullName, email, phone);
+            }
+        } catch (IllegalArgumentException e) {
+            forwardError(request, response, e.getMessage(), username, fullName, email, phone);
         }
     }
 
@@ -120,7 +124,7 @@ public class RegisterServlet extends HttpServlet {
         request.setAttribute("email", email);
         request.setAttribute("phone", phone);
         
-        request.getRequestDispatcher("view/register.jsp").forward(request, response);
+        request.getRequestDispatcher("view/authen/register.jsp").forward(request, response);
     }
 
 }
