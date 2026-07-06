@@ -1,4 +1,4 @@
-package controller.assistant;
+package controller.assistant.profile;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;

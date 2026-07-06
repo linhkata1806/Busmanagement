@@ -127,7 +127,7 @@ public class NotificationDAO extends DBContext {
                     list.add(mapRow(rs));
                 }
             } catch (Exception ex) {
-                Logger.getLogger(NotificationDAO.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(NotificationDAO.class.getName()).log(Level.SEVERE, "Lỗi getByAccountAndRole", ex);
             }
         } catch (SQLException e) {
             e.printStackTrace();

@@ -1,4 +1,4 @@
-package controller.assistant;
+package controller.assistant.profile;
 
 import dal.AccountDAO;
 import jakarta.servlet.ServletException;
