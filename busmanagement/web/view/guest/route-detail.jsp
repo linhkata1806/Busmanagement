@@ -13,8 +13,7 @@ Author     : Administrator
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Chi tiết lộ trình - Xe Bus Hà Nội</title>
-        <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
-        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+        <jsp:include page="/common/head_imports.jsp" />
         <style>
             :root {
                 --primary: #1a73e8;
@@ -191,45 +190,8 @@ Author     : Administrator
     </head>
     <body>
 
-        <nav class="navbar navbar-expand-lg">
-            <div class="container">
-                <a class="navbar-brand" href="${pageContext.request.contextPath}/home">
-                    🚌 Bus <span>Hà Nội</span>
-                </a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
-                    <span class="navbar-toggler-icon" style="filter: invert(1);"></span>
-                </button>
-                <div class="collapse navbar-collapse" id="navMenu">
-                    <ul class="navbar-nav me-auto">
-                        <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/guide">Hướng dẫn</a></li>
-                        <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/route-list">Tuyến xe</a></li>
-                    </ul>
-                    <ul class="navbar-nav ms-auto align-items-center">
-                        <c:choose>
-                            <c:when test="${not empty USER}">
-                                <li class="nav-item dropdown">
-                                    <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
-                                        <i class="fas fa-user-circle me-1"></i> Chào, <strong>${USER.fullName}</strong>
-                                    </a>
-                                    <ul class="dropdown-menu dropdown-menu-end">
-                                        <li><a class="dropdown-item" href="${pageContext.request.contextPath}/customer/profile"><i class="fas fa-user me-2 text-primary"></i>Hồ sơ</a></li>
-                                        <c:if test="${USER.roleName == 'CUSTOMER'}">
-                                            <li><a class="dropdown-item" href="${pageContext.request.contextPath}/customer/ticket"><i class="fas fa-ticket-alt me-2 text-primary"></i>Vé của tôi</a></li>
-                                        </c:if>
-                                        <li><hr class="dropdown-divider"></li>
-                                        <li><a class="dropdown-item text-danger" href="${pageContext.request.contextPath}/logout"><i class="fas fa-sign-out-alt me-2"></i>Đăng xuất</a></li>
-                                    </ul>
-                                </li>
-                            </c:when>
-                            <c:otherwise>
-                                <li class="nav-item"><a class="nav-link btn-nav-login" href="${pageContext.request.contextPath}/login">Đăng nhập</a></li>
-                                <li class="nav-item"><a class="nav-link btn-nav-register" href="${pageContext.request.contextPath}/register">Đăng ký</a></li>
-                            </c:otherwise>
-                        </c:choose>
-                    </ul>
-                </div>
-            </div>
-        </nav>
+        <!-- ===== HEADER NAVIGATION ===== -->
+        <jsp:include page="/common/navbar.jsp" />
 
         <c:choose>
             <c:when test="${not empty route}">
@@ -253,11 +215,6 @@ Author     : Administrator
                                 <p class="lead m-0 mt-1 opacity-75">
                                     <i class="fas fa-map-marked-alt me-1"></i> Chi tiết lộ trình hành trình xe buýt công cộng
                                 </p>
-                            </div>
-                            <div class="col-md-auto text-md-end text-center mt-3 mt-md-0">
-                                <a href="javascript:history.back()" class="btn btn-light rounded-pill px-4 fw-bold text-dark shadow-sm">
-                                    <i class="fas fa-arrow-left me-2"></i>Quay lại
-                                </a>
                             </div>
                         </div>
                     </div>
@@ -412,35 +369,8 @@ Author     : Administrator
             </c:otherwise>
         </c:choose>
 
-        <footer>
-            <div class="container">
-                <div class="row">
-                    <div class="col-md-4 mb-3">
-                        <h6 class="text-white fw-bold">🚌 Bus Hà Nội</h6>
-                        <small>Hệ thống quản lý xe bus công cộng thành phố Hà Nội.</small>
-                    </div>
-                    <div class="col-md-4 mb-3">
-                        <h6 class="text-white fw-bold">Liên kết</h6>
-                        <ul class="list-unstyled small">
-                            <li><a href="${pageContext.request.contextPath}/home">Trang chủ</a></li>
-                            <li><a href="${pageContext.request.contextPath}/route-list">Danh sách tuyến</a></li>
-                            <li><a href="${pageContext.request.contextPath}/login">Đăng nhập</a></li>
-                        </ul>
-                    </div>
-                    <div class="col-md-4 mb-3">
-                        <h6 class="text-white fw-bold">Liên hệ</h6>
-                        <small>
-                            <i class="fas fa-phone me-1"></i>1900 xxxx<br>
-                            <i class="fas fa-envelope me-1"></i>support@bushanoi.vn
-                        </small>
-                    </div>
-                </div>
-                <hr style="border-color: rgba(255,255,255,0.1)">
-                <div class="text-center small">© 2024 Bus Hà Nội. All rights reserved.</div>
-            </div>
-        </footer>
-
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+        <!-- ===== FOOTER ===== -->
+        <jsp:include page="/common/footer.jsp" />
         
         <script>
             function toggleFavorite(routeId, isLoggedIn, iconElement) {

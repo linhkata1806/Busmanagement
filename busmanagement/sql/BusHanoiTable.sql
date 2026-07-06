@@ -292,21 +292,21 @@ INSERT INTO Roles (RoleName) VALUES
 ('ADMIN'), ('STAFF'), ('DRIVER'), ('ASSISTANT'), ('CUSTOMER');
 
 INSERT INTO Accounts (Username, Password, FullName, Email, Phone, RoleID, IsActive) VALUES
-('admin',       '$2a$10$xyz...', N'Hệ thống Quản trị', 'admin@bus.vn',     '0900000001', 1, 1),
-('staff_hoa',   '$2a$10$xyz...', N'Nguyễn Thị Hoa',    'hoant@bus.vn',     '0900000002', 2, 1),
-('staff_tuan',  '$2a$10$xyz...', N'Trần Anh Tuấn',     'tuanta@bus.vn',    '0900000003', 2, 1),
-('driver_binh', '$2a$10$xyz...', N'Lê Thanh Bình',     'binhlt@bus.vn',    '0900000101', 3, 1),
-('driver_hai',  '$2a$10$xyz...', N'Phạm Quang Hải',    'haipq@bus.vn',     '0900000102', 3, 1),
-('driver_cuong','$2a$10$xyz...', N'Vũ Quốc Cường',     'cuongvq@bus.vn',   '0900000103', 3, 1),
-('driver_long', '$2a$10$xyz...', N'Đinh Phi Long',     'longdp@bus.vn',    '0900000104', 3, 1),
-('driver_son',  '$2a$10$xyz...', N'Hoàng Thái Sơn',    'sonht@bus.vn',     '0900000105', 3, 1),
-('ast_lan',     '$2a$10$xyz...', N'Ngô Ngọc Lan',      'lannn@bus.vn',     '0900000201', 4, 1),
-('ast_phong',   '$2a$10$xyz...', N'Bùi Văn Phong',     'phongbv@bus.vn',   '0900000202', 4, 1),
-('ast_linh',    '$2a$10$xyz...', N'Đặng Thùy Linh',    'linhdt@bus.vn',    '0900000203', 4, 1),
-('linhkata',    '$2a$10$xyz...', N'Đặng Nhật Linh',    'linhkata@bus.vn',  '0912345678', 5, 1),
-('sv_nam',      '$2a$10$xyz...', N'Trần Văn Nam',      'namsv@gmail.com',  '0988888888', 5, 1),
-('kh_mai',      '$2a$10$xyz...', N'Lê Phương Mai',     'maiphuong@bus.vn', '0977777777', 5, 1),
-('kh_hung',     '$2a$10$xyz...', N'Phạm Tiến Hùng',    'hungpt@bus.vn',    '0966666666', 5, 1);
+('admin',       '$2a$10$.5Elh8fgxypNUWhpUUr/xOa2sZm0VIaE0qWuGGl9otUfobb46T1Pq', N'Hệ thống Quản trị', 'admin@bus.vn',     '0900000001', 1, 1),
+('staff_hoa',   '$2a$10$.5Elh8fgxypNUWhpUUr/xOa2sZm0VIaE0qWuGGl9otUfobb46T1Pq', N'Nguyễn Thị Hoa',    'hoant@bus.vn',     '0900000002', 2, 1),
+('staff_tuan',  '$2a$10$.5Elh8fgxypNUWhpUUr/xOa2sZm0VIaE0qWuGGl9otUfobb46T1Pq', N'Trần Anh Tuấn',     'tuanta@bus.vn',    '0900000003', 2, 1),
+('driver_binh', '$2a$10$.5Elh8fgxypNUWhpUUr/xOa2sZm0VIaE0qWuGGl9otUfobb46T1Pq', N'Lê Thanh Bình',     'binhlt@bus.vn',    '0900000101', 3, 1),
+('driver_hai',  '$2a$10$.5Elh8fgxypNUWhpUUr/xOa2sZm0VIaE0qWuGGl9otUfobb46T1Pq', N'Phạm Quang Hải',    'haipq@bus.vn',     '0900000102', 3, 1),
+('driver_cuong','$2a$10$.5Elh8fgxypNUWhpUUr/xOa2sZm0VIaE0qWuGGl9otUfobb46T1Pq', N'Vũ Quốc Cường',     'cuongvq@bus.vn',   '0900000103', 3, 1),
+('driver_long', '$2a$10$.5Elh8fgxypNUWhpUUr/xOa2sZm0VIaE0qWuGGl9otUfobb46T1Pq', N'Đinh Phi Long',     'longdp@bus.vn',    '0900000104', 3, 1),
+('driver_son',  '$2a$10$.5Elh8fgxypNUWhpUUr/xOa2sZm0VIaE0qWuGGl9otUfobb46T1Pq', N'Hoàng Thái Sơn',    'sonht@bus.vn',     '0900000105', 3, 1),
+('ast_lan',     '$2a$10$.5Elh8fgxypNUWhpUUr/xOa2sZm0VIaE0qWuGGl9otUfobb46T1Pq', N'Ngô Ngọc Lan',      'lannn@bus.vn',     '0900000201', 4, 1),
+('ast_phong',   '$2a$10$.5Elh8fgxypNUWhpUUr/xOa2sZm0VIaE0qWuGGl9otUfobb46T1Pq', N'Bùi Văn Phong',     'phongbv@bus.vn',   '0900000202', 4, 1),
+('ast_linh',    '$2a$10$.5Elh8fgxypNUWhpUUr/xOa2sZm0VIaE0qWuGGl9otUfobb46T1Pq', N'Đặng Thùy Linh',    'linhdt@bus.vn',    '0900000203', 4, 1),
+('linhkata',    '$2a$10$.5Elh8fgxypNUWhpUUr/xOa2sZm0VIaE0qWuGGl9otUfobb46T1Pq', N'Đặng Nhật Linh',    'linhkata@bus.vn',  '0912345678', 5, 1),
+('sv_nam',      '$2a$10$.5Elh8fgxypNUWhpUUr/xOa2sZm0VIaE0qWuGGl9otUfobb46T1Pq', N'Trần Văn Nam',      'namsv@gmail.com',  '0988888888', 5, 1),
+('kh_mai',      '$2a$10$.5Elh8fgxypNUWhpUUr/xOa2sZm0VIaE0qWuGGl9otUfobb46T1Pq', N'Lê Phương Mai',     'maiphuong@bus.vn', '0977777777', 5, 1),
+('kh_hung',     '$2a$10$.5Elh8fgxypNUWhpUUr/xOa2sZm0VIaE0qWuGGl9otUfobb46T1Pq', N'Phạm Tiến Hùng',    'hungpt@bus.vn',    '0966666666', 5, 1);
 
 INSERT INTO Stops (StopName, Address, Latitude, Longitude) VALUES
 (N'Bến xe Kim Mã', N'Số 1 Kim Mã, Ba Đình', 21.0311, 105.8245),
