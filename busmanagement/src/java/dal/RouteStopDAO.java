@@ -12,7 +12,7 @@ public class RouteStopDAO extends DBContext {
     // KHU VỰC LẤY DỮ LIỆU (READ)
     // =========================================================================
 
-    // 1. LẤY DANH SÁCH STOP THEO TUYẾN (Bổ sung Lat, Lng cho Map)
+    // 1. LẤY DANH SÁCH STOP THEO TUYẾN (Bổ sung Lat, Lng cho Map), hàm cho guest
     public List<RouteStopDTO> getStopsByRoute(int routeID) {
         List<RouteStopDTO> list = new ArrayList<>();
         String sql = "SELECT rs.RouteStopID, rs.RouteID, rs.StopID, rs.StopOrder, rs.DistanceFromStart, " +

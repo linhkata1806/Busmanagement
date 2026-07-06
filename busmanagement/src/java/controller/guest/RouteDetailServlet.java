@@ -2,7 +2,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
  */
-package controller;
+package controller.guest;
 
 import dal.FavoriteDAO;
 import dal.RouteDAO;
@@ -74,7 +74,7 @@ public class RouteDetailServlet extends HttpServlet {
             e.printStackTrace();
         }
 
-        request.getRequestDispatcher("view/route-detail.jsp").forward(request, response);
+        request.getRequestDispatcher("view/guest/route-detail.jsp").forward(request, response);
     }
     
 

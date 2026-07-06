@@ -2,9 +2,10 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
  */
-package controller;
+package controller.guest;
 
 import dal.RouteDAO;
+import dal.StopDAO;
 import java.io.IOException;
 import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
@@ -13,14 +14,16 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.List;
 import model.Route;
+import model.Stop;
 
 /**
  *
  * @author Administrator
  */
-public class SearchRouteServlet extends HttpServlet {
+public class HomeServlet extends HttpServlet {
 
     private RouteDAO routeDAO;
+    private StopDAO stopDAO;
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -35,6 +38,7 @@ public class SearchRouteServlet extends HttpServlet {
     public void init()
             throws ServletException {
         routeDAO = new RouteDAO();
+        stopDAO = new StopDAO();
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
@@ -48,19 +52,16 @@ public class SearchRouteServlet extends HttpServlet {
      */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String keyword = request.getParameter("keyword");
-        if (keyword == null) {
-            keyword = "";
-        }
 
-       
-        List<Route> routes = routeDAO.searchRoutes(keyword);
+        List<Route> popularRoutes = routeDAO.getPopularRoutes(6);
+        request.setAttribute("popularRoutes", popularRoutes);
 
-        request.setAttribute("routes", routes);
-        request.setAttribute("keyword", keyword);
+        List<Stop> stopNames = stopDAO.getAllStops();
 
+        request.setAttribute("stopNames", stopNames);
+
+        request.getRequestDispatcher("view/guest/home.jsp").forward(request, response);
         
-        request.getRequestDispatcher("view/search-route.jsp").forward(request, response);
     }
 
     /**
