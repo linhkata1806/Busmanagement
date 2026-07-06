@@ -2,10 +2,9 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
  */
-package controller;
+package controller.guest;
 
 import dal.RouteDAO;
-import dal.StopDAO;
 import java.io.IOException;
 import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
@@ -14,31 +13,18 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.List;
 import model.Route;
-import model.Stop;
 
 /**
  *
  * @author Administrator
  */
-public class HomeServlet extends HttpServlet {
+public class RouteListServlet extends HttpServlet {
 
     private RouteDAO routeDAO;
-    private StopDAO stopDAO;
 
-    /**
-     * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
-     * methods.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
     @Override
-    public void init()
-            throws ServletException {
+    public void init() {
         routeDAO = new RouteDAO();
-        stopDAO = new StopDAO();
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
@@ -51,17 +37,14 @@ public class HomeServlet extends HttpServlet {
      * @throws IOException if an I/O error occurs
      */
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        List<Route> routes = routeDAO.getAllActiveRoutes();
 
-        List<Route> popularRoutes = routeDAO.getPopularRoutes(6);
-        request.setAttribute("popularRoutes", popularRoutes);
+        request.setAttribute("routes", routes);
 
-        List<Stop> stopNames = stopDAO.getAllStops();
-
-        request.setAttribute("stopNames", stopNames);
-
-        request.getRequestDispatcher("view/home.jsp").forward(request, response);
-        
+        request.getRequestDispatcher("view/guest/route-list.jsp")
+                .forward(request, response);
     }
 
     /**

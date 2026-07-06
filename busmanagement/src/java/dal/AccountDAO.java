@@ -46,14 +46,16 @@ public class AccountDAO extends DBContext {
         return acc;
     }
 
+    //=== đoạnn này dành cho authen
     public Account getAccountByUsername(String username) {
         String sql = "SELECT a.*, r.RoleName FROM Accounts a "
                 + "JOIN Roles r ON a.RoleID = r.RoleID "
-                + "WHERE a.Username = ?";
+                + "WHERE a.Username = ? OR a.Email = ?";
 
         // BƯỚC 2: Gọi thẳng biến 'connection' được thừa kế từ DBContext
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, username);
+             ps.setString(2, username);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     return mapAccount(rs);
@@ -123,6 +125,7 @@ public class AccountDAO extends DBContext {
         }
         return false;
     }
+    //=============================
 
     public boolean updateProfile(int accountID, String fullName, String email, String phone, String avatar) {
         String sql = "UPDATE Accounts SET FullName = ?, Email = ?, Phone = ?, Avatar = ?, UpdatedAt = GETDATE() WHERE AccountID = ?";
@@ -193,15 +196,15 @@ public class AccountDAO extends DBContext {
                 + "JOIN Roles r ON a.RoleID = r.RoleID "
                 + "WHERE a.RoleID = ? AND a.IsActive = 1";
 
-        try  {
+        try {
             PreparedStatement ps = connection.prepareStatement(sql);
             ps.setInt(1, roleID);
             ResultSet rs = ps.executeQuery();
-                while (rs.next()) {
-                   
-                    list.add(mapAccount(rs));
-                }
-            
+            while (rs.next()) {
+
+                list.add(mapAccount(rs));
+            }
+
         } catch (Exception e) {
             System.out.println("Lỗi getAccountsByRole: " + e.getMessage());
         }

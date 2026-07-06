@@ -26,19 +26,19 @@
     </filter-mapping>
     <servlet>
         <servlet-name>LoginServlet</servlet-name>
-        <servlet-class>controller.LoginServlet</servlet-class>
+        <servlet-class>controller.authen.LoginServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>LogOutServlet</servlet-name>
-        <servlet-class>controller.LogOutServlet</servlet-class>
+        <servlet-class>controller.authen.LogOutServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>RegisterServlet</servlet-name>
-        <servlet-class>controller.RegisterServlet</servlet-class>
+        <servlet-class>controller.authen.RegisterServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>HomeServlet</servlet-name>
-        <servlet-class>controller.HomeServlet</servlet-class>
+        <servlet-class>controller.guest.HomeServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>GuideServlet</servlet-name>
@@ -46,19 +46,19 @@
     </servlet>
     <servlet>
         <servlet-name>SearchRouteServlet</servlet-name>
-        <servlet-class>controller.SearchRouteServlet</servlet-class>
+        <servlet-class>controller.guest.SearchRouteServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>RouteDetailServlet</servlet-name>
-        <servlet-class>controller.RouteDetailServlet</servlet-class>
+        <servlet-class>controller.guest.RouteDetailServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>FindRoundServlet</servlet-name>
-        <servlet-class>controller.FindRoundServlet</servlet-class>
+        <servlet-class>controller.guest.FindRoundServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>RouteListServlet</servlet-name>
-        <servlet-class>controller.RouteListServlet</servlet-class>
+        <servlet-class>controller.guest.RouteListServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>DashboardServlet</servlet-name>

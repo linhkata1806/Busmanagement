@@ -244,12 +244,12 @@
                 <form id="loginForm" action="login" method="POST" class="needs-validation" novalidate>
                     <!-- Username Input -->
                     <div class="mb-3">
-                        <label class="form-label">TÊN ĐĂNG NHẬP</label>
+                        <label class="form-label">TÊN ĐĂNG NHẬP HOẶC EMAIL</label>
                         <div class="input-group">
                             <span class="input-group-text input-group-text-custom"><i class="fas fa-user"></i></span>
                             <input type="text" name="username" class="form-control form-control-custom"
                                    minlength="4" maxlength="50" autocomplete="username"
-                                   value="${requestScope.username}" required placeholder="Nhập username...">
+                                   value="${requestScope.username}" required placeholder="Nhập username hoặc email....">
                         </div>
                     </div>
 
@@ -348,7 +348,7 @@
                         
                         // Look for error message element or default error message
                         const errorMsgElement = doc.querySelector('.alert-danger div') || doc.querySelector('#alert-container .alert-danger div');
-                        const errorMsg = errorMsgElement ? errorMsgElement.textContent.trim() : 'Tên đăng nhập hoặc mật khẩu không chính xác!';
+                        const errorMsg = errorMsgElement ? errorMsgElement.textContent.trim() : 'Tên đăng nhập,email hoặc mật khẩu không chính xác!';
 
                         // Display alert dynamically
                         alertContainer.innerHTML = `

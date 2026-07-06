@@ -2,7 +2,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
  */
-package controller;
+package controller.guest;
 
 import dal.RouteDAO;
 import java.io.IOException;
@@ -18,12 +18,22 @@ import model.Route;
  *
  * @author Administrator
  */
-public class RouteListServlet extends HttpServlet {
+public class SearchRouteServlet extends HttpServlet {
 
     private RouteDAO routeDAO;
 
+    /**
+     * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
+     * methods.
+     *
+     * @param request servlet request
+     * @param response servlet response
+     * @throws ServletException if a servlet-specific error occurs
+     * @throws IOException if an I/O error occurs
+     */
     @Override
-    public void init() {
+    public void init()
+            throws ServletException {
         routeDAO = new RouteDAO();
     }
 
@@ -37,14 +47,20 @@ public class RouteListServlet extends HttpServlet {
      * @throws IOException if an I/O error occurs
      */
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        List<Route> routes = routeDAO.getAllActiveRoutes();
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String keyword = request.getParameter("keyword");
+        if (keyword == null) {
+            keyword = "";
+        }
+
+       
+        List<Route> routes = routeDAO.searchRoutes(keyword);
 
         request.setAttribute("routes", routes);
+        request.setAttribute("keyword", keyword);
 
-        request.getRequestDispatcher("view/route-list.jsp")
-                .forward(request, response);
+        
+        request.getRequestDispatcher("view/guest/search-route.jsp").forward(request, response);
     }
 
     /**
