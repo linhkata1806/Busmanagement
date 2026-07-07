@@ -14,6 +14,9 @@ import service.NotificationService;
 public class NotificationServlet extends HttpServlet {
     private NotificationService notificationService;
 
+    /** Hằng số vai trò phụ xe, khớp với giá trị TargetRole trong DB */
+    private static final String ASSISTANT_ROLE = "ASSISTANT";
+
     @Override
     public void init() throws ServletException {
         notificationService = new NotificationService();
@@ -26,8 +29,9 @@ public class NotificationServlet extends HttpServlet {
         Account user = (Account) session.getAttribute("USER");
         int accountId = user.getAccountID();
 
-        List<Notification> notiList = notificationService.getByAccount(accountId);
-        int unreadCount = notificationService.countUnreadNotifications(accountId);
+        // Lấy cả thông báo đích danh + broadcast cho nhóm ASSISTANT (Spec Sprint 6 – Mục V)
+        List<Notification> notiList = notificationService.getByAccountAndRole(accountId, ASSISTANT_ROLE);
+        int unreadCount = notificationService.countUnreadByAccountAndRole(accountId, ASSISTANT_ROLE);
 
         request.setAttribute("notiList", notiList);
         request.setAttribute("unreadCount", unreadCount);
@@ -38,7 +42,7 @@ public class NotificationServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        // Mark as read logic
+        // Đánh dấu đã đọc – chỉ áp dụng cho thông báo đích danh (có AccountID)
         HttpSession session = request.getSession(false);
         Account user = (Account) session.getAttribute("USER");
         int accountId = user.getAccountID();

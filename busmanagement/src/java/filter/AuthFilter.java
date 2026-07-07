@@ -126,7 +126,7 @@ public class AuthFilter implements Filter {
         //authorization
         //admin
         if(path.startsWith("/admin")&&!"ADMIN".equals(role)){
-            res.sendRedirect(req.getContextPath()+"/home");
+            res.sendRedirect(req.getContextPath()+"/access-denied");
             return;
         }
         //staff
@@ -137,20 +137,38 @@ public class AuthFilter implements Filter {
         }
         //driver
         if(path.startsWith("/driver")&&!"DRIVER".equals(role)){
-            res.sendRedirect(req.getContextPath()+"/home");
+            res.sendRedirect(req.getContextPath()+"/access-denied");
             return;
         }
         //assistant
         if(path.startsWith("/assistant")&&!"ASSISTANT".equals(role)){
-            res.sendRedirect(req.getContextPath()+"/home");
+            res.sendRedirect(req.getContextPath()+"/access-denied");
             return;
         }
         //customer
         if(path.startsWith("/customer")&&!"CUSTOMER".equals(role)){
-            res.sendRedirect(req.getContextPath()+"/home");
+            res.sendRedirect(req.getContextPath()+"/access-denied");
             return;
         }
-        
+        // Set unread count for notifications to render in sidebars/headers
+        if ("ASSISTANT".equals(role)) {
+            try {
+                service.NotificationService notiService = new service.NotificationService();
+                int unreadCount = notiService.countUnreadByAccountAndRole(user.getAccountID(), "ASSISTANT");
+                req.setAttribute("unreadCount", unreadCount);
+            } catch (Exception e) {
+                System.out.println("Error setting unreadCount in AuthFilter for Assistant: " + e.getMessage());
+            }
+        } else if ("CUSTOMER".equals(role)) {
+            try {
+                service.NotificationService notiService = new service.NotificationService();
+                int unreadCount = notiService.countUnreadNotifications(user.getAccountID());
+                req.setAttribute("unreadCount", unreadCount);
+            } catch (Exception e) {
+                System.out.println("Error setting unreadCount in AuthFilter for Customer: " + e.getMessage());
+            }
+        }
+
         //If valid then continue access to other page
         chain.doFilter(request, response);
         

@@ -15,7 +15,11 @@ import model.*;
 public enum NotificationType {
     TICKET,
     PASS_APPROVED,
+    PASS_REJECTED,
     SYSTEM_ALERT,
     BUS_ALERT,
-    PROMOTION
+    PROMOTION,
+    ROUTE_DELAY,
+    ROUTE_CHANGE,
+    SYSTEM_MAINTENANCE
 }

@@ -12,6 +12,8 @@ import enums.NotificationType;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -23,6 +25,31 @@ public class NotificationDAO extends DBContext {
         String sql = "SELECT COUNT(*) FROM Notifications WHERE AccountID = ? AND IsRead = 0";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, accountId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
+    /**
+     * Đếm thông báo chưa đọc dành cho một tài khoản VÀ các thông báo broadcast
+     * gửi tới nhóm vai trò (roleName) hoặc gửi cho tất cả ('ALL').
+     * Dành cho Phụ xe: roleName = "ASSISTANT"
+     */
+    public int countUnreadByAccountAndRole(int accountId, String roleName) {
+        String sql = "SELECT COUNT(*) FROM Notifications "
+                + "WHERE IsRead = 0 AND ("
+                + "  AccountID = ? "
+                + "  OR (AccountID IS NULL AND TargetRole IN (?, 'ALL'))"
+                + ")";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, accountId);
+            ps.setString(2, roleName);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     return rs.getInt(1);
@@ -74,6 +101,33 @@ public class NotificationDAO extends DBContext {
                     n.setCreatedAt(rs.getTimestamp("CreatedAt").toLocalDateTime());
                     list.add(n);
                 }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
+    /**
+     * Lấy thông báo cho Phụ xe: bao gồm thông báo đích danh (AccountID = accountID)
+     * VÀ thông báo broadcast gửi tới nhóm vai trò (roleName) hoặc gửi tất cả ('ALL').
+     * Spec Sprint 6 – Mục V: "xem thông báo được gửi đích danh HOẶC gửi hàng loạt dành cho nhóm Phụ xe".
+     */
+    public List<Notification> getByAccountAndRole(int accountID, String roleName) {
+        List<Notification> list = new ArrayList<>();
+        String sql = "SELECT * FROM Notifications "
+                + "WHERE AccountID = ? "
+                + "   OR (AccountID IS NULL AND TargetRole IN (?, 'ALL')) "
+                + "ORDER BY CreatedAt DESC";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, accountID);
+            ps.setString(2, roleName);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    list.add(mapRow(rs));
+                }
+            } catch (Exception ex) {
+                Logger.getLogger(NotificationDAO.class.getName()).log(Level.SEVERE, null, ex);
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -133,6 +187,7 @@ public class NotificationDAO extends DBContext {
                 list.add(mapRow(rs));
             }
         } catch (Exception e) {
+            e.printStackTrace();
         }
         return list;
     }
@@ -182,6 +237,12 @@ public class NotificationDAO extends DBContext {
         Notification n = new Notification();
         n.setNotificationID(rs.getInt("NotificationID"));
         n.setAccountID(rs.getInt("AccountID"));
+        int accountID = rs.getInt("AccountID");
+        if (rs.wasNull()) {
+            n.setAccountID(0);
+        } else {
+            n.setAccountID(accountID);
+    }
         n.setNotificationType(NotificationType.valueOf(rs.getString("NotificationType")));
         n.setTitle(rs.getString("Title"));
         n.setContent(rs.getString("Content"));

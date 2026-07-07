@@ -7,8 +7,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Thanh toán QR - Bus Hà Nội</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <jsp:include page="/common/head_imports.jsp" />
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -113,35 +112,16 @@
             background: var(--primary);
             color: white;
         }
-        /* ===== FOOTER ===== */
-        footer {
-            background: var(--dark-blue);
-            color: rgba(255,255,255,0.7);
-            padding: 30px 0;
-            margin-top: 60px;
-        }
-        footer a { color: rgba(255,255,255,0.7); text-decoration: none; }
-        footer a:hover { color: white; }
     </style>
 </head>
 <body class="d-flex flex-column min-vh-100">
-
-    <!-- Navigation Header -->
-    <nav class="navbar navbar-dark bg-primary shadow-sm py-3">
-        <div class="container">
-            <a class="navbar-brand fw-bold d-flex align-items-center" href="${pageContext.request.contextPath}/home">
-                <span class="me-2">🚌</span> Bus Hà Nội
-            </a>
-            <span class="navbar-text text-white fw-medium">
-                <i class="fas fa-shield-alt me-1 text-warning"></i> Cổng thanh toán bảo mật
-            </span>
-        </div>
-    </nav>
+    <!-- ===== HEADER NAVIGATION ===== -->
+    <jsp:include page="/common/navbar.jsp" />
 
     <div class="container my-5 flex-grow-1">
         <div class="row justify-content-center">
             <div class="col-lg-6 col-md-8">
-                
+
                 <!-- Hiển thị thông báo thành công từ Session -->
                 <c:if test="${not empty sessionScope.successMsg}">
                     <div class="alert alert-success alert-dismissible fade show d-flex align-items-center mb-4 rounded-3 border-0 shadow-sm" role="alert" style="background-color: #d1f7ec; color: #0f5132;">
@@ -158,15 +138,18 @@
                         <p class="mb-0 opacity-75 small">Sử dụng ứng dụng ngân hàng hoặc ví điện tử bất kỳ để quét</p>
                     </div>
                     <div class="card-body p-4 text-center">
-                        
+
                         <div class="qr-wrapper">
-                            <!-- Gọi API tạo mã QR động thực tế của QRServer -->
-                            <c:set var="qrData" value="Chuyen khoan Bus Ha Noi: Loai ve ${param.type}, So tien ${param.amount}đ, Tuyen ${param.route}"/>
+                            <!-- Gọi API tạo mã QR động thực tế của QRServer với tham số được URL-encode -->
+                            <c:url var="qrCodeUrl" value="https://api.qrserver.com/v1/create-qr-code/">
+                                <c:param name="size" value="250x250" />
+                                <c:param name="data" value="Chuyen khoan Bus Ha Noi: Loai ve ${requestScope.qrType}, So tien ${requestScope.qrAmount}đ, Tuyen ${requestScope.qrRoute}" />
+                            </c:url>
                             <img class="qr-image" 
-                                 src="https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${qrData}" 
+                                 src="${qrCodeUrl}" 
                                  alt="Mã QR chuyển khoản ngân hàng" />
                         </div>
-                        
+
                         <div class="text-start bg-light p-3 rounded-3 mb-4">
                             <div class="info-row">
                                 <span class="info-label">Ngân hàng thụ hưởng</span>
@@ -176,8 +159,8 @@
                                 <span class="info-label">Loại dịch vụ</span>
                                 <span class="info-value">
                                     <c:choose>
-                                        <c:when test="${param.type eq 'luot'}">Vé lượt trực tuyến</c:when>
-                                        <c:when test="${param.type eq 'thang'}">Vé tháng (Cố định)</c:when>
+                                        <c:when test="${requestScope.qrType eq 'luot'}">Vé lượt trực tuyến</c:when>
+                                        <c:when test="${requestScope.qrType eq 'thang'}">Vé tháng (Cố định)</c:when>
                                         <c:otherwise>Vé tháng (Liên tuyến)</c:otherwise>
                                     </c:choose>
                                 </span>
@@ -196,13 +179,13 @@
                             <div class="info-row">
                                 <span class="info-label">Số tiền thanh toán</span>
                                 <span class="info-value text-danger fs-5 fw-bold">
-                                    <fmt:formatNumber value="${param.amount}" pattern="#,###"/> đ
+                                    <fmt:formatNumber value="${requestScope.qrAmount}" pattern="#,###"/> đ
                                 </span>
                             </div>
                             <div class="info-row">
                                 <span class="info-label">Nội dung chuyển khoản</span>
                                 <span class="info-value">
-                                    <c:set var="transferDesc" value="THANH TOAN VE XE BUS ${param.route}"/>
+                                    <c:set var="transferDesc" value="THANH TOAN VE XE BUS ${requestScope.qrRoute}"/>
                                     <span id="transferCode">${transferDesc}</span>
                                     <span class="copy-badge" onclick="copyText('transferCode')"><i class="far fa-copy"></i> Sao chép</span>
                                 </span>
@@ -215,17 +198,17 @@
                             </a>
                             <form action="${pageContext.request.contextPath}/customer/buy-ticket" method="POST" class="m-0">
                                 <input type="hidden" name="action" value="confirm">
-                                <input type="hidden" name="routeId" value="${param.routeId}">
-                                <input type="hidden" name="ticketType" value="${param.type}">
-                                <input type="hidden" name="passTypeId" value="${param.passTypeId}">
-                                <input type="hidden" name="imageProof" value="${param.imageProof}">
-                                
+                                <input type="hidden" name="routeId" value="${requestScope.qrRouteId}">
+                                <input type="hidden" name="ticketType" value="${requestScope.qrType}">
+                                <input type="hidden" name="passTypeId" value="${requestScope.qrPassTypeId}">
+                                <input type="hidden" name="imageProof" value="${requestScope.qrImageProof}">
+
                                 <button type="submit" class="btn btn-confirm">
                                     <i class="fas fa-check-circle me-1"></i>Đã hoàn tất thanh toán
                                 </button>
                             </form>
                         </div>
-                        
+
                         <div class="mt-4 text-muted small">
                             <i class="fas fa-info-circle me-1"></i>Hệ thống sẽ kiểm tra và phê duyệt vé ngay sau khi nhận được tiền.
                         </div>
@@ -237,35 +220,7 @@
     </div>
 
     <!-- ===== FOOTER ===== -->
-    <footer>
-        <div class="container">
-            <div class="row">
-                <div class="col-md-4 mb-3 text-start">
-                    <h6 class="text-white fw-bold">🚌 Bus Hà Nội</h6>
-                    <small class="text-white-50">Hệ thống quản lý xe bus công cộng thành phố Hà Nội.</small>
-                </div>
-                <div class="col-md-4 mb-3 text-start">
-                    <h6 class="text-white fw-bold">Liên kết</h6>
-                    <ul class="list-unstyled small">
-                        <li><a href="${pageContext.request.contextPath}/home">Trang chủ</a></li>
-                        <li><a href="${pageContext.request.contextPath}/route-list">Danh sách tuyến</a></li>
-                        <li><a href="${pageContext.request.contextPath}/login">Đăng nhập</a></li>
-                    </ul>
-                </div>
-                <div class="col-md-4 mb-3 text-start">
-                    <h6 class="text-white fw-bold">Liên hệ</h6>
-                    <small class="text-white-50">
-                        <i class="fas fa-phone me-1"></i>1900 xxxx<br>
-                        <i class="fas fa-envelope me-1"></i>support@bushanoi.vn
-                    </small>
-                </div>
-            </div>
-            <hr style="border-color: rgba(255,255,255,0.1)">
-            <div class="text-center small text-white-50">© 2024 Bus Hà Nội. All rights reserved.</div>
-        </div>
-    </footer>
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <jsp:include page="/common/footer.jsp" />
     <script>
         function copyText(elementId) {
             const text = document.getElementById(elementId).innerText;

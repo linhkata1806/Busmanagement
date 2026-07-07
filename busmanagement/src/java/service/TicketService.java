@@ -21,15 +21,14 @@ import java.util.List;
  */
 public class TicketService {
 
-    private TicketDAO ticketDAO = new TicketDAO();
+    private TicketDAO ticketDAO ;
 
     public TicketService() {
+        ticketDAO= new TicketDAO();
     }
 
-    public void setConnection(java.sql.Connection conn) {
-        this.ticketDAO.setConnection(conn);
-    }
-
+ 
+    //========customer(xu ly mua ve)
     public void buySingleTicket(int accountID, int routeId, long ticketPrice, String ticketType) throws Exception {
         Ticket ticket = new Ticket();
 
@@ -52,8 +51,9 @@ public class TicketService {
     private String generateTicketCode(int routeId) {
         return "TK-" + routeId + "-" + System.currentTimeMillis();
     }
-    
+    //====custome(lay danh sach ve)
     public List<TicketDTO> getTicketsByAccount(int accountID) {
+        ticketDAO.updateExpiredTickets(); 
         return ticketDAO.getTicketsByAccount(accountID);
     }
 

@@ -125,6 +125,19 @@ public class AccountDAO extends DBContext {
         }
         return false;
     }
+    public boolean existsByPhone(String phone) {
+        String sql = "SELECT 1 FROM Accounts WHERE Phone = ?";
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, phone);
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
     //=============================
 
     public boolean updateProfile(int accountID, String fullName, String email, String phone, String avatar) {

@@ -52,7 +52,7 @@
                 </c:if>
 
                 <!-- Profile Info Card -->
-                <div class="row">
+                <div class="row justify-content-center">
                     <div class="col-12 col-md-8 col-lg-6">
                         <div class="card profile-card p-4">
                             <div class="text-center mb-4">
@@ -76,7 +76,7 @@
                                 </div>
                                 <div class="row">
                                     <div class="col-4 text-secondary fw-semibold">Số điện thoại:</div>
-                                    <div class="col-8 text-dark">${account.phoneNumber}</div>
+                                    <div class="col-8 text-dark">${account.phone}</div>
                                 </div>
                                 <div class="row">
                                     <div class="col-4 text-secondary fw-semibold">Trạng thái:</div>

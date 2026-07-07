@@ -82,7 +82,7 @@
                                                             <span class="badge bg-info px-2.5 py-1.5 rounded">Hoàn thành</span>
                                                         </c:when>
                                                         <c:otherwise>
-                                                            <span class="badge bg-danger px-2.5 py-1.5 rounded">${t.status}</span>
+                                                            <span class="badge bg-danger px-2.5 py-1.5 rounded">${t.vietnameseStatus}</span>
                                                         </c:otherwise>
                                                     </c:choose>
                                                 </td>

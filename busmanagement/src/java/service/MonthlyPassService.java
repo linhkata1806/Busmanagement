@@ -24,10 +24,7 @@ public class MonthlyPassService {
         notificationDAO = new NotificationDAO();
     }
 
-    public void setConnection(java.sql.Connection conn) {
-        this.monthlyPassDAO.setConnection(conn);
-    }
-
+    // dang ky ve thang hco 1 chuyen
     public void registerRoutePass(int accountID, int routeId, int passTypeID, String imageProof) {
         if (monthlyPassDAO.hasPendingOrApprovedPass(accountID, routeId)) {
             throw new IllegalArgumentException("Bạn đã đăng ký vé tháng cho tuyến này.");
@@ -50,6 +47,7 @@ public class MonthlyPassService {
         monthlyPassDAO.insert(pass);
     }
 
+    // dang ky lien chuyen
     public void registerAllRoutePass(int accountID, int passTypeID, String imageProof) {
         if (monthlyPassDAO.hasPendingOrApprovedAllRoutePass(accountID)) {
             throw new IllegalArgumentException("Bạn đã có vé tháng liên tuyến.");
@@ -70,8 +68,6 @@ public class MonthlyPassService {
         // Nếu hàm calculatePassPrice yêu cầu int routeId, bạn cần xử lý trường hợp null này
         pass.setPrice(calculatePassPrice(null, passTypeID)); // Cần kiểm tra lại hàm tính giá của bạn
 
-        pass.setPrice(calculatePassPrice(null, passTypeID));
-
         pass.setStatus(PassStatus.PENDING);
         pass.setImageProof(imageProof);
 
@@ -83,6 +79,7 @@ public class MonthlyPassService {
         return "PASS-" + System.currentTimeMillis();
     }
 
+    //==========customer
     public long calculatePassPrice(Integer routeId, int passTypeID) {
         MonthlyPassTypeDAO monthlyPassType = new MonthlyPassTypeDAO();
         long basePrice = (routeId == null) ? 200000 : 100000;
@@ -98,14 +95,26 @@ public class MonthlyPassService {
         return Math.round(basePrice * (100 - discount) / 100.0);
     }
 
-    // Lấy danh sách vé tháng đơn tuyến dạng DTO
+    //=====customer Lấy danh sách vé tháng đơn tuyến dạng DTO
     public List<MonthlyPassDTO> getRoutePasses(int accountID) {
+         monthlyPassDAO.updateExpiredPasses();
         return monthlyPassDAO.getRoutePasses(accountID);
     }
 
-    // Lấy danh sách vé tháng liên tuyến dạng DTO
+    //======customer Lấy danh sách vé tháng liên tuyến dạng DTO
     public List<MonthlyPassDTO> getAllRoutePasses(int accountID) {
+         monthlyPassDAO.updateExpiredPasses();
         return monthlyPassDAO.getAllRoutePasses(accountID);
+    }
+
+    //======customer Kiểm tra khách hàng đã có vé tháng đang chờ duyệt hoặc đã duyệt cho tuyến này chưa
+    public boolean hasPendingOrApprovedPass(int accountID, int routeId) {
+        return monthlyPassDAO.hasPendingOrApprovedPass(accountID, routeId);
+    }
+
+    //========customer Kiểm tra khách hàng đã có vé tháng liên tuyến đang chờ duyệt hoặc đã duyệt chưa
+    public boolean hasPendingOrApprovedAllRoutePass(int accountID) {
+        return monthlyPassDAO.hasPendingOrApprovedAllRoutePass(accountID);
     }
 
     public int countPendingPasses() {
@@ -114,11 +123,13 @@ public class MonthlyPassService {
 
     // 2. Lấy danh sách tất cả vé tháng (Giao diện Staff)
     public List<MonthlyPassDTO> getAllPassesForStaff() {
+         monthlyPassDAO.updateExpiredPasses();
         return monthlyPassDAO.getAllPasses();
     }
 
     // 3. Lấy danh sách vé tháng theo trạng thái lọc
     public List<MonthlyPassDTO> getPassesByStatusForStaff(String status) {
+         monthlyPassDAO.updateExpiredPasses();
         return monthlyPassDAO.getPassesByStatus(status);
     }
 

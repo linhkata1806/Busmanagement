@@ -20,6 +20,7 @@ import model.MonthlyPass;
  */
 public class MonthlyPassDAO extends DBContext {
 
+    //=====Customer
     public int countActivePasses(int accountId) {
         String sql = "SELECT COUNT(*) FROM MonthlyPasses "
                 + "WHERE AccountID = ? AND Status = 'APPROVED' AND EndDate >= CAST(GETDATE() AS DATE)";
@@ -36,6 +37,32 @@ public class MonthlyPassDAO extends DBContext {
         return 0;
     }
 
+    //====Customer
+    public boolean hasPendingOrApprovedAllRoutePass(int accountID) {
+        String sql = "                 SELECT 1\n"
+                + "                 FROM MonthlyPasses\n"
+                + "                 WHERE AccountID = ?\n"
+                + "                 AND RouteID IS NULL\n"
+                + "                 AND Status IN ('PENDING', 'APPROVED')";
+
+        try (
+                PreparedStatement ps = connection.prepareStatement(sql)) {
+
+            ps.setInt(1, accountID);
+
+            ResultSet rs = ps.executeQuery();
+
+            return rs.next();
+
+        } catch (SQLException e) {
+            System.out.println("Error hasPendingOrApprovedAllRoutePass: "
+                    + e.getMessage());
+        }
+
+        return false;
+    }
+
+    //===Customer
     public boolean hasPendingOrApprovedPass(int accountID, int routeId) {
         String sql = "SELECT 1\n"
                 + "                 FROM MonthlyPasses\n"
@@ -59,6 +86,7 @@ public class MonthlyPassDAO extends DBContext {
         return false;
     }
 
+    //===Customer
     public void insert(MonthlyPass pass) {
         String sql = """
                  INSERT INTO MonthlyPasses(
@@ -111,30 +139,7 @@ public class MonthlyPassDAO extends DBContext {
         }
     }
 
-    public boolean hasPendingOrApprovedAllRoutePass(int accountID) {
-        String sql = "                 SELECT 1\n"
-                + "                 FROM MonthlyPasses\n"
-                + "                 WHERE AccountID = ?\n"
-                + "                 AND RouteID IS NULL\n"
-                + "                 AND Status IN ('PENDING', 'APPROVED')";
-
-        try (
-                PreparedStatement ps = connection.prepareStatement(sql)) {
-
-            ps.setInt(1, accountID);
-
-            ResultSet rs = ps.executeQuery();
-
-            return rs.next();
-
-        } catch (SQLException e) {
-            System.out.println("Error hasPendingOrApprovedAllRoutePass: "
-                    + e.getMessage());
-        }
-
-        return false;
-    }
-
+    //===Customer
     public List<MonthlyPassDTO> getRoutePasses(int accountID) {
         List<dto.MonthlyPassDTO> list = new ArrayList<>();
         String sql = "SELECT mp.PassCode, mp.StartDate, mp.EndDate, mp.Status, mp.QRCodeToken, "
@@ -158,6 +163,7 @@ public class MonthlyPassDAO extends DBContext {
         return list;
     }
 
+    //====Customer
     public List<MonthlyPassDTO> getAllRoutePasses(int accountID) {
         List<dto.MonthlyPassDTO> list = new ArrayList<>();
         String sql = "SELECT mp.PassCode, mp.StartDate, mp.EndDate, mp.Status, mp.QRCodeToken, "
@@ -179,6 +185,67 @@ public class MonthlyPassDAO extends DBContext {
             System.out.println("Lỗi getAllRoutePasses: " + e.getMessage());
         }
         return list;
+    }
+
+    //====Customer
+    public MonthlyPassDTO getActivePassByAccountId(int accountID) {
+        String sql = "SELECT TOP 1 "
+                + "    mp.PassCode, "
+                + "    mp.QRCodeToken, "
+                + "    mp.StartDate, "
+                + "    mp.EndDate, "
+                + "    mp.Status, "
+                + "    r.RouteNumber, "
+                + "    r.RouteName, "
+                + "    mpt.TypeName "
+                + "FROM MonthlyPasses mp "
+                + "LEFT JOIN Routes r "
+                + "    ON mp.RouteID = r.RouteID "
+                + "JOIN MonthlyPassTypes mpt "
+                + "    ON mp.PassTypeID = mpt.PassTypeID "
+                + "WHERE mp.AccountID = ? "
+                + "    AND mp.Status = 'APPROVED' "
+                + "    AND mp.EndDate >= CAST(GETDATE() AS DATE) "
+                + "ORDER BY mp.EndDate DESC";
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, accountID);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return mapRowToMonthlyPassDTO(rs);
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("Lỗi getActivePassByAccountId: " + e.getMessage());
+        }
+        return null;
+    }
+
+    //=====Customer
+    public MonthlyPass getPassByID(int passID) {
+        String sql = "Select * from MonthlyPasses where passID= ?";
+        try {
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ps.setInt(1, passID);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return mapRowToMonthlyPass(rs);
+            }
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+        return null;
+
+    }
+    
+    //==Customer(expired monthly pass)
+    public void updateExpiredPasses() {
+        String sql = "UPDATE MonthlyPasses SET Status = 'EXPIRED' WHERE Status = 'APPROVED' AND EndDate < CAST(GETDATE() AS DATE)";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     private dto.MonthlyPassDTO mapRowToMonthlyPassDTO(ResultSet rs) throws SQLException {
@@ -215,7 +282,7 @@ public class MonthlyPassDAO extends DBContext {
         }
 
         Date endDate = rs.getDate("endDate");
-        if (startDate != null) {
+        if (endDate != null) {
             mp.setEndDate(endDate.toLocalDate());
         }
         mp.setPrice(rs.getLong("Price"));
@@ -320,22 +387,6 @@ public class MonthlyPassDAO extends DBContext {
         return list;
     }
 
-    public MonthlyPass getPassByID(int passID) {
-        String sql = "Select * from MonthlyPasses where passID= ?";
-        try {
-            PreparedStatement ps = connection.prepareStatement(sql);
-            ps.setInt(1, passID);
-            ResultSet rs = ps.executeQuery();
-            if (rs.next()) {
-                return mapRowToMonthlyPass(rs);
-            }
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-        }
-        return null;
-
-    }
-
     public boolean updateStatus(int passID, PassStatus passStatus, int staffID) {
         String sql;
         if (passStatus == PassStatus.APPROVED) {
@@ -384,25 +435,32 @@ public class MonthlyPassDAO extends DBContext {
         return dto;
     }
 
-    public MonthlyPassDTO getActivePassByAccountId(int accountID) {
-        String sql = "SELECT TOP 1 mp.PassCode, mp.StartDate, mp.EndDate, mp.Status, "
-                + "r.RouteNumber, r.RouteName, mpt.TypeName "
-                + "FROM MonthlyPasses mp "
-                + "LEFT JOIN Routes r ON mp.RouteID = r.RouteID "
-                + "JOIN MonthlyPassTypes mpt ON mp.PassTypeID = mpt.PassTypeID "
-                + "WHERE mp.AccountID = ? AND mp.Status = 'APPROVED' AND mp.EndDate >= CAST(GETDATE() AS DATE) "
-                + "ORDER BY mp.EndDate DESC";
+    
 
+    public MonthlyPass getByCode(String passCode) {
+        String sql = "SELECT * FROM MonthlyPasses WHERE PassCode = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setInt(1, accountID);
+            ps.setString(1, passCode);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
-                    return mapRowToMonthlyPassDTO(rs);
+                    return mapRowToMonthlyPass(rs);
                 }
             }
         } catch (SQLException e) {
-            System.out.println("Lỗi getActivePassByAccountId: " + e.getMessage());
+            e.printStackTrace();
         }
         return null;
     }
+
+    public boolean updateLastUsed(int passID) {
+        String sql = "UPDATE MonthlyPasses SET LastUsedAt = GETDATE() WHERE PassID = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, passID);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+  
 }

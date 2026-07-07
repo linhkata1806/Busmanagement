@@ -1,9 +1,3 @@
-<%-- 
-    Document   : buy-ticket
-    Created on : Jun 27, 2026, 8:18:43 PM
-    Author     : Administrator
---%>
-
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
@@ -14,8 +8,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Xác nhận đăng ký dịch vụ vé - Bus Hà Nội</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <jsp:include page="/common/head_imports.jsp" />
 
     <style>
         :root {
@@ -24,21 +17,26 @@
             --accent: #fbbc04;
             --bg-light: #f8f9fa;
         }
-        body { 
-            background-color: var(--bg-light); 
+        body {
+            background-color: var(--bg-light);
         }
-        .navbar { 
-            background: var(--primary) !important; 
-            box-shadow: 0 2px 8px rgba(0,0,0,0.15); 
+        .navbar {
+            background: var(--primary) !important;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
         }
-        .navbar-brand { 
-            font-weight: 700; 
-            font-size: 1.3rem; 
-            color: white !important; 
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.3rem;
+            color: white !important;
         }
-        .navbar-brand span { color: var(--accent); }
-        .nav-link { color: rgba(255,255,255,0.9) !important; font-weight: 500; }
-        
+        .navbar-brand span {
+            color: var(--accent);
+        }
+        .nav-link {
+            color: rgba(255,255,255,0.9) !important;
+            font-weight: 500;
+        }
+
         /* Thiết kế hóa đơn dạng Vé xe Bus chuyên nghiệp */
         .ticket-container {
             max-width: 500px;
@@ -57,8 +55,8 @@
             padding: 24px;
             text-align: center;
         }
-        .ticket-body { 
-            padding: 28px; 
+        .ticket-body {
+            padding: 28px;
         }
         .info-row {
             display: flex;
@@ -68,20 +66,20 @@
             padding-bottom: 12px;
             border-bottom: 1px dashed #e9ecef;
         }
-        .info-row:last-of-type { 
-            border-bottom: none; 
+        .info-row:last-of-type {
+            border-bottom: none;
         }
-        .info-label { 
-            color: #6c757d; 
-            font-weight: 500; 
+        .info-label {
+            color: #6c757d;
+            font-weight: 500;
             font-size: 0.95rem;
         }
-        .info-value { 
-            color: #212529; 
-            font-weight: 600; 
+        .info-value {
+            color: #212529;
+            font-weight: 600;
             font-size: 1rem;
         }
-        
+
         /* Tạo vết răng cưa hai bên hông vé cho giống vé thật */
         .ticket-card::before, .ticket-card::after {
             content: '';
@@ -93,45 +91,33 @@
             border-radius: 50%;
             z-index: 3;
         }
-        .ticket-card::before { left: -10px; }
-        .ticket-card::after { right: -10px; }
+        .ticket-card::before {
+            left: -10px;
+        }
+        .ticket-card::after {
+            right: -10px;
+        }
     </style>
 </head>
 <body>
-
-    <nav class="navbar navbar-expand-lg">
-        <div class="container">
-            <a class="navbar-brand" href="${pageContext.request.contextPath}/home">
-                🚌 Bus <span>Hà Nội</span>
-            </a>
-            <div class="collapse navbar-collapse" id="navMenu">
-                <ul class="navbar-nav me-auto">
-                    <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/guide">Hướng dẫn</a></li>
-                    <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/route-list">Tuyến xe</a></li>
-                </ul>
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item text-white fw-semibold">
-                        <i class="fas fa-user-circle me-1"></i> Chào, ${sessionScope.USER.fullName}
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </nav>
+    <!-- ===== HEADER NAVIGATION ===== -->
+    <jsp:include page="/common/navbar.jsp" />
 
     <div class="container my-5">
         <div class="ticket-container">
-            
+
             <div class="mb-3 text-start">
                 <a href="javascript:history.back()" class="btn btn-light rounded-pill px-4 fw-bold text-dark shadow-sm">
                     <i class="fas fa-arrow-left me-2"></i>Quay lại
                 </a>
             </div>
-            
+
             <c:if test="${not empty errorMsg}">
                 <div class="alert alert-danger alert-dismissible fade show shadow-sm mb-4" role="alert">
                     <i class="fas fa-exclamation-triangle me-2"></i> ${errorMsg}
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
+                <c:remove var="errorMsg" scope="session" />
             </c:if>
 
             <div class="card ticket-card shadow-sm">
@@ -152,7 +138,6 @@
                 </div>
 
                 <div class="ticket-body">
-                    
                     <c:if test="${ticketType != 'lien_chuyen'}">
                         <div class="info-row">
                             <span class="info-label">Mã số tuyến:</span>
@@ -165,7 +150,7 @@
                             </span>
                         </div>
                     </c:if>
-                    
+
                     <c:if test="${ticketType == 'lien_chuyen'}">
                         <div class="info-row">
                             <span class="info-label">Phạm vi áp dụng:</span>
@@ -195,17 +180,15 @@
                     <div class="info-row align-items-center mt-4 pt-3 border-top border-2">
                         <span class="info-label fw-bold text-dark fs-6">Tổng chi phí:</span>
 
-                        <span class="info-value text-success fs-3 fw-bold">
-                            <fmt:formatNumber value="${displayPrice}" pattern="#,###"/> đ
                         <span class="info-value text-success fs-3 fw-bold" id="priceDisplay">
-                            <fmt:formatNumber value="${basePrice}" pattern="#,###"/> đ
+                            <fmt:formatNumber value="${displayPrice}" pattern="#,###"/> đ
                         </span>
                     </div>
 
                     <form action="${pageContext.request.contextPath}/customer/buy-ticket" method="POST" class="mt-4 needs-validation" novalidate>
                         <input type="hidden" name="routeId" value="${route.routeID != null ? route.routeID : 0}">
                         <input type="hidden" name="ticketType" value="${ticketType}">
-                        
+
                         <c:if test="${ticketType == 'thang' || ticketType == 'lien_chuyen'}">
                             <div class="mb-3">
                                 <label class="form-label fw-bold text-secondary small">ĐỐI TƯỢNG ĐĂNG KÝ VÉ THÁNG</label>
@@ -224,19 +207,33 @@
                                     </c:choose>
                                 </select>
                             </div>
-                            
+
                             <div class="mb-3">
                                 <label class="form-label fw-bold text-secondary small">MÃ HSSV / SỐ CCCD</label>
-                                <input type="text" name="cardNumber" class="form-control rounded-3" placeholder="Nhập mã thẻ hoặc số định danh..." required>
+                                <input type="text" name="cardNumber" class="form-control rounded-3" placeholder="Nhập 12 số CCCD định danh..." pattern="[0-9]{12}" maxlength="12" title="Số CCCD phải gồm đúng 12 chữ số" required>
                             </div>
-                            
+
                             <div class="mb-3" id="proofUploadSection">
-                                <label class="form-label fw-bold text-secondary small">ẢNH THẺ HSSV / CCCD (MINH CHỨNG ƯU TIÊN)</label>
-                                <input type="text" name="imageProof" class="form-control rounded-3" placeholder="Dán link ảnh thẻ/minh chứng ưu tiên..." required value="https://hanoibus.vn/images/proof_default.jpg">
-                                <div class="form-text small text-muted">Nhập link ảnh thẻ để nhân viên quầy kiểm tra duyệt trước khi cấp vé.</div>
+                                <label class="form-label fw-bold text-secondary small">TẢI ẢNH THẺ HSSV / CCCD (MINH CHỨNG ƯU TIÊN)</label>
+                                <input type="file" id="imageProofFile" class="form-control rounded-3" accept="image/*" required>
+                                <input type="hidden" name="imageProof" id="imageProofBase64" value="https://hanoibus.vn/images/proof_default.jpg">
+                                <div class="form-text small text-muted">Vui lòng tải ảnh minh chứng lên để nhân viên quầy kiểm tra duyệt trước khi cấp vé.</div>
                             </div>
                         </c:if>
-                        
+
+                        <script>
+                            document.getElementById('imageProofFile')?.addEventListener('change', function(e) {
+                                const file = e.target.files[0];
+                                if (file) {
+                                    const reader = new FileReader();
+                                    reader.onload = function(evt) {
+                                        document.getElementById('imageProofBase64').value = evt.target.result;
+                                    };
+                                    reader.readAsDataURL(file);
+                                }
+                            });
+                        </script>
+
                         <div class="d-grid gap-2">
                             <button type="submit" class="btn btn-success fw-bold py-2.5 shadow-sm rounded-3 fs-6">
                                 <i class="fas fa-check-circle me-1"></i> XÁC NHẬN THANH TOÁN
@@ -250,28 +247,30 @@
                     <script>
                         function updatePrice() {
                             const select = document.getElementById('passTypeSelect');
-                            if (!select) return;
+                            if (!select)
+                                return;
                             const discount = parseFloat(select.options[select.selectedIndex].getAttribute('data-discount'));
                             const basePrice = ${basePrice};
                             const finalPrice = basePrice * (100 - discount) / 100;
-                            
+
                             document.getElementById('priceDisplay').textContent = new Intl.NumberFormat('vi-VN').format(finalPrice) + ' đ';
                         }
-                        
+
                         window.addEventListener('DOMContentLoaded', () => {
                             updatePrice();
                         });
                     </script>
-                    
+
                 </div>
             </div>
-            
+
             <p class="text-center text-muted small mt-3">
                 <i class="fas fa-shield-alt me-1 text-secondary"></i> Giao dịch bảo mật kỹ thuật số. Vé điện tử sẽ được cấp ngay sau khi xác nhận thành công.
             </p>
         </div>
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <!-- ===== FOOTER ===== -->
+    <jsp:include page="/common/footer.jsp" />
 </body>
 </html>
