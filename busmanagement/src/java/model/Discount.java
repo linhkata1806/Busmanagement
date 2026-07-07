@@ -18,6 +18,18 @@ public class Discount {
 
     public Discount() {}
 
+    public Discount(int discountID, String discountCode, double discountPercent, long minimumAmount, Timestamp startDate, Timestamp endDate, boolean isActive, String description) {
+        this.discountID = discountID;
+        this.discountCode = discountCode;
+        this.discountPercent = discountPercent;
+        this.minimumAmount = minimumAmount;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.isActive = isActive;
+        this.description = description;
+    }
+    
+
     public int getDiscountID() { return discountID; }
     public void setDiscountID(int discountID) { this.discountID = discountID; }
 

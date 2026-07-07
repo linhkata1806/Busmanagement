@@ -14,12 +14,22 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import model.Account;
+import service.AuthService;
 
 /**
  *
  * @author Administrator
  */
 public class LogOutServlet extends HttpServlet {
+    private AuthService authService;
+
+    @Override
+    public void init() throws ServletException {
+        authService = new AuthService();
+    }
+    
+    
    
     /** 
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code> methods.
@@ -59,6 +69,11 @@ public class LogOutServlet extends HttpServlet {
         // 1. Hủy Session trên Server
         HttpSession session = request.getSession(false);
         if (session != null) {
+            Account user = (Account) session.getAttribute("USER");
+            if (user != null) {
+                // Xóa Token trong Database
+                authService.clearRememberToken(user.getAccountID());
+            }
             session.invalidate(); 
         }
 
@@ -75,7 +90,7 @@ public class LogOutServlet extends HttpServlet {
         Cookie[] cookies = request.getCookies();
         if (cookies != null) {
             for (Cookie cookie : cookies) {
-                if (cookie.getName().equals("REMEMBER_ME") || cookie.getName().equals("username")) {
+                if (cookie.getName().equals("REMEMBER_TOKEN") || cookie.getName().equals("username")) {
                     cookie.setValue("");
                     cookie.setMaxAge(0); 
                     cookie.setPath(contextPath); 

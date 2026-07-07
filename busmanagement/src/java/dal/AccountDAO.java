@@ -66,6 +66,40 @@ public class AccountDAO extends DBContext {
         }
         return null;
     }
+    //=========authen
+    public boolean updateRememberToken(int accountId, String token) {
+        String sql = "UPDATE Accounts SET RememberToken = ? WHERE AccountID = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, token);
+            ps.setInt(2, accountId);
+            return ps.executeUpdate() > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    //===========authen  (Dùng cho AuthFilter)
+    public Account getByRememberToken(String token) {
+        String sql = "SELECT a.*, r.RoleName FROM Accounts a "
+                + "JOIN Roles r ON a.RoleID = r.RoleID "
+                + "WHERE a.RememberToken = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, token);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return mapAccount(rs); // Gọi lại hàm mapAccount có sẵn của cậu
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+    //====authen xóa khi logout
+    public boolean clearRememberToken(int accountId) {
+        return updateRememberToken(accountId, null);
+    }
 
     public boolean insertAccount(Account account) {
         String sql = "INSERT INTO Accounts (Username, Password, FullName, Email, Phone, RoleID) "
@@ -125,6 +159,7 @@ public class AccountDAO extends DBContext {
         }
         return false;
     }
+
     public boolean existsByPhone(String phone) {
         String sql = "SELECT 1 FROM Accounts WHERE Phone = ?";
 
@@ -293,7 +328,6 @@ public class AccountDAO extends DBContext {
 //        }
 //        return false;
 //    }
-
     // 4. updateStatus() - Phục vụ tính năng Lock/Unlock tài khoản qua biến IsActive (BIT)
     public boolean updateStatus(int accountId, boolean isActive) {
         String sql = "UPDATE Accounts SET IsActive = ?, UpdatedAt = GETDATE() WHERE AccountID = ?";
@@ -307,7 +341,7 @@ public class AccountDAO extends DBContext {
         }
         return false;
     }
-    
+
     public boolean checkEmailExistsForOtherAccount(String email, int excludeAccountId) {
         String sql = "SELECT TOP 1 1 FROM Accounts WHERE Email = ? AND AccountID != ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {

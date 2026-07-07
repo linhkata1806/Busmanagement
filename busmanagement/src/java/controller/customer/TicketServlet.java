@@ -9,10 +9,13 @@ import dto.TicketDTO;
 import java.io.IOException;
 import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import jakarta.servlet.http.Part;
+import java.io.File;
 import java.util.List;
 import model.Account;
 import service.MonthlyPassService;
@@ -22,6 +25,11 @@ import service.TicketService;
  *
  * @author Administrator
  */
+@MultipartConfig(
+        fileSizeThreshold = 1024 * 1024 * 1, // 1 MB
+        maxFileSize = 1024 * 1024 * 5, // 5 MB (Bắt buộc theo Spec)
+        maxRequestSize = 1024 * 1024 * 10 // 10 MB
+)
 public class TicketServlet extends HttpServlet {
 
     private TicketService ticketService;
@@ -58,8 +66,8 @@ public class TicketServlet extends HttpServlet {
         String tab = request.getParameter("tab");
         Account user = (Account) session.getAttribute("USER");
         int accountID = user.getAccountID();
-        if(tab==null){
-            tab="ticket";
+        if (tab == null) {
+            tab = "ticket";
         }
         //service lay du lieu tu DTO
         List<TicketDTO> ticketList = ticketService.getTicketsByAccount(accountID);
@@ -85,7 +93,49 @@ public class TicketServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        doGet(request, response);
+        String action = request.getParameter("action");
+        if ("registerPass".equals(action)) {
+            try {
+                HttpSession session = request.getSession(false);
+                Account user = (Account) session.getAttribute("USER");
+                if (user == null) {
+                    response.sendRedirect(request.getContextPath() + "/login");
+                    return;
+                }
+                //Lấy Part chứa file ảnh từ form
+                Part filePart = request.getPart("imageProof");
+                //Định vị thư mục thực tế trên Server
+                String applicationPath = request.getServletContext().getRealPath("");
+                String uploadPath = applicationPath + File.separator + "uploads" + File.separator + "pass-proof";
+                //Gọi Service xử lý lưu file (hàm processAndSaveProof tớ vừa viết cho cậu ở trên)
+                String dbImagePath = monthlyPassService.processAndSaveProof(filePart, uploadPath);
+                //Lấy các thông số đăng ký vé từ Form
+                int passTypeID = Integer.parseInt(request.getParameter("passTypeID"));
+                String routeIdParam = request.getParameter("routeID");
+                if (routeIdParam != null && !routeIdParam.trim().isEmpty()) {
+                    // Vé 1 tuyến
+                    int routeID = Integer.parseInt(routeIdParam);
+                    monthlyPassService.registerRoutePass(user.getAccountID(), routeID, passTypeID, dbImagePath);
+                } else {
+                    // Vé liên tuyến (truyền routeID = null ngầm bên trong hàm)
+                    monthlyPassService.registerAllRoutePass(user.getAccountID(), passTypeID, dbImagePath);
+                }
+                session.setAttribute("successMsg", "Đăng ký vé tháng thành công! Vui lòng chờ nhân viên xét duyệt.");
+                response.sendRedirect(request.getContextPath() + "/customer/ticket?tab=pass");
+            } catch (IllegalArgumentException e) {
+                // Lỗi file rác, quá 5MB -> Trả về chữ đỏ
+                request.setAttribute("errorMsg", e.getMessage());
+                // Chuyển hướng lại trang form đăng ký
+                request.getRequestDispatcher("/view/customer/register-pass.jsp").forward(request, response);
+            } catch (Exception e) {
+                // Lỗi hệ thống
+                request.setAttribute("errorMsg", "Lỗi hệ thống khi tải ảnh lên.");
+                request.getRequestDispatcher("/view/customer/register-pass.jsp").forward(request, response);
+            }
+        }
+        else {
+            doGet(request, response);
+        }
     }
 
     /**

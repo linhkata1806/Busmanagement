@@ -264,6 +264,17 @@
                             <span class="input-group-text password-toggle" id="togglePassword"><i class="fas fa-eye"></i></span>
                         </div>
                     </div>
+                    
+                    <div class="mb-4 d-flex justify-content-between align-items-center">
+                        <div class="form-check">
+                            <!-- Thuộc tính name="remember" cực kỳ quan trọng để Servlet bắt được -->
+                            <input class="form-check-input border-secondary" type="checkbox" name="remember" id="rememberMe">
+                            <label class="form-check-label text-secondary fw-semibold" for="rememberMe" style="font-size: 0.9rem;">
+                                Ghi nhớ đăng nhập
+                            </label>
+                        </div>
+                        <a href="forgot-password" class="text-primary text-decoration-none fw-bold" style="font-size: 0.9rem;">Quên mật khẩu?</a>
+                    </div>
 
                     <!-- Submit Button -->
                     <button type="submit" id="submitBtn" class="btn-submit d-flex align-items-center justify-content-center">

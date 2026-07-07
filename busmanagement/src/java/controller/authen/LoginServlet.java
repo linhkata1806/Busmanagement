@@ -2,17 +2,14 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
  */
-
 package controller.authen;
-
-
-
 
 import controller.*;
 import service.AuthService;
 import java.io.IOException;
 import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -82,6 +79,17 @@ public class LoginServlet extends HttpServlet {
                 HttpSession newSession = request.getSession(true);
                 newSession.setAttribute("USER", account);
 
+                String remember = request.getParameter("remember");
+                if ("on".equals(remember)) {
+                    // Gọi Service sinh Token và lưu DB
+                    String token = authService.generateAndSaveRememberToken(account.getAccountID());
+                    if (token != null) {
+                        Cookie cookie = new Cookie("REMEMBER_TOKEN", token);
+                        cookie.setMaxAge(30 * 24 * 60 * 60); // Thời hạn 30 ngày (tính bằng giây)
+                        cookie.setPath(request.getContextPath());
+                        response.addCookie(cookie);
+                    }
+                }
                 // perfomed navigation base on role
                 switch (account.getRoleName()) {
                     case "ADMIN":
@@ -97,7 +105,7 @@ public class LoginServlet extends HttpServlet {
                         response.sendRedirect("assistant/dashboard");
                         break;
 
-                    default:                  
+                    default:
                         response.sendRedirect(request.getContextPath() + "/home");
                         break;
                 }

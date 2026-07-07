@@ -17,7 +17,7 @@ USE HanoiBusDB;
 GO
 
 -- ==========================================
--- 3. KHỞI TẠO CẤU TRÚC BẢNG
+-- 3. KHỞI TẠO CẤU TRÚC BẢNGr
 -- ==========================================
 
 CREATE TABLE Roles (
@@ -283,6 +283,11 @@ CREATE TABLE TripProgress (
     CONSTRAINT UQ_TripProgress UNIQUE(TripID) 
 );
 GO
+ALTER TABLE Tickets DROP CONSTRAINT CHK_Tickets_Status;
+
+-- 2. Tạo lại constraint mới khít 100% với danh sách trạng thái V2
+ALTER TABLE Tickets ADD CONSTRAINT CHK_Tickets_Status 
+CHECK (Status IN ('UNUSED', 'CHECKED_IN', 'COMPLETED', 'EXPIRED', 'CANCELLED'));
 
 -- ==========================================
 -- 4. INSERT MOCK DATA TỰ ĐỘNG

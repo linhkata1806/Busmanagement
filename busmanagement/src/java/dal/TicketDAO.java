@@ -189,9 +189,10 @@ public class TicketDAO extends DBContext {
     }
 
     public boolean checkInTicket(int ticketID, int tripID, String status) {
+        System.out.println("--- DEBUG CHECKIN: status = [" + status + "], tripID = " + tripID + ", ticketID = " + ticketID);
         String sql = "UPDATE Tickets SET Status = ?, TripID = ?, UsedAt = GETDATE() WHERE TicketID = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setString(1, status);
+            ps.setString(1, status); // Truyền chuỗi trạng thái (ví dụ: "CHECKED_IN")
             ps.setInt(2, tripID);
             ps.setInt(3, ticketID);
             return ps.executeUpdate() > 0;
@@ -248,4 +249,46 @@ public class TicketDAO extends DBContext {
         return list;
     }
 
+    // Hàm đếm số lượt quét thẻ tháng trên cùng một chuyến để chặn double-scan
+    public int countPassengerCheckIn(int accountID, int tripID) {
+        String sql = "SELECT COUNT(*) FROM Tickets WHERE AccountID = ? AND TripID = ? AND Status = 'CHECKED_IN'";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, accountID);
+            ps.setInt(2, tripID);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("Lỗi countPassengerCheckIn: " + e.getMessage());
+        }
+        return 0;
+    }
+
+// Hàm check trùng lịch: Đảm bảo khách không thể leo lên 2 xe khác nhau chạy cùng khung giờ
+    public boolean hasPassengerConflict(int accountID, int targetTripID, String tripDate) {
+        String sql = "SELECT COUNT(*) FROM Tickets tk "
+                + "JOIN Trips t1 ON tk.TripID = t1.TripID "
+                + "JOIN Trips t2 ON t2.TripID = ? "
+                + "WHERE tk.AccountID = ? "
+                + "AND tk.Status = 'CHECKED_IN' "
+                + "AND t1.TripID <> t2.TripID "
+                + "AND t1.TripDate = ? "
+                + "AND t1.StartTime < t2.EndTime "
+                + "AND t1.EndTime > t2.StartTime";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, targetTripID);
+            ps.setInt(2, accountID);
+            ps.setString(3, tripDate);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0;
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("Lỗi hasPassengerConflict: " + e.getMessage());
+        }
+        return false;
+    }
 }

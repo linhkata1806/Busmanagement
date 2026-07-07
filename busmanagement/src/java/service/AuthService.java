@@ -8,6 +8,7 @@ import util.PasswordEncoder;
 import util.Validator;
 import dal.AccountDAO;
 import dal.RoleDAO;
+import java.util.UUID;
 import model.Account;
 import model.Role;
 
@@ -64,6 +65,23 @@ public class AuthService {
         accountDAO.updateLastLogin(account.getAccountID());
 
         return account;
+    }
+    
+    public String generateAndSaveRememberToken(int accountId) {
+        // Sinh chuỗi UUID bảo mật tuyệt đối, không dùng Username theo đúng đặc tả
+        String token = UUID.randomUUID().toString();
+        boolean success = accountDAO.updateRememberToken(accountId, token);
+        return success ? token : null;
+    }
+    
+    // Tìm tài khoản bằng Token
+    public Account loginWithToken(String token) {
+        return accountDAO.getByRememberToken(token);
+    }
+
+    // Xóa Token khỏi DB
+    public void clearRememberToken(int accountId) {
+        accountDAO.clearRememberToken(accountId);
     }
 
     public boolean register(Account account) throws IllegalArgumentException {

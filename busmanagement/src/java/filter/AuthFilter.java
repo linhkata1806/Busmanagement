@@ -2,7 +2,6 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Filter.java to edit this template
  */
-
 package filter;
 
 import jakarta.servlet.Filter;
@@ -34,18 +33,19 @@ public class AuthFilter implements Filter {
     private FilterConfig filterConfig = null;
 
     public AuthFilter() {
-    } 
+    }
 
     private void doBeforeProcessing(ServletRequest request, ServletResponse response)
-	throws IOException, ServletException {
-	if (debug) log("AuthFilter:DoBeforeProcessing");
+            throws IOException, ServletException {
+        if (debug) {
+            log("AuthFilter:DoBeforeProcessing");
+        }
 
-	// Write code here to process the request and/or response before
-	// the rest of the filter chain is invoked.
-
-	// For example, a logging filter might log items on the request object,
-	// such as the parameters.
-	/*
+        // Write code here to process the request and/or response before
+        // the rest of the filter chain is invoked.
+        // For example, a logging filter might log items on the request object,
+        // such as the parameters.
+        /*
 	for (Enumeration en = request.getParameterNames(); en.hasMoreElements(); ) {
 	    String name = (String)en.nextElement();
 	    String values[] = request.getParameterValues(name);
@@ -60,32 +60,32 @@ public class AuthFilter implements Filter {
 	    }
 	    log(buf.toString());
 	}
-	*/
-    } 
+         */
+    }
 
     private void doAfterProcessing(ServletRequest request, ServletResponse response)
-	throws IOException, ServletException {
-	if (debug) log("AuthFilter:DoAfterProcessing");
+            throws IOException, ServletException {
+        if (debug) {
+            log("AuthFilter:DoAfterProcessing");
+        }
 
-	// Write code here to process the request and/or response after
-	// the rest of the filter chain is invoked.
-	
-	// For example, a logging filter might log the attributes on the
-	// request object after the request has been processed. 
-	/*
+        // Write code here to process the request and/or response after
+        // the rest of the filter chain is invoked.
+        // For example, a logging filter might log the attributes on the
+        // request object after the request has been processed. 
+        /*
 	for (Enumeration en = request.getAttributeNames(); en.hasMoreElements(); ) {
 	    String name = (String)en.nextElement();
 	    Object value = request.getAttribute(name);
 	    log("attribute: " + name + "=" + value.toString());
 
 	}
-	*/
-
-	// For example, a filter might append something to the response.
-	/*
+         */
+        // For example, a filter might append something to the response.
+        /*
 	PrintWriter respOut = new PrintWriter(response.getWriter());
 	respOut.println("<P><B>This has been appended by an intrusive filter.</B>");
-	*/
+         */
     }
 
     /**
@@ -98,56 +98,111 @@ public class AuthFilter implements Filter {
      * @exception ServletException if a servlet error occurs
      */
     public void doFilter(ServletRequest request, ServletResponse response,
-                         FilterChain chain)
-	throws IOException, ServletException {
+            FilterChain chain)
+            throws IOException, ServletException {
 
-	HttpServletRequest req = (HttpServletRequest) request;
+        HttpServletRequest req = (HttpServletRequest) request;
         HttpServletResponse res = (HttpServletResponse) response;
         HttpSession session = req.getSession(false);
-        Account user =null;
+        Account user = null;
         //check if session is executing
-        if(session!=null){
+        if (session != null) {
             user = (Account) session.getAttribute("USER");
         }
+        if (user == null) {
+            jakarta.servlet.http.Cookie[] cookies = req.getCookies();
+            if (cookies != null) {
+                for (jakarta.servlet.http.Cookie cookie : cookies) {
+                    if ("REMEMBER_TOKEN".equals(cookie.getName())) {
+                        String token = cookie.getValue();
+                        try {
+                            service.AuthService authService = new service.AuthService();
+                            Account accountFromToken = authService.loginWithToken(token);
+
+                            if (accountFromToken != null && accountFromToken.isActive()) {
+                                // Token hợp lệ ->ra Session mới
+                                session = req.getSession(true);
+                                session.setAttribute("USER", accountFromToken);
+                                user = accountFromToken;
+
+                                // (Tùy chọn) Cập nhật lại LastLogin
+                                new dal.AccountDAO().updateLastLogin(accountFromToken.getAccountID());
+                            }
+                        } catch (Exception e) {
+                            System.out.println("Lỗi Auto-Login qua Cookie: " + e.getMessage());
+                        }
+                        break;
+                    }
+                }
+            }
+        }
         //check if session has not logged in before
-        if(user==null){
-            res.sendRedirect(req.getContextPath()+"/login");
+        if (user == null) {
+            jakarta.servlet.http.Cookie[] cookies = req.getCookies();
+            if (cookies != null) {
+                for (jakarta.servlet.http.Cookie cookie : cookies) {
+                    if ("REMEMBER_TOKEN".equals(cookie.getName())) {
+                        String token = cookie.getValue();
+                        try {
+                            service.AuthService authService = new service.AuthService();
+                            Account accountFromToken = authService.loginWithToken(token);
+
+                            if (accountFromToken != null && accountFromToken.isActive()) {
+                                // Token hợp lệ -> Cấp cứu bằng cách đẻ ra Session mới
+                                session = req.getSession(true);
+                                session.setAttribute("USER", accountFromToken);
+                                user = accountFromToken;
+
+                                // (Tùy chọn) Cập nhật lại LastLogin
+                                new dal.AccountDAO().updateLastLogin(accountFromToken.getAccountID());
+                            }
+                        } catch (Exception e) {
+                            System.out.println("Lỗi Auto-Login qua Cookie: " + e.getMessage());
+                        }
+                        break;
+                    }
+                }
+            }
+        }
+
+        if (user == null) {
+            res.sendRedirect(req.getContextPath() + "/login");
             return;
         }
-        
+
         //get uri
         String uri = req.getRequestURI();
         //get path
         String path = uri.substring(req.getContextPath().length());
-        
+
         //get role
-        String role = user.getRoleName()!=null?user.getRoleName().toUpperCase():"";
-        
+        String role = user.getRoleName() != null ? user.getRoleName().toUpperCase() : "";
+
         //authorization
         //admin
-        if(path.startsWith("/admin")&&!"ADMIN".equals(role)){
-            res.sendRedirect(req.getContextPath()+"/access-denied");
+        if (path.startsWith("/admin") && !"ADMIN".equals(role)) {
+            res.sendRedirect(req.getContextPath() + "/access-denied");
             return;
         }
         //staff
         //staff (Cho phép cả STAFF và ADMIN truy cập)
-        if(path.startsWith("/staff") && !("STAFF".equals(role) || "ADMIN".equals(role))){
-            res.sendRedirect(req.getContextPath()+"/home");
+        if (path.startsWith("/staff") && !("STAFF".equals(role) || "ADMIN".equals(role))) {
+            res.sendRedirect(req.getContextPath() + "/home");
             return;
         }
         //driver
-        if(path.startsWith("/driver")&&!"DRIVER".equals(role)){
-            res.sendRedirect(req.getContextPath()+"/access-denied");
+        if (path.startsWith("/driver") && !"DRIVER".equals(role)) {
+            res.sendRedirect(req.getContextPath() + "/access-denied");
             return;
         }
         //assistant
-        if(path.startsWith("/assistant")&&!"ASSISTANT".equals(role)){
-            res.sendRedirect(req.getContextPath()+"/access-denied");
+        if (path.startsWith("/assistant") && !"ASSISTANT".equals(role)) {
+            res.sendRedirect(req.getContextPath() + "/access-denied");
             return;
         }
         //customer
-        if(path.startsWith("/customer")&&!"CUSTOMER".equals(role)){
-            res.sendRedirect(req.getContextPath()+"/access-denied");
+        if (path.startsWith("/customer") && !"CUSTOMER".equals(role)) {
+            res.sendRedirect(req.getContextPath() + "/access-denied");
             return;
         }
         // Set unread count for notifications to render in sidebars/headers
@@ -171,15 +226,14 @@ public class AuthFilter implements Filter {
 
         //If valid then continue access to other page
         chain.doFilter(request, response);
-        
-        
+
     }
-    
+
     /**
      * Return the filter configuration object for this filter.
      */
     public FilterConfig getFilterConfig() {
-	return (this.filterConfig);
+        return (this.filterConfig);
     }
 
     /**
@@ -188,85 +242,86 @@ public class AuthFilter implements Filter {
      * @param filterConfig The filter configuration object
      */
     public void setFilterConfig(FilterConfig filterConfig) {
-	this.filterConfig = filterConfig;
+        this.filterConfig = filterConfig;
     }
 
     /**
-     * Destroy method for this filter 
+     * Destroy method for this filter
      */
-    public void destroy() { 
+    public void destroy() {
     }
 
     /**
-     * Init method for this filter 
+     * Init method for this filter
      */
-    public void init(FilterConfig filterConfig) { 
-	this.filterConfig = filterConfig;
-	if (filterConfig != null) {
-	    if (debug) { 
-		log("AuthFilter:Initializing filter");
-	    }
-	}
+    public void init(FilterConfig filterConfig) {
+        this.filterConfig = filterConfig;
+        if (filterConfig != null) {
+            if (debug) {
+                log("AuthFilter:Initializing filter");
+            }
+        }
     }
 
     /**
      * Return a String representation of this object.
      */
     public String toString() {
-	if (filterConfig == null) return ("AuthFilter()");
-	StringBuffer sb = new StringBuffer("AuthFilter(");
-	sb.append(filterConfig);
-	sb.append(")");
-	return (sb.toString());
+        if (filterConfig == null) {
+            return ("AuthFilter()");
+        }
+        StringBuffer sb = new StringBuffer("AuthFilter(");
+        sb.append(filterConfig);
+        sb.append(")");
+        return (sb.toString());
     }
 
     private void sendProcessingError(Throwable t, ServletResponse response) {
-	String stackTrace = getStackTrace(t); 
+        String stackTrace = getStackTrace(t);
 
-	if(stackTrace != null && !stackTrace.equals("")) {
-	    try {
-		response.setContentType("text/html");
-		PrintStream ps = new PrintStream(response.getOutputStream());
-		PrintWriter pw = new PrintWriter(ps); 
-		pw.print("<html>\n<head>\n<title>Error</title>\n</head>\n<body>\n"); //NOI18N
-		    
-		// PENDING! Localize this for next official release
-		pw.print("<h1>The resource did not process correctly</h1>\n<pre>\n"); 
-		pw.print(stackTrace); 
-		pw.print("</pre></body>\n</html>"); //NOI18N
-		pw.close();
-		ps.close();
-		response.getOutputStream().close();
-	    }
-	    catch(Exception ex) {}
-	}
-	else {
-	    try {
-		PrintStream ps = new PrintStream(response.getOutputStream());
-		t.printStackTrace(ps);
-		ps.close();
-		response.getOutputStream().close();
-	    }
-	    catch(Exception ex) {}
-	}
+        if (stackTrace != null && !stackTrace.equals("")) {
+            try {
+                response.setContentType("text/html");
+                PrintStream ps = new PrintStream(response.getOutputStream());
+                PrintWriter pw = new PrintWriter(ps);
+                pw.print("<html>\n<head>\n<title>Error</title>\n</head>\n<body>\n"); //NOI18N
+
+                // PENDING! Localize this for next official release
+                pw.print("<h1>The resource did not process correctly</h1>\n<pre>\n");
+                pw.print(stackTrace);
+                pw.print("</pre></body>\n</html>"); //NOI18N
+                pw.close();
+                ps.close();
+                response.getOutputStream().close();
+            } catch (Exception ex) {
+            }
+        } else {
+            try {
+                PrintStream ps = new PrintStream(response.getOutputStream());
+                t.printStackTrace(ps);
+                ps.close();
+                response.getOutputStream().close();
+            } catch (Exception ex) {
+            }
+        }
     }
 
     public static String getStackTrace(Throwable t) {
-	String stackTrace = null;
-	try {
-	    StringWriter sw = new StringWriter();
-	    PrintWriter pw = new PrintWriter(sw);
-	    t.printStackTrace(pw);
-	    pw.close();
-	    sw.close();
-	    stackTrace = sw.getBuffer().toString();
-	}
-	catch(Exception ex) {}
-	return stackTrace;
+        String stackTrace = null;
+        try {
+            StringWriter sw = new StringWriter();
+            PrintWriter pw = new PrintWriter(sw);
+            t.printStackTrace(pw);
+            pw.close();
+            sw.close();
+            stackTrace = sw.getBuffer().toString();
+        } catch (Exception ex) {
+        }
+        return stackTrace;
     }
 
     public void log(String msg) {
-	filterConfig.getServletContext().log(msg); 
+        filterConfig.getServletContext().log(msg);
     }
 
 }
