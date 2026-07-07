@@ -16,6 +16,7 @@ public class MonthlyPassDTO {
     private LocalDate startDate;
     private LocalDate endDate;
     private PassStatus status;
+    private String imageProof;
     
     //cac truong join themm
     private String routeNumber;
@@ -30,6 +31,16 @@ public class MonthlyPassDTO {
 
     public MonthlyPassDTO() {
     }
+
+    public String getImageProof() {
+        return imageProof;
+    }
+
+    public void setImageProof(String imageProof) {
+        this.imageProof = imageProof;
+    }
+    
+    
 
     public MonthlyPassDTO(String passCode, LocalDate startDate, LocalDate endDate, PassStatus status, String routeNumber, String routeName, String typeName) {
         this.passCode = passCode;

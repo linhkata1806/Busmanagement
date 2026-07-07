@@ -142,7 +142,7 @@ public class MonthlyPassDAO extends DBContext {
     //===Customer
     public List<MonthlyPassDTO> getRoutePasses(int accountID) {
         List<dto.MonthlyPassDTO> list = new ArrayList<>();
-        String sql = "SELECT mp.PassCode, mp.StartDate, mp.EndDate, mp.Status, mp.QRCodeToken, "
+        String sql = "SELECT mp.PassCode, mp.StartDate, mp.EndDate, mp.Status, mp.QRCodeToken, mp.ImageProof, "
                 + "r.RouteNumber, r.RouteName, mpt.TypeName "
                 + "FROM MonthlyPasses mp "
                 + "LEFT JOIN Routes r ON mp.RouteID = r.RouteID "
@@ -166,7 +166,7 @@ public class MonthlyPassDAO extends DBContext {
     //====Customer
     public List<MonthlyPassDTO> getAllRoutePasses(int accountID) {
         List<dto.MonthlyPassDTO> list = new ArrayList<>();
-        String sql = "SELECT mp.PassCode, mp.StartDate, mp.EndDate, mp.Status, mp.QRCodeToken, "
+        String sql = "SELECT mp.PassCode, mp.StartDate, mp.EndDate, mp.Status, mp.QRCodeToken, mp.ImageProof, "
                 + "r.RouteNumber, r.RouteName, mpt.TypeName "
                 + "FROM MonthlyPasses mp "
                 + "LEFT JOIN Routes r ON mp.RouteID = r.RouteID "
@@ -237,7 +237,7 @@ public class MonthlyPassDAO extends DBContext {
         return null;
 
     }
-    
+
     //==Customer(expired monthly pass)
     public void updateExpiredPasses() {
         String sql = "UPDATE MonthlyPasses SET Status = 'EXPIRED' WHERE Status = 'APPROVED' AND EndDate < CAST(GETDATE() AS DATE)";
@@ -246,6 +246,35 @@ public class MonthlyPassDAO extends DBContext {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+    }
+
+    //====Customer
+    public boolean updateImageProof(int passID, String imagePath) {
+        String sql = "UPDATE MonthlyPasses SET ImageProof = ?, UpdatedAt = GETDATE() WHERE PassID = ?";
+        try (java.sql.PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, imagePath);
+            ps.setInt(2, passID);
+            return ps.executeUpdate() > 0;
+        } catch (Exception e) {
+            System.out.println("Lỗi updateImageProof: " + e.getMessage());
+        }
+        return false;
+    }
+
+    //========customer Lấy đường dẫn ảnh ra để hiển thị
+    public String getImageProof(int passID) {
+        String sql = "SELECT ImageProof FROM MonthlyPasses WHERE PassID = ?";
+        try (java.sql.PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, passID);
+            try (java.sql.ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getString("ImageProof");
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("Lỗi getImageProof: " + e.getMessage());
+        }
+        return null;
     }
 
     private dto.MonthlyPassDTO mapRowToMonthlyPassDTO(ResultSet rs) throws SQLException {
@@ -261,6 +290,7 @@ public class MonthlyPassDAO extends DBContext {
         dto.setRouteName(rs.getString("RouteName"));
         dto.setTypeName(rs.getString("TypeName"));
         dto.setQrCodeToken(rs.getString("QRCodeToken"));
+        dto.setImageProof(rs.getString("ImageProof"));
 
         return dto;
     }
@@ -338,7 +368,8 @@ public class MonthlyPassDAO extends DBContext {
                 + "    mp.Status, \n"
                 + "    r.RouteNumber, \n"
                 + "    r.RouteName, \n"
-                + "    mpt.TypeName\n"
+                + "    mpt.TypeName, \n"
+                + "    mp.ImageProof\n"
                 + "FROM MonthlyPasses mp \n"
                 + "JOIN Accounts a ON mp.AccountID = a.AccountID \n"
                 + "LEFT JOIN Routes r ON mp.RouteID = r.RouteID \n"
@@ -367,7 +398,8 @@ public class MonthlyPassDAO extends DBContext {
                 + "    mp.Status, \n"
                 + "    r.RouteNumber, \n"
                 + "    r.RouteName, \n"
-                + "    mpt.TypeName \n"
+                + "    mpt.TypeName, \n"
+                + "    mp.ImageProof\n"
                 + "FROM MonthlyPasses mp \n"
                 + "JOIN Accounts a ON mp.AccountID = a.AccountID \n"
                 + "LEFT JOIN Routes r ON mp.RouteID = r.RouteID \n"
@@ -431,14 +463,12 @@ public class MonthlyPassDAO extends DBContext {
         dto.setRouteNumber(rs.getString("RouteNumber"));
         dto.setRouteName(rs.getString("RouteName"));
         dto.setTypeName(rs.getString("TypeName"));
-
+        dto.setImageProof(rs.getString("ImageProof"));
         return dto;
     }
 
-    
-
     public MonthlyPass getByCode(String passCode) {
-        String sql = "SELECT * FROM MonthlyPasses WHERE PassCode = ?";
+        String sql = "SELECT * FROM MonthlyPasses WHERE PassCode = ? OR QRCodeToken = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, passCode);
             try (ResultSet rs = ps.executeQuery()) {
@@ -462,5 +492,5 @@ public class MonthlyPassDAO extends DBContext {
             return false;
         }
     }
-  
+
 }

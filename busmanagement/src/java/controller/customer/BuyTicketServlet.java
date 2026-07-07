@@ -59,17 +59,18 @@ public class BuyTicketServlet extends HttpServlet {
                 response.sendRedirect(request.getContextPath() + "/route-list");
                 return;
             }
-            // 5. Tính giá hiển thị trên form
             long displayPrice;
             switch (ticketType) {
                 case "luot":
                     displayPrice = (long) route.getTicketPrice();
                     break;
                 case "thang":
-                    displayPrice = 100_000L;
+                    // Gọi Service tính toán dựa trên cấu trúc giảm giá của bảng MonthlyPassTypes dưới DB V2
+                    displayPrice = monthlyPassService.calculatePassPrice(routeId, 1);
                     break;
                 case "lien_chuyen":
-                    displayPrice = 200_000L;
+                    // Truyền null cho routeId tương ứng với vé tháng liên tuyến
+                    displayPrice = monthlyPassService.calculatePassPrice(null, 1);
                     break;
                 default:
                     displayPrice = (long) route.getTicketPrice();

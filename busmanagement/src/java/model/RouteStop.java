@@ -9,26 +9,22 @@ package model;
  * @author Administrator
  */
 public class RouteStop {
+
     private int routestopID;
     private int routID;
     private int stopID;
     private int stopOrder;
-    
-    private String stopName;
-    private double latitude;
-    private double longitude;
+    private double distanceFromStart;
 
     public RouteStop() {
     }
 
-    public RouteStop(int routestopID, int routID, int stopID, int stopOrder, String stopName, double latitude, double longitude) {
+    public RouteStop(int routestopID, int routID, int stopID, int stopOrder, double distanceFromStart) {
         this.routestopID = routestopID;
         this.routID = routID;
         this.stopID = stopID;
         this.stopOrder = stopOrder;
-        this.stopName = stopName;
-        this.latitude = latitude;
-        this.longitude = longitude;
+        this.distanceFromStart = distanceFromStart;
     }
 
     public int getRoutestopID() {
@@ -63,34 +59,18 @@ public class RouteStop {
         this.stopOrder = stopOrder;
     }
 
-    public String getStopName() {
-        return stopName;
+    public double getDistanceFromStart() {
+        return distanceFromStart;
     }
 
-    public void setStopName(String stopName) {
-        this.stopName = stopName;
-    }
-
-    public double getLatitude() {
-        return latitude;
-    }
-
-    public void setLatitude(double latitude) {
-        this.latitude = latitude;
-    }
-
-    public double getLongitude() {
-        return longitude;
-    }
-
-    public void setLongitude(double longitude) {
-        this.longitude = longitude;
+    public void setDistanceFromStart(double distanceFromStart) {
+        this.distanceFromStart = distanceFromStart;
     }
 
     @Override
     public String toString() {
-        return "RouteStop{" + "routestopID=" + routestopID + ", routID=" + routID + ", stopID=" + stopID + ", stopOrder=" + stopOrder + ", stopName=" + stopName + ", latitude=" + latitude + ", longitude=" + longitude + '}';
+        return "RouteStop{" + "routestopID=" + routestopID + ", routID=" + routID + ", stopID=" + stopID + ", stopOrder=" + stopOrder + ", distanceFromStart=" + distanceFromStart + '}';
     }
-    
+
     
 }

@@ -26,18 +26,20 @@ public class Trip {
     public Trip() {
     }
 
-    public Trip(int tripID, int routeID, int busID, int driverID, Integer assistantID, LocalDate tripDate, LocalTime startTime, LocalTime endTime, int direction, TripStatus status) {
-        this.tripID = tripID;
-        this.routeID = routeID;
-        this.busID = busID;
-        this.driverID = driverID;
-        this.assistantID = assistantID;
-        this.tripDate = tripDate;
-        this.startTime = startTime;
-        this.endTime = endTime;
-        this.direction = direction;
-        this.status = status;
-    }
+public Trip(int tripID, int routeID, int busID, int driverID, Integer assistantID, LocalDate tripDate, LocalTime startTime, LocalTime endTime, int direction, TripStatus status, Timestamp actualStartTime, Timestamp actualEndTime) {
+    this.tripID = tripID;
+    this.routeID = routeID;
+    this.busID = busID;
+    this.driverID = driverID;
+    this.assistantID = assistantID;
+    this.tripDate = tripDate;
+    this.startTime = startTime;
+    this.endTime = endTime;
+    this.direction = direction;
+    this.status = status;
+    this.actualStartTime = actualStartTime; // Added
+    this.actualEndTime = actualEndTime;     // Added
+}
 
     public int getTripID() {
         return tripID;

@@ -196,18 +196,20 @@
                                                                 <c:if test="${p.status eq 'PENDING'}">
                                                                     <a href="${pageContext.request.contextPath}/staff/monthly-pass/approve?id=${p.passID}" 
                                                                        class="btn btn-success fw-semibold px-2.5" 
-                                                                       onclick="return confirm('Hệ thống sẽ cấp mã hoạt động. Xác nhận DUYỆT đơn #${p.passCode}?')">
+                                                                       onclick="return confirm('Xác nhận DUYỆT đơn #${p.passCode}?')">
                                                                         <i class="fas fa-check me-1"></i>Duyệt
                                                                     </a>
                                                                     <a href="${pageContext.request.contextPath}/staff/monthly-pass/reject?id=${p.passID}" 
                                                                        class="btn btn-danger fw-semibold px-2.5" 
-                                                                       onclick="return confirm('Hành động không thể hoàn tác. Xác nhận TỪ CHỐI đơn #${p.passCode}?')">
+                                                                       onclick="return confirm('Xác nhận TỪ CHỐI đơn #${p.passCode}?')">
                                                                         <i class="fas fa-ban me-1"></i>Từ chối
                                                                     </a>
                                                                 </c:if>
-                                                                <a href="#" class="btn btn-outline-secondary px-2.5" title="Xem hồ sơ gốc chi tiết">
-                                                                    <i class="fas fa-eye"></i> Chi tiết
-                                                                </a>
+                                                                <!-- ĐÃ SỬA: Nút gọi Modal xem ảnh -->
+                                                                <button type="button" class="btn btn-outline-secondary px-2.5" title="Xem hồ sơ gốc chi tiết"
+                                                                        onclick="showProofImage('${pageContext.request.contextPath}/${p.imageProof}', '${p.fullName}')">
+                                                                    <i class="fas fa-image"></i> Xem ảnh
+                                                                </button>
                                                             </div>
                                                         </td>
                                                     </tr>
@@ -224,5 +226,28 @@
         </div>
 
         <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+        <div class="modal fade" id="imageProofModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-lg">
+                <div class="modal-content border-0 shadow">
+                    <div class="modal-header bg-light">
+                        <h5 class="modal-title fw-bold text-dark"><i class="fas fa-id-badge me-2 text-primary"></i>Giấy tờ minh chứng: <span id="modalCustomerName" class="text-primary"></span></h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body text-center bg-dark p-0">
+                        <img id="modalProofImg" src="" alt="Không có ảnh minh chứng" class="img-fluid w-100" style="max-height: 80vh; object-fit: contain;">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- JS để truyền link ảnh vào Modal -->
+        <script>
+            function showProofImage(imageUrl, customerName) {
+                document.getElementById('modalCustomerName').innerText = customerName;
+                document.getElementById('modalProofImg').src = imageUrl;
+                var myModal = new bootstrap.Modal(document.getElementById('imageProofModal'));
+                myModal.show();
+            }
+        </script>
     </body>
 </html>

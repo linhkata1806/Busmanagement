@@ -13,6 +13,9 @@ import java.util.List;
 import model.MonthlyPassType;
 import model.Notification;
 import enums.NotificationType;
+import jakarta.servlet.http.Part;
+import java.io.File;
+import java.util.UUID;
 
 public class MonthlyPassService {
 
@@ -26,7 +29,7 @@ public class MonthlyPassService {
 
     // dang ky ve thang hco 1 chuyen
     public void registerRoutePass(int accountID, int routeId, int passTypeID, String imageProof) {
-        if (monthlyPassDAO.hasPendingOrApprovedPass(accountID, routeId)) {
+        if (monthlyPassDAO.hasPendingOrApprovedPass(accountID, routeId) || monthlyPassDAO.hasPendingOrApprovedAllRoutePass(accountID)) {
             throw new IllegalArgumentException("Bạn đã đăng ký vé tháng cho tuyến này.");
         }
 
@@ -97,13 +100,13 @@ public class MonthlyPassService {
 
     //=====customer Lấy danh sách vé tháng đơn tuyến dạng DTO
     public List<MonthlyPassDTO> getRoutePasses(int accountID) {
-         monthlyPassDAO.updateExpiredPasses();
+        monthlyPassDAO.updateExpiredPasses();
         return monthlyPassDAO.getRoutePasses(accountID);
     }
 
     //======customer Lấy danh sách vé tháng liên tuyến dạng DTO
     public List<MonthlyPassDTO> getAllRoutePasses(int accountID) {
-         monthlyPassDAO.updateExpiredPasses();
+        monthlyPassDAO.updateExpiredPasses();
         return monthlyPassDAO.getAllRoutePasses(accountID);
     }
 
@@ -123,13 +126,13 @@ public class MonthlyPassService {
 
     // 2. Lấy danh sách tất cả vé tháng (Giao diện Staff)
     public List<MonthlyPassDTO> getAllPassesForStaff() {
-         monthlyPassDAO.updateExpiredPasses();
+        monthlyPassDAO.updateExpiredPasses();
         return monthlyPassDAO.getAllPasses();
     }
 
     // 3. Lấy danh sách vé tháng theo trạng thái lọc
     public List<MonthlyPassDTO> getPassesByStatusForStaff(String status) {
-         monthlyPassDAO.updateExpiredPasses();
+        monthlyPassDAO.updateExpiredPasses();
         return monthlyPassDAO.getPassesByStatus(status);
     }
 
@@ -177,7 +180,7 @@ public class MonthlyPassService {
         notif.setTitle(title);
         notif.setContent(content);
         notif.setCreatedAt(java.time.LocalDateTime.now());
-
+        notif.setTargetRole("CUSTOMER");
         notificationDAO.insert(notif);
     }
 
@@ -212,6 +215,52 @@ public class MonthlyPassService {
             }
         }
         return filteredList;
+    }
+
+    public String processAndSaveProof(Part filePart, String realPath) throws IllegalArgumentException, Exception {
+        // 1. Kiểm tra file rỗng
+        if (filePart == null || filePart.getSize() == 0) {
+            throw new IllegalArgumentException("Vui lòng tải lên ảnh minh chứng.");
+        }
+
+        // 2. Kiểm tra dung lượng (Max 5MB = 5 * 1024 * 1024 bytes)
+        if (filePart.getSize() > 5 * 1024 * 1024) {
+            throw new IllegalArgumentException("Dung lượng ảnh vượt quá giới hạn 5MB.");
+        }
+
+        // 3. Kiểm tra MIME Type từ Header để chặn file giả mạo 
+        String contentType = filePart.getContentType();
+        if (contentType == null || (!contentType.equals("image/jpeg") && !contentType.equals("image/png"))) {
+            throw new IllegalArgumentException("Định dạng file không hợp lệ. Chỉ chấp nhận ảnh JPG/PNG.");
+        }
+
+        // 4. Lấy tên gốc của file và trích xuất phần mở rộng (Extension)
+        String submittedFileName = filePart.getSubmittedFileName();
+        if (submittedFileName == null || !submittedFileName.contains(".")) {
+            throw new IllegalArgumentException("Tên file không hợp lệ.");
+        }
+
+        // Cắt lấy đuôi file (ví dụ: ".jpg", ".png") và chuyển về chữ thường để check an toàn kép
+        String extension = submittedFileName.substring(submittedFileName.lastIndexOf(".")).toLowerCase();
+        if (!extension.equals(".jpg") && !extension.equals(".jpeg") && !extension.equals(".png")) {
+            throw new IllegalArgumentException("Đuôi file mở rộng không được hỗ trợ.");
+        }
+
+        // 5. Sinh tên file Unique, Ngắn gọn (Ví dụ: 550e8400-e29b-41d4-a716-446655440000.jpg)
+        String uniqueFileName = UUID.randomUUID().toString() + extension;
+
+        // 6. Tạo thư mục lưu trữ nếu chưa tồn tại trên Server
+        File uploadDir = new File(realPath);
+        if (!uploadDir.exists()) {
+            uploadDir.mkdirs();
+        }
+
+        // 7. Ghi file vào ổ cứng của Server
+        String savePath = realPath + File.separator + uniqueFileName;
+        filePart.write(savePath);
+
+        // 8. Trả về đường dẫn tương đối chuẩn xác để lưu vào Database
+        return "uploads/pass-proof/" + uniqueFileName;
     }
 
 }

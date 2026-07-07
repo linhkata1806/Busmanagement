@@ -52,6 +52,9 @@ public class NotificationServlet extends HttpServlet {
             try {
                 int notiID = Integer.parseInt(notiIdStr);
                 notificationService.markAsRead(notiID, accountId);
+                
+                int updatedUnreadCount = notificationService.countUnreadByAccountAndRole(accountId, ASSISTANT_ROLE);
+                session.setAttribute("globalUnreadCount", updatedUnreadCount);
             } catch (Exception e) {
                 e.printStackTrace();
             }

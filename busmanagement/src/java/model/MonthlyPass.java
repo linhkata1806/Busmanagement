@@ -33,21 +33,24 @@ public class MonthlyPass {
     public MonthlyPass() {
     }
 
-    public MonthlyPass(int passID, int accountID, Integer routeID, int passTypeID, String passCode, LocalDate startDate, LocalDate endDate, long price, PassStatus status, String imageProof, Integer approvedBy, LocalDate approvedAt, LocalDate createdAt) {
-        this.passID = passID;
-        this.accountID = accountID;
-        this.routeID = routeID;
-        this.passTypeID = passTypeID;
-        this.passCode = passCode;
-        this.startDate = startDate;
-        this.endDate = endDate;
-        this.price = price;
-        this.status = status;
-        this.imageProof = imageProof;
-        this.approvedBy = approvedBy;
-        this.approvedAt = approvedAt;
-        this.createdAt = createdAt;
-    }
+ 
+public MonthlyPass(int passID, int accountID, Integer routeID, int passTypeID, String passCode, LocalDate startDate, LocalDate endDate, long price, PassStatus status, String imageProof, Integer approvedBy, LocalDate approvedAt, LocalDate createdAt, String qrCodeToken, java.sql.Timestamp lastUsedAt) {
+    this.passID = passID;
+    this.accountID = accountID;
+    this.routeID = routeID;
+    this.passTypeID = passTypeID;
+    this.passCode = passCode;
+    this.startDate = startDate;
+    this.endDate = endDate;
+    this.price = price;
+    this.status = status;
+    this.imageProof = imageProof;
+    this.approvedBy = approvedBy;
+    this.approvedAt = approvedAt;
+    this.createdAt = createdAt;
+    this.qrCodeToken = qrCodeToken; // Added
+    this.lastUsedAt = lastUsedAt;   // Added
+}
 
     public int getPassID() {
         return passID;

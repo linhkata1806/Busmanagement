@@ -24,6 +24,21 @@ public class Payment {
 
     public Payment() {}
 
+    public Payment(int paymentID, int accountID, Integer ticketID, Integer passID, long amount, String paymentMethod, String transactionCode, String qrImage, PaymentStatus paymentStatus, Timestamp paidAt, Timestamp createdAt) {
+        this.paymentID = paymentID;
+        this.accountID = accountID;
+        this.ticketID = ticketID;
+        this.passID = passID;
+        this.amount = amount;
+        this.paymentMethod = paymentMethod;
+        this.transactionCode = transactionCode;
+        this.qrImage = qrImage;
+        this.paymentStatus = paymentStatus;
+        this.paidAt = paidAt;
+        this.createdAt = createdAt;
+    }
+    
+
     public int getPaymentID() { return paymentID; }
     public void setPaymentID(int paymentID) { this.paymentID = paymentID; }
 

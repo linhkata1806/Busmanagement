@@ -20,11 +20,12 @@ public class Notification {
     private String content;
     private boolean isRead;
     private LocalDateTime createdAt;
+    private String targetRole;
 
     public Notification() {
     }
 
-    public Notification(int notificationID, int accountID, NotificationType notificationType, String title, String content, boolean isRead, LocalDateTime createdAt) {
+    public Notification(int notificationID, int accountID, NotificationType notificationType, String title, String content, boolean isRead, LocalDateTime createdAt, String targetRole) {
         this.notificationID = notificationID;
         this.accountID = accountID;
         this.notificationType = notificationType;
@@ -32,6 +33,7 @@ public class Notification {
         this.content = content;
         this.isRead = isRead;
         this.createdAt = createdAt;
+        this.targetRole = targetRole;
     }
 
     public int getNotificationID() {
@@ -90,8 +92,18 @@ public class Notification {
         this.createdAt = createdAt;
     }
 
+    public String getTargetRole() {
+        return targetRole;
+    }
+
+    public void setTargetRole(String targetRole) {
+        this.targetRole = targetRole;
+    }
+
     @Override
     public String toString() {
-        return "Notification{" + "title='" + title + '\'' + ", isRead=" + isRead + '}';
+        return "Notification{" + "notificationID=" + notificationID + ", accountID=" + accountID + ", notificationType=" + notificationType + ", title=" + title + ", content=" + content + ", isRead=" + isRead + ", createdAt=" + createdAt + ", targetRole=" + targetRole + '}';
     }
+
+    
 }

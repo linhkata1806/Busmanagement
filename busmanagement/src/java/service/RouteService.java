@@ -73,6 +73,12 @@ public class RouteService {
         if (estimatedDuration <= 0) {
             throw new IllegalArgumentException("Thời gian dự kiến phải > 0 phút.");
         }
+        if (ticketPrice <= 0) {
+            throw new IllegalArgumentException("Giá vé bắt buộc phải lớn hơn 0 VNĐ.");
+        }
+        if (distance <= 0) {
+            throw new IllegalArgumentException("Tổng chiều dài tuyến đường phải lớn hơn 0 km.");
+        }
 
         Route route = new Route();
         route.setRouteNumber(routeNumber.trim());
@@ -113,7 +119,13 @@ public class RouteService {
         if (estimatedDuration <= 0) {
             throw new IllegalArgumentException("Thời gian dự kiến phải > 0 phút.");
         }
-
+        
+        if (ticketPrice <= 0) {
+            throw new IllegalArgumentException("Giá vé bắt buộc phải lớn hơn 0 VNĐ.");
+        }
+        if (distance <= 0) {
+            throw new IllegalArgumentException("Tổng chiều dài tuyến đường phải lớn hơn 0 km.");
+        }
         Route route = new Route();
         route.setRouteID(routeID);
         route.setRouteName(routeName.trim());

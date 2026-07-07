@@ -25,6 +25,22 @@ public class TripProgress {
 
     public TripProgress() {}
 
+    public TripProgress(int tripProgressID, int tripID, int currentStopID, Integer nextStopID, Double distanceRemaining, Timestamp estimatedArrival, Timestamp updatedAt, String currentStopName, String nextStopName, double currentLat, double currentLng) {
+        this.tripProgressID = tripProgressID;
+        this.tripID = tripID;
+        this.currentStopID = currentStopID;
+        this.nextStopID = nextStopID;
+        this.distanceRemaining = distanceRemaining;
+        this.estimatedArrival = estimatedArrival;
+        this.updatedAt = updatedAt;
+        this.currentStopName = currentStopName;
+        this.nextStopName = nextStopName;
+        this.currentLat = currentLat;
+        this.currentLng = currentLng;
+    }
+    
+    
+
     public int getTripProgressID() { return tripProgressID; }
     public void setTripProgressID(int tripProgressID) { this.tripProgressID = tripProgressID; }
 
