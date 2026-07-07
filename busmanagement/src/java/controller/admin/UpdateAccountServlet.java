@@ -35,11 +35,11 @@ public class UpdateAccountServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         String idParam = request.getParameter("id");
-        
+
         try {
             int accountId = Integer.parseInt(idParam);
             Account account = accountDAO.getAccountById(accountId);
-            
+
             if (account != null) {
                 request.setAttribute("account", account);
                 request.getRequestDispatcher("/view/admin/update-account.jsp").forward(request, response);
@@ -56,7 +56,7 @@ public class UpdateAccountServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        
+
         request.setCharacterEncoding("UTF-8");
         HttpSession session = request.getSession();
 
@@ -66,8 +66,8 @@ public class UpdateAccountServlet extends HttpServlet {
             String fullName = request.getParameter("fullName");
             String email = request.getParameter("email");
             String phone = request.getParameter("phone");
-            String avatar = request.getParameter("avatar"); 
-
+            String avatar = request.getParameter("avatar");
+            accountService.updateAccount(accountId, fullName, email, phone, avatar);
             Account updatedAcc = new Account();
             updatedAcc.setAccountID(accountId);
             updatedAcc.setFullName(fullName);
@@ -75,17 +75,19 @@ public class UpdateAccountServlet extends HttpServlet {
             updatedAcc.setPhone(phone);
             updatedAcc.setAvatar(avatar);
 
-            boolean success = accountService.updateAccount(updatedAcc);
+            session.setAttribute("successMsg", "Cập nhật thông tin thành công!");
+            response.sendRedirect(request.getContextPath() + "/admin/accounts");
 
-            if (success) {
-                session.setAttribute("successMsg", "Cập nhật thông tin thành công!");
-                response.sendRedirect(request.getContextPath() + "/admin/accounts");
-            } else {
-                throw new Exception("Lỗi hệ thống khi cập nhật Database.");
-            }
+        } catch (IllegalArgumentException e) {
+            // Hứng chính xác cái lỗi "Email đã được sử dụng" ném ra từ Service
+            session.setAttribute("errorMsg", e.getMessage());
+
+            // Cậu có thể redirect về lại trang danh sách, hoặc trang update tùy luồng thiết kế của cậu
+            response.sendRedirect(request.getContextPath() + "/admin/accounts");
 
         } catch (Exception e) {
-            session.setAttribute("errorMsg", "Cập nhật thất bại: " + e.getMessage());
+            // Hứng các lỗi hệ thống khác (ví dụ sập DB, null pointer...)
+            session.setAttribute("errorMsg", "Cập nhật thất bại: Lỗi hệ thống.");
             response.sendRedirect(request.getContextPath() + "/admin/accounts");
         }
     }

@@ -53,9 +53,9 @@ public class DashboardDAO extends DBContext {
     // 2. DÀNH CHO BÁO CÁO DOANH THU (REVENUE REPORT)
     // =========================================================================
     public double getTodayRevenue() {
-        // ĐÃ SỬA: Status = 'COMPLETED' theo đúng đặc tả mục II.6
-        String ticketSql = "SELECT SUM(Price) FROM Tickets WHERE Status = 'COMPLETED' AND CAST(CreatedAt AS DATE) = CAST(GETDATE() AS DATE)";
-        String passSql = "SELECT SUM(Price) FROM MonthlyPasses WHERE Status = 'APPROVED' AND CAST(UpdatedAt AS DATE) = CAST(GETDATE() AS DATE)";
+        // ĐÃ FIX: Đổi CreatedAt thành PurchasedAt cho Tickets và UpdatedAt thành ApprovedAt cho MonthlyPasses
+        String ticketSql = "SELECT SUM(Price) FROM Tickets WHERE Status = 'COMPLETED' AND CAST(PurchasedAt AS DATE) = CAST(GETDATE() AS DATE)";
+        String passSql = "SELECT SUM(Price) FROM MonthlyPasses WHERE Status = 'APPROVED' AND CAST(ApprovedAt AS DATE) = CAST(GETDATE() AS DATE)";
 
         double revenue = 0.0;
         try {
@@ -76,9 +76,9 @@ public class DashboardDAO extends DBContext {
     }
 
     public double getRevenueByMonth(int month, int year) {
-        // ĐÃ SỬA: Status = 'COMPLETED'
-        String ticketSql = "SELECT SUM(Price) FROM Tickets WHERE Status = 'COMPLETED' AND MONTH(CreatedAt) = ? AND YEAR(CreatedAt) = ?";
-        String passSql = "SELECT SUM(Price) FROM MonthlyPasses WHERE Status = 'APPROVED' AND MONTH(UpdatedAt) = ? AND YEAR(UpdatedAt) = ?";
+        // ĐÃ FIX: Đổi CreatedAt thành PurchasedAt và UpdatedAt thành ApprovedAt
+        String ticketSql = "SELECT SUM(Price) FROM Tickets WHERE Status = 'COMPLETED' AND MONTH(PurchasedAt) = ? AND YEAR(PurchasedAt) = ?";
+        String passSql = "SELECT SUM(Price) FROM MonthlyPasses WHERE Status = 'APPROVED' AND MONTH(ApprovedAt) = ? AND YEAR(ApprovedAt) = ?";
 
         double revenue = 0.0;
         try {
@@ -107,9 +107,9 @@ public class DashboardDAO extends DBContext {
     }
 
     public double getRevenueByRange(java.util.Date fromDate, java.util.Date toDate) {
-        // ĐÃ SỬA: Status = 'COMPLETED'
-        String ticketSql = "SELECT SUM(Price) FROM Tickets WHERE Status = 'COMPLETED' AND CreatedAt BETWEEN ? AND ?";
-        String passSql = "SELECT SUM(Price) FROM MonthlyPasses WHERE Status = 'APPROVED' AND UpdatedAt BETWEEN ? AND ?";
+        // ĐÃ FIX: Đổi CreatedAt thành PurchasedAt và UpdatedAt thành ApprovedAt
+        String ticketSql = "SELECT SUM(Price) FROM Tickets WHERE Status = 'COMPLETED' AND PurchasedAt BETWEEN ? AND ?";
+        String passSql = "SELECT SUM(Price) FROM MonthlyPasses WHERE Status = 'APPROVED' AND ApprovedAt BETWEEN ? AND ?";
 
         double revenue = 0.0;
         try {

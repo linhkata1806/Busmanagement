@@ -280,19 +280,19 @@ public class AccountDAO extends DBContext {
         return list;
     }
 
-    // 3. existsPhone() - Kiểm tra trùng lặp số điện thoại khi tạo/sửa tài khoản
-    public boolean existsByPhone(String phone) {
-        String sql = "SELECT 1 FROM Accounts WHERE Phone = ?";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setString(1, phone);
-            try (ResultSet rs = ps.executeQuery()) {
-                return rs.next();
-            }
-        } catch (Exception e) {
-            System.out.println("Lỗi tại existsByPhone: " + e.getMessage());
-        }
-        return false;
-    }
+//    // 3. existsPhone() - Kiểm tra trùng lặp số điện thoại khi tạo/sửa tài khoản
+//    public boolean existsByPhone(String phone) {
+//        String sql = "SELECT 1 FROM Accounts WHERE Phone = ?";
+//        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+//            ps.setString(1, phone);
+//            try (ResultSet rs = ps.executeQuery()) {
+//                return rs.next();
+//            }
+//        } catch (Exception e) {
+//            System.out.println("Lỗi tại existsByPhone: " + e.getMessage());
+//        }
+//        return false;
+//    }
 
     // 4. updateStatus() - Phục vụ tính năng Lock/Unlock tài khoản qua biến IsActive (BIT)
     public boolean updateStatus(int accountId, boolean isActive) {
@@ -303,6 +303,21 @@ public class AccountDAO extends DBContext {
             return ps.executeUpdate() > 0;
         } catch (Exception e) {
             System.out.println("Lỗi tại updateStatus: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return false;
+    }
+    
+    public boolean checkEmailExistsForOtherAccount(String email, int excludeAccountId) {
+        String sql = "SELECT TOP 1 1 FROM Accounts WHERE Email = ? AND AccountID != ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, email);
+            ps.setInt(2, excludeAccountId);
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next(); // Trả về true nếu có người khác đang dùng email này
+            }
+        } catch (Exception e) {
+            System.out.println("Lỗi tại checkEmailExistsForOtherAccount: " + e.getMessage());
             e.printStackTrace();
         }
         return false;

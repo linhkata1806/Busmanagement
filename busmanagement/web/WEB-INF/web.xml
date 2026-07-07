@@ -283,9 +283,11 @@
     <servlet>
         <servlet-name>ResetPasswordServlet</servlet-name>
         <servlet-class>controller.admin.ResetPasswordServlet</servlet-class>
+    </servlet>
+    
+    <servlet>
         <servlet-name>AddStopToRouteServlet</servlet-name>
         <servlet-class>controller.staff.stop.AddStopToRouteServlet</servlet-class>
-
     </servlet>
     <servlet-mapping>
         <servlet-name>LoginServlet</servlet-name>

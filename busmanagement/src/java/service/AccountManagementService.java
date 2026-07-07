@@ -125,4 +125,20 @@ public class AccountManagementService {
             return false;
         }
     }
+    
+    public void updateAccount(int accountID, String fullName, String email, String phone, String avatar) throws IllegalArgumentException {
+        
+        // 1. Quét lỗi trùng Email
+        if (accountDAO.checkEmailExistsForOtherAccount(email, accountID)) {
+            throw new IllegalArgumentException("Thao tác thất bại: Email '" + email + "' đã được sử dụng bởi một tài khoản khác!");
+        }
+
+
+
+        // 3. Nếu an toàn thì mới cho Update
+        boolean isSuccess = accountDAO.updateProfile(accountID, fullName, email, phone, avatar);
+        if (!isSuccess) {
+            throw new RuntimeException("Lỗi hệ thống: Không thể lưu thông tin cập nhật vào cơ sở dữ liệu.");
+        }
+    }
 }
