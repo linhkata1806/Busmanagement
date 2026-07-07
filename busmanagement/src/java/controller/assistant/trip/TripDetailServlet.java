@@ -1,4 +1,4 @@
-package controller.assistant;
+package controller.assistant.trip;
 
 import dto.RouteStopDTO;
 import dto.TripDTO;

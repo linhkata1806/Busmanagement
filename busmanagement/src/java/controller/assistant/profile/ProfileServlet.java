@@ -1,22 +1,20 @@
-package controller.assistant;
+package controller.assistant.profile;
 
-import dto.TripDTO;
+import dal.AccountDAO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
-import java.util.List;
 import model.Account;
-import service.TripService;
 
-public class MyTripServlet extends HttpServlet {
-    private TripService tripService;
+public class ProfileServlet extends HttpServlet {
+    private AccountDAO accountDAO;
 
     @Override
     public void init() throws ServletException {
-        tripService = new TripService();
+        accountDAO = new AccountDAO();
     }
 
     @Override
@@ -24,12 +22,16 @@ public class MyTripServlet extends HttpServlet {
             throws ServletException, IOException {
         HttpSession session = request.getSession(false);
         Account user = (Account) session.getAttribute("USER");
-        int assistantID = user.getAccountID();
+        int accountId = user.getAccountID();
 
-        List<TripDTO> assignedTrips = tripService.getTripsByAssistant(assistantID);
-        request.setAttribute("assignedTrips", assignedTrips);
-
-        request.getRequestDispatcher("/view/assistant/my-trip.jsp").forward(request, response);
+        Account account = accountDAO.getAccountById(accountId);
+        if (account == null) {
+            session.invalidate();
+            response.sendRedirect(request.getContextPath() + "/login");
+            return;
+        }
+        request.setAttribute("account", account);
+        request.getRequestDispatcher("/view/assistant/profile.jsp").forward(request, response);
     }
 
     @Override

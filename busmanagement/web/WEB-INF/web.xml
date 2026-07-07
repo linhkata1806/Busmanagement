@@ -1,6 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <web-app version="6.0" xmlns="https://jakarta.ee/xml/ns/jakartaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/web-app_6_0.xsd">
     <filter>
+        <filter-name>EncodingFilter</filter-name>
+        <filter-class>filter.EncodingFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>EncodingFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+    <filter>
         <filter-name>AuthFilter</filter-name>
         <filter-class>filter.AuthFilter</filter-class>
     </filter>
@@ -87,6 +95,10 @@
     <servlet>
         <servlet-name>EditProfileServlet</servlet-name>
         <servlet-class>controller.customer.EditProfileServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>TripHistoryServlet</servlet-name>
+        <servlet-class>controller.customer.TripHistoryServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>BuyTicketServlet</servlet-name>
@@ -206,27 +218,27 @@
     </servlet>
     <servlet>
         <servlet-name>MyTripServlet</servlet-name>
-        <servlet-class>controller.assistant.MyTripServlet</servlet-class>
+        <servlet-class>controller.assistant.trip.MyTripServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>TripDetailServlet</servlet-name>
-        <servlet-class>controller.assistant.TripDetailServlet</servlet-class>
+        <servlet-class>controller.assistant.trip.TripDetailServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>PassengerCheckServlet</servlet-name>
-        <servlet-class>controller.assistant.PassengerCheckServlet</servlet-class>
+        <servlet-class>controller.assistant.trip.PassengerCheckServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>AssistantNotificationServlet</servlet-name>
-        <servlet-class>controller.assistant.NotificationServlet</servlet-class>
+        <servlet-class>controller.assistant.notification.NotificationServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>AssistantProfileServlet</servlet-name>
-        <servlet-class>controller.assistant.ProfileServlet</servlet-class>
+        <servlet-class>controller.assistant.profile.ProfileServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>AssistantChangePasswordServlet</servlet-name>
-        <servlet-class>controller.assistant.ChangePasswordServlet</servlet-class>
+        <servlet-class>controller.assistant.profile.ChangePasswordServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>DriverDashboardServlet</servlet-name>
@@ -327,6 +339,10 @@
     <servlet-mapping>
         <servlet-name>EditProfileServlet</servlet-name>
         <url-pattern>/customer/editProfile</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>TripHistoryServlet</servlet-name>
+        <url-pattern>/customer/trip-history</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>BuyTicketServlet</servlet-name>
