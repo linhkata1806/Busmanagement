@@ -1,4 +1,4 @@
-package controller.assistant;
+package controller.assistant.trip;
 
 import dto.TripDTO;
 import jakarta.servlet.ServletException;

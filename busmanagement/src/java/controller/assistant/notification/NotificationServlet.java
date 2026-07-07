@@ -1,4 +1,4 @@
-package controller.assistant;
+package controller.assistant.notification;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
