@@ -25,7 +25,7 @@
         <span class="fs-5 fw-bold text-white">Phụ Xe Bus</span>
     </div>
     <hr class="text-secondary">
-    
+
     <ul class="nav flex-column gap-2 mb-5">
         <li class="nav-item">
             <a class="nav-link py-2.5 px-3 ${param.activeMenu == 'dashboard' ? 'active' : ''}" href="${pageContext.request.contextPath}/assistant/dashboard">
@@ -40,8 +40,8 @@
         <li class="nav-item">
             <a class="nav-link py-2.5 px-3 ${param.activeMenu == 'notification' ? 'active' : ''}" href="${pageContext.request.contextPath}/assistant/notification">
                 <i class="fas fa-bell me-2"></i>Thông báo
-                <c:if test="${not empty unreadCount and unreadCount > 0}">
-                    <span class="badge bg-danger float-end rounded-pill">${unreadCount}</span>
+                <c:if test="${not empty sessionScope.globalUnreadCount and sessionScope.globalUnreadCount > 0}">
+                    <span class="badge bg-danger float-end rounded-pill">${sessionScope.globalUnreadCount}</span>
                 </c:if>
             </a>
         </li>
@@ -51,7 +51,7 @@
             </a>
         </li>
     </ul>
-    
+
     <div class="position-absolute bottom-0 start-0 w-100 p-3">
         <hr class="text-secondary">
         <a href="${pageContext.request.contextPath}/logout" class="nav-link py-2.5 px-3 text-danger fw-bold">

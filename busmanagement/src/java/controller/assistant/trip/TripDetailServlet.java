@@ -32,8 +32,11 @@ public class TripDetailServlet extends HttpServlet {
         int assistantID = user.getAccountID();
 
         String idStr = request.getParameter("id");
+        
+        // 1. VÁ LỖI THIẾU ID TỪ URL (Thay thế sendError)
         if (idStr == null || idStr.trim().isEmpty()) {
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Thiếu mã chuyến xe.");
+            request.setAttribute("error", "Thiếu thông tin mã chuyến xe. Vui lòng chọn lại từ danh sách.");
+            request.getRequestDispatcher("/view/assistant/trip-detail.jsp").forward(request, response);
             return;
         }
 
@@ -44,7 +47,7 @@ public class TripDetailServlet extends HttpServlet {
             Trip trip = tripService.getTripById(tripID);
 
             if (trip == null) {
-                throw new IllegalArgumentException("Chuyến xe không tồn tại.");
+                throw new IllegalArgumentException("Chuyến xe không tồn tại hoặc đã bị xóa khỏi hệ thống.");
             }
 
             // Security constraint: AssistantID == CurrentUserID
@@ -63,12 +66,21 @@ public class TripDetailServlet extends HttpServlet {
             request.setAttribute("routeStops", routeStops);
 
             request.getRequestDispatcher("/view/assistant/trip-detail.jsp").forward(request, response);
+            
+        } catch (NumberFormatException e) {
+            // 2. VÁ LỖI NHẬP CHỮ VÀO URL (VD: ?id=abc)
+            request.setAttribute("error", "Mã chuyến xe không đúng định dạng. Hệ thống từ chối truy cập.");
+            request.getRequestDispatcher("/view/assistant/trip-detail.jsp").forward(request, response);
+            
         } catch (IllegalArgumentException e) {
             request.setAttribute("error", e.getMessage());
             request.getRequestDispatcher("/view/assistant/trip-detail.jsp").forward(request, response);
+            
         } catch (Exception e) {
             e.printStackTrace();
-            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Lỗi hệ thống.");
+            // 3. VÁ LỖI 500 (Ném lỗi hệ thống ra giao diện thay vì sendError)
+            request.setAttribute("error", "Hệ thống đang gặp sự cố trong quá trình tải dữ liệu. Vui lòng thử lại sau.");
+            request.getRequestDispatcher("/view/assistant/trip-detail.jsp").forward(request, response);
         }
     }
 
