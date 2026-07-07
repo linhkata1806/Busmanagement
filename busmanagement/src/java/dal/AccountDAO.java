@@ -55,7 +55,7 @@ public class AccountDAO extends DBContext {
         // BƯỚC 2: Gọi thẳng biến 'connection' được thừa kế từ DBContext
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, username);
-             ps.setString(2, username);
+            ps.setString(2, username);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     return mapAccount(rs);
@@ -224,4 +224,87 @@ public class AccountDAO extends DBContext {
         return list;
     }
 
+    //Code for ADMIN
+    // 1. getAll() - Lấy toàn bộ danh sách tài khoản, sắp xếp mới nhất lên đầu
+    public List<Account> getAllAccounts() {
+        List<Account> list = new ArrayList<>();
+        String sql = "SELECT a.*, r.RoleName "
+                + "FROM Accounts a "
+                + "JOIN Roles r ON a.RoleID = r.RoleID "
+                + "ORDER BY a.AccountID ASC"; // Đã sửa ở đây
+
+        try (PreparedStatement ps = connection.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                list.add(mapAccount(rs));
+            }
+        } catch (Exception e) {
+            System.out.println("Lỗi tại getAllAccounts: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return list;
+    }
+
+    // 2. searchAndFilter() - Tìm kiếm đa cột theo từ khóa và lọc theo RoleName (Bắt buộc dùng JOIN Roles)
+    public List<Account> searchAndFilter(String keyword, String roleName) {
+        List<Account> list = new ArrayList<>();
+        String sql = "SELECT a.*, r.RoleName "
+                + "FROM Accounts a "
+                + "JOIN Roles r ON a.RoleID = r.RoleID "
+                + "WHERE (a.Username LIKE ? OR a.FullName LIKE ? OR a.Email LIKE ?) ";
+
+        boolean isFilterByRole = roleName != null && !roleName.equalsIgnoreCase("ALL") && !roleName.trim().isEmpty();
+        if (isFilterByRole) {
+            sql += "AND r.RoleName = ? ";
+        }
+        sql += "ORDER BY a.AccountID ASC"; // Đã sửa ở đây
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            String searchPattern = "%" + (keyword == null ? "" : keyword.trim()) + "%";
+            ps.setString(1, searchPattern);
+            ps.setString(2, searchPattern);
+            ps.setString(3, searchPattern);
+
+            if (isFilterByRole) {
+                ps.setString(4, roleName);
+            }
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    list.add(mapAccount(rs));
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("Lỗi tại searchAndFilter: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return list;
+    }
+
+    // 3. existsPhone() - Kiểm tra trùng lặp số điện thoại khi tạo/sửa tài khoản
+    public boolean existsByPhone(String phone) {
+        String sql = "SELECT 1 FROM Accounts WHERE Phone = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, phone);
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next();
+            }
+        } catch (Exception e) {
+            System.out.println("Lỗi tại existsByPhone: " + e.getMessage());
+        }
+        return false;
+    }
+
+    // 4. updateStatus() - Phục vụ tính năng Lock/Unlock tài khoản qua biến IsActive (BIT)
+    public boolean updateStatus(int accountId, boolean isActive) {
+        String sql = "UPDATE Accounts SET IsActive = ?, UpdatedAt = GETDATE() WHERE AccountID = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setBoolean(1, isActive);
+            ps.setInt(2, accountId);
+            return ps.executeUpdate() > 0;
+        } catch (Exception e) {
+            System.out.println("Lỗi tại updateStatus: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return false;
+    }
 }

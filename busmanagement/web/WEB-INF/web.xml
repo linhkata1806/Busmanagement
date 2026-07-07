@@ -273,8 +273,19 @@
         <servlet-class>controller.driver.ChangePasswordServlet</servlet-class>
     </servlet>
     <servlet>
+        <servlet-name>CreateAccountServlet</servlet-name>
+        <servlet-class>controller.admin.CreateAccountServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>UpdateAccountServlet</servlet-name>
+        <servlet-class>controller.admin.UpdateAccountServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>ResetPasswordServlet</servlet-name>
+        <servlet-class>controller.admin.ResetPasswordServlet</servlet-class>
         <servlet-name>AddStopToRouteServlet</servlet-name>
         <servlet-class>controller.staff.stop.AddStopToRouteServlet</servlet-class>
+
     </servlet>
     <servlet-mapping>
         <servlet-name>LoginServlet</servlet-name>
@@ -523,4 +534,57 @@
     <welcome-file-list>
         <welcome-file>home</welcome-file>
     </welcome-file-list>
+    <servlet>
+        <servlet-name>AdminDashboardServlet</servlet-name>
+        <servlet-class>controller.admin.AdminDashboardServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>AccountManagementServlet</servlet-name>
+        <servlet-class>controller.admin.AccountManagementServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>ProfileServlet</servlet-name>
+        <servlet-class>controller.admin.ProfileServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>RevenueReportServlet</servlet-name>
+        <servlet-class>controller.admin.RevenueReportServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>SystemReportServlet</servlet-name>
+        <servlet-class>controller.admin.SystemReportServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>AdminDashboardServlet</servlet-name>
+        <url-pattern>/admin/dashboard</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>AccountManagementServlet</servlet-name>
+        <url-pattern>/admin/accounts</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ProfileServlet</servlet-name>
+        <url-pattern>/admin/profile</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>RevenueReportServlet</servlet-name>
+        <url-pattern>/admin/revenue-report</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>SystemReportServlet</servlet-name>
+        <url-pattern>/admin/system-report</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>CreateAccountServlet</servlet-name>
+        <url-pattern>/admin/account/create</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>UpdateAccountServlet</servlet-name>
+        <url-pattern>/admin/account/update</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ResetPasswordServlet</servlet-name>
+        <url-pattern>/admin/account/reset-password</url-pattern>
+    </servlet-mapping>
 </web-app>
