@@ -68,11 +68,19 @@ public class BusService {
             throw new IllegalArgumentException(
                     "Biển số xe '" + plate + "' đã tồn tại.");
         }
-
-// ===== Validate loại xe =====
         if (busType == null || busType.trim().isEmpty()) {
-            throw new IllegalArgumentException(
-                    "Loại xe không được để trống.");
+            throw new IllegalArgumentException("Loại phương tiện không được để trống.");
+        }
+
+        java.util.List<String> validBusTypes = java.util.Arrays.asList(
+                "Bus Thường (Diesel)",
+                "VinBus (Điện)",
+                "BRT (Bus Nhanh)",
+                "Minibus (Cỡ nhỏ)"
+        );
+
+        if (!validBusTypes.contains(busType.trim())) {
+            throw new IllegalArgumentException("Loại phương tiện không hợp lệ. Vui lòng chọn từ danh sách gợi ý.");
         }
 
         if (busType.trim().length() > 50) {
@@ -157,7 +165,7 @@ public class BusService {
 
         // 2. Kiểm tra lịch sử chuyến đi (Sử dụng hàm vừa thêm ở TripDAO)
         if (tripDAO.existsByBusId(busId)) {
-           
+
             model.Bus bus = busDAO.getBusById(busId);
             bus.setStatus(enums.BusStatus.INACTIVE); // Chuyển sang INACTIVE
 

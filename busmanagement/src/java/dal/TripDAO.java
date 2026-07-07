@@ -570,4 +570,33 @@ public class TripDAO extends DBContext {
         }
         return 0;
     }
+    // Kiểm tra xem Tài xế có đang chạy chuyến nào khác không
+    public boolean isDriverCurrentlyDriving(int driverID, int excludeTripID) {
+        String sql = "SELECT TOP 1 1 FROM Trips WHERE DriverID = ? AND Status = 'IN_PROGRESS' AND TripID != ?";
+        try (java.sql.PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, driverID);
+            ps.setInt(2, excludeTripID);
+            try (java.sql.ResultSet rs = ps.executeQuery()) {
+                return rs.next(); // Trả về true nếu bị trùng
+            }
+        } catch (Exception e) {
+            System.out.println("Lỗi isDriverCurrentlyDriving: " + e.getMessage());
+        }
+        return false;
+    }
+
+    // Kiểm tra xem Xe buýt có đang kẹt chạy chuyến nào khác không
+    public boolean isBusCurrentlyRunning(int busID, int excludeTripID) {
+        String sql = "SELECT TOP 1 1 FROM Trips WHERE BusID = ? AND Status = 'IN_PROGRESS' AND TripID != ?";
+        try (java.sql.PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, busID);
+            ps.setInt(2, excludeTripID);
+            try (java.sql.ResultSet rs = ps.executeQuery()) {
+                return rs.next(); // Trả về true nếu bị trùng
+            }
+        } catch (Exception e) {
+            System.out.println("Lỗi isBusCurrentlyRunning: " + e.getMessage());
+        }
+        return false;
+    }
 }

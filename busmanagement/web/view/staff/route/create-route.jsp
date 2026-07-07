@@ -111,12 +111,10 @@
                                     </div>
                                     <div class="col-md-4">
                                         <label class="form-label small fw-bold text-secondary">Giá vé lượt (VNĐ)</label>
-                                        <input type="number" name="ticketPrice" class="form-control py-2" value="${valPrice}" placeholder="Ví dụ: 7000" required min="0">
-                                    </div>
+                                        <input type="number" name="ticketPrice" class="form-control py-2" value="${valPrice}" placeholder="Ví dụ: 7000" required min="1000">                                    </div>
                                     <div class="col-md-4">
                                         <label class="form-label small fw-bold text-secondary">Tổng chiều dài (km)</label>
-                                        <input type="number" step="0.1" name="distance" class="form-control py-2" value="${valDist}" placeholder="Ví dụ: 15.5" required min="0">
-                                    </div>
+                                        <input type="number" step="0.1" name="distance" class="form-control py-2" value="${valDist}" placeholder="Ví dụ: 15.5" required min="0.1">                                    </div>
                                     <div class="col-md-4">
                                         <label class="form-label small fw-bold text-secondary">Thời gian dự kiến (phút)</label>
                                         <input type="number" name="estimatedDuration" class="form-control py-2" value="${valDuration}" placeholder="Ví dụ: 45" min="1" required>
