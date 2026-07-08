@@ -85,8 +85,16 @@
                             <h2 class="fw-bold text-dark m-0">Bảng điều khiển tổng quan</h2>
                             <p class="text-muted small m-0">Chào mừng quay trở lại, <span class="fw-bold text-primary">${staff.fullName}</span> (Nhân viên vận hành)</p>
                         </div>
-                        <div class="text-end">
-                            <span class="badge bg-white text-secondary shadow-sm py-2 px-3 rounded-3 fs-6 border">
+
+                        <div class="text-end d-flex align-items-center justify-content-end gap-3">
+
+                            <c:if test="${sessionScope.USER.roleName == 'ADMIN'}">
+                                <a href="${pageContext.request.contextPath}/admin/dashboard" class="btn btn-danger shadow-sm py-2 px-3 rounded-3 fs-6 border-0 fw-semibold" style="transition: all 0.2s;">
+                                    <i class="fas fa-sign-out-alt me-2"></i>Về trang Admin
+                                </a>
+                            </c:if>
+
+                            <span class="badge bg-white text-secondary shadow-sm py-2 px-3 rounded-3 fs-6 border m-0">
                                 <i class="far fa-calendar-alt text-primary me-2"></i>
                                 Hôm nay: <%= new java.text.SimpleDateFormat("dd/MM/yyyy").format(new java.util.Date()) %>
                             </span>

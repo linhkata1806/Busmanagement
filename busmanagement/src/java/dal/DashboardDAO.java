@@ -3,8 +3,10 @@ package dal;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Date;
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.List;
 
 public class DashboardDAO extends DBContext {
 
@@ -152,6 +154,9 @@ public class DashboardDAO extends DBContext {
                 + "  (SELECT COUNT(*) FROM Trips) AS totalTrips, "
                 + "  (SELECT COUNT(*) FROM Tickets) AS totalTickets, "
                 + "  (SELECT COUNT(*) FROM MonthlyPasses) AS totalPasses, "
+                + "  (SELECT COUNT(*) FROM MonthlyPasses WHERE Status = 'PENDING') AS pendingPasses, "
+                + "  (SELECT COUNT(*) FROM MonthlyPasses WHERE Status = 'APPROVED') AS approvedPasses, "
+                + "  (SELECT COUNT(*) FROM MonthlyPasses WHERE Status = 'REJECTED') AS rejectedPasses, "
                 + "  (SELECT COUNT(*) FROM Notifications) AS totalNotifications";
 
         try (PreparedStatement ps = connection.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
@@ -163,11 +168,47 @@ public class DashboardDAO extends DBContext {
                 metrics.put("trips", rs.getInt("totalTrips"));
                 metrics.put("tickets", rs.getInt("totalTickets"));
                 metrics.put("passes", rs.getInt("totalPasses"));
+                // Put thêm 3 trạng thái mới vào Map
+                metrics.put("pendingPasses", rs.getInt("pendingPasses"));
+                metrics.put("approvedPasses", rs.getInt("approvedPasses"));
+                metrics.put("rejectedPasses", rs.getInt("rejectedPasses"));
                 metrics.put("notifications", rs.getInt("totalNotifications"));
             }
         } catch (Exception e) {
             System.out.println("Lỗi getDatabaseScaleMetrics: " + e.getMessage());
         }
         return metrics;
+    }
+
+    //Hàm doanh thu
+    public List<Map<String, Object>> getRevenueByRouteAndType(Date fromDate, Date toDate) {
+        List<Map<String, Object>> list = new ArrayList<>();
+        // SỬA ĐỔI: Sử dụng CAST(... AS DATE) để đồng bộ kiểu dữ liệu ngày thuần túy với Java
+        String sql = "SELECT r.RouteNumber, "
+                + "ISNULL(SUM(t.Price), 0) as TicketRev, "
+                + "ISNULL(SUM(p.Price), 0) as PassRev "
+                + "FROM Routes r "
+                + "LEFT JOIN Tickets t ON r.RouteID = t.RouteID AND t.Status = 'COMPLETED' AND CAST(t.PurchasedAt AS DATE) BETWEEN ? AND ? "
+                + "LEFT JOIN MonthlyPasses p ON r.RouteID = p.RouteID AND p.Status = 'APPROVED' AND CAST(p.ApprovedAt AS DATE) BETWEEN ? AND ? "
+                + "GROUP BY r.RouteNumber";
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setDate(1, fromDate);
+            ps.setDate(2, toDate);
+            ps.setDate(3, fromDate);
+            ps.setDate(4, toDate);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Map<String, Object> map = new HashMap<>();
+                    map.put("route", rs.getString("RouteNumber"));
+                    map.put("ticket", rs.getDouble("TicketRev"));
+                    map.put("pass", rs.getDouble("PassRev"));
+                    list.add(map);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
     }
 }
