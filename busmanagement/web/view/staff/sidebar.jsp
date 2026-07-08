@@ -66,6 +66,15 @@
                 <i class="fas fa-bell me-2"></i>Thông báo chung
             </a>
         </li>
+
+        <c:if test="${sessionScope.USER.roleName == 'ADMIN'}">
+            <hr class="border-secondary opacity-25 mx-3 my-2">
+            <li class="nav-item mt-2">
+                <a href="${pageContext.request.contextPath}/admin/dashboard" class="btn btn-danger w-100 text-start text-white shadow-sm py-2 px-3 fw-semibold" style="transition: all 0.2s; border-radius: 0.375rem;">
+                    <i class="fas fa-user-shield me-2"></i>Về trang Admin
+                </a>
+            </li>
+        </c:if>
     </ul>
     
     <div class="position-absolute bottom-0 start-0 w-100 p-3">

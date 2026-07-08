@@ -99,6 +99,33 @@ public class TripDAO extends DBContext {
         }
         return list;
     }
+    //=====guest
+    public List<TripDTO> getRunningTripsForTracking() {
+        List<TripDTO> list = new ArrayList<>();
+        String sql = "SELECT t.TripID, r.RouteNumber, r.RouteName, b.LicensePlate AS BusPlate, "
+                + "ad.FullName AS DriverName, aa.FullName AS AssistantName, "
+                + "t.TripDate, t.StartTime, t.EndTime, t.Direction, t.Status, "
+                + "t.ActualStartTime, t.ActualEndTime "
+                + "FROM Trips t "
+                + "JOIN Routes r ON t.RouteID = r.RouteID "
+                + "JOIN Buses b ON t.BusID = b.BusID "
+                + "JOIN Accounts ad ON t.DriverID = ad.AccountID "
+                + "LEFT JOIN Accounts aa ON t.AssistantID = aa.AccountID "
+                + "WHERE t.Status = 'IN_PROGRESS'";
+
+        try (PreparedStatement ps = connection.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                try {
+                    list.add(mapRowtoDTO(rs));
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("Lỗi getRunningTripsForTracking: " + e.getMessage());
+        }
+        return list;
+    }
 
     public Trip getById(int tripID) {
         String sql = " select * from trips where TripID=?";
