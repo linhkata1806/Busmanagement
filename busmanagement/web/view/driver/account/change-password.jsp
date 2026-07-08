@@ -31,7 +31,7 @@
     <div class="container-fluid">
         <div class="row">
             <!-- Sidebar -->
-            <jsp:include page="sidebar.jsp">
+            <jsp:include page="../sidebar.jsp">
                 <jsp:param name="activeMenu" value="profile" />
             </jsp:include>
             

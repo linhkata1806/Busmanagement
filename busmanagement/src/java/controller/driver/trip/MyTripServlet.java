@@ -1,4 +1,4 @@
-package controller.driver;
+package controller.driver.trip;
 
 import dto.TripDTO;
 import jakarta.servlet.ServletException;
@@ -40,7 +40,7 @@ public class MyTripServlet extends HttpServlet {
         int unreadCount = notificationService.countUnreadNotifications(driverID);
         request.setAttribute("unreadCount", unreadCount);
 
-        request.getRequestDispatcher("/view/driver/my-trip.jsp").forward(request, response);
+        request.getRequestDispatcher("/view/driver/trip/my-trip.jsp").forward(request, response);
     }
 
     @Override

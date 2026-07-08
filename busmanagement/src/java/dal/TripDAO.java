@@ -556,6 +556,7 @@ public class TripDAO extends DBContext {
         }
         return false;
     }
+
     public int countDriverTripsToday(int driverID) {
         String sql = "SELECT COUNT(*) FROM Trips WHERE DriverID = ? AND TripDate = CAST(GETDATE() AS DATE)";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -570,6 +571,7 @@ public class TripDAO extends DBContext {
         }
         return 0;
     }
+
     // Kiểm tra xem Tài xế có đang chạy chuyến nào khác không
     public boolean isDriverCurrentlyDriving(int driverID, int excludeTripID) {
         String sql = "SELECT TOP 1 1 FROM Trips WHERE DriverID = ? AND Status = 'IN_PROGRESS' AND TripID != ?";
@@ -596,6 +598,48 @@ public class TripDAO extends DBContext {
             }
         } catch (Exception e) {
             System.out.println("Lỗi isBusCurrentlyRunning: " + e.getMessage());
+        }
+        return false;
+    }
+
+    // Kiểm tra xem Tài xế có chuyến nào ĐANG CHẠY (chưa kết thúc) không, kể cả từ hôm qua
+    public boolean hasInProgressTrip(int driverID) {
+        String sql = "SELECT COUNT(*) FROM Trips WHERE DriverID = ? AND Status = 'IN_PROGRESS'";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, driverID);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0;
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("Lỗi hasInProgressTrip: " + e.getMessage());
+        }
+        return false;
+    }
+
+    // Cập nhật trạng thái và Lưu thời gian BẮT ĐẦU thực tế
+    public boolean updateTripStatusAndStartTime(int tripID, TripStatus status) {
+        String sql = "UPDATE Trips SET Status = ?, ActualStartTime = GETDATE() WHERE TripID = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, status.name());
+            ps.setInt(2, tripID);
+            return ps.executeUpdate() > 0;
+        } catch (Exception e) {
+            System.out.println("Lỗi updateTripStatusAndStartTime: " + e.getMessage());
+        }
+        return false;
+    }
+
+    // Cập nhật trạng thái và Lưu thời gian KẾT THÚC thực tế
+    public boolean updateTripStatusAndEndTime(int tripID, TripStatus status) {
+        String sql = "UPDATE Trips SET Status = ?, ActualEndTime = GETDATE() WHERE TripID = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, status.name());
+            ps.setInt(2, tripID);
+            return ps.executeUpdate() > 0;
+        } catch (Exception e) {
+            System.out.println("Lỗi updateTripStatusAndEndTime: " + e.getMessage());
         }
         return false;
     }

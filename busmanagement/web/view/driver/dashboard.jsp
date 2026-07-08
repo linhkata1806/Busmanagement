@@ -160,12 +160,7 @@
                                                             <div><strong>Loại xe:</strong> ${currentBus.busType} (${currentBus.capacity} chỗ)</div>
                                                         </c:if>
                                                         <div><strong>Phụ xe phụ trách:</strong> ${not empty currentTrip.assistantName ? currentTrip.assistantName : 'Không có phụ xe'}</div>
-
                                                         <div><strong>Giờ chạy dự kiến:</strong> ${currentTrip.startTime} - ${currentTrip.endTime}</div>
-                                                        <c:if test="${currentTrip.status == 'IN_PROGRESS'}">
-                                                            <div class="text-danger fw-bold"><i class="fas fa-map-marker-alt me-1"></i><strong>Trạm hiện tại:</strong> ${not empty progress.currentStopName ? progress.currentStopName : 'Đang cập nhật...'}</div>
-                                                            <div class="text-primary fw-bold"><i class="fas fa-clock me-1"></i><strong>Thời gian đến trạm kế (ETA):</strong> ${not empty progress.estimatedArrival ? progress.estimatedArrival : 'Đang tính toán...'}</div>
-                                                                </c:if>
                                                         <div><strong>Ngày đi:</strong> ${currentTrip.tripDate}</div>
                                                         <div><strong>Trạng thái:</strong> 
                                                             <span class="badge ${currentTrip.status == 'IN_PROGRESS' ? 'bg-success' : 'bg-warning text-dark'} px-2.5 py-1.5 rounded">
@@ -199,7 +194,6 @@
                                                                 </button>
                                                             </c:otherwise>
                                                         </c:choose>
-
                                                         <a href="${pageContext.request.contextPath}/driver/trip/detail?id=${currentTrip.tripID}" class="btn btn-outline-secondary">
                                                             <i class="fas fa-info-circle me-2"></i>Xem lộ trình & điểm dừng
                                                         </a>

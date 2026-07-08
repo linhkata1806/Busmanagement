@@ -39,7 +39,7 @@ public class DriverTripService {
             throw new Exception("Chỉ có thể bắt đầu chuyến xe trong đúng ngày được phân công.");
         }
 
-        // 4. Validate thời gian (Khoảng thời gian cho phép: -30 phút đến +30 phút so với giờ StartTime)
+        // 4. Validate thời gian (Khoảng thời gian cho phép: -5 phút đến +30 phút so với giờ StartTime)
         LocalTime now = LocalTime.now();
         LocalTime scheduledTime = trip.getStartTime();
 
@@ -51,7 +51,6 @@ public class DriverTripService {
             throw new Exception("Chuyến xe chưa tới giờ (chỉ chạy sớm trước 5 phút), chưa thể bắt đầu.");
         } else if (minutesDifference > 30) {
             // Trễ hơn 30 phút
-            // (Tuỳ nghiệp vụ, bạn có thể gọi updateTripStatus thành CANCELLED ở đây luôn nếu muốn)
             throw new Exception("Chuyến xe đã lỡ (chỉ chạy sau giờ tối đa 30 phút), liên hệ với nhân viên.");
         }
 
@@ -64,7 +63,6 @@ public class DriverTripService {
         }
     }
 
-    // Bổ sung vào service/DriverTripService.java
     public void finishTrip(int tripID, int driverID) throws Exception {
         Trip trip = tripDAO.getById(tripID);
 

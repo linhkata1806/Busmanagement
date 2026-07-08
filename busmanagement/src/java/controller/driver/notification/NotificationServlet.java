@@ -1,4 +1,4 @@
-package controller.driver;
+package controller.driver.notification;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
@@ -36,7 +36,7 @@ public class NotificationServlet extends HttpServlet {
         request.setAttribute("notiList", notiList);
         request.setAttribute("unreadCount", unreadCount);
 
-        request.getRequestDispatcher("/view/driver/notification.jsp").forward(request, response);
+        request.getRequestDispatcher("/view/driver/notification/notification.jsp").forward(request, response);
     }
 
     @Override

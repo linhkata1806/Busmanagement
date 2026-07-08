@@ -1,4 +1,4 @@
-package controller.driver;
+package controller.driver.trip;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
@@ -9,14 +9,13 @@ import java.io.IOException;
 import model.Account;
 import service.DriverTripService;
 
-public class FinishTripServlet extends HttpServlet {
+public class StartTripServlet extends HttpServlet {
 
     private DriverTripService driverTripService;
 
     @Override
     public void init() throws ServletException {
         driverTripService = new DriverTripService();
-        // Đã bỏ TripService ở đây vì logic tìm kiếm và validate đã được chuyển hết vào DriverTripService
     }
 
     @Override
@@ -30,24 +29,23 @@ public class FinishTripServlet extends HttpServlet {
 
         Account user = (Account) session.getAttribute("USER");
         int driverID = user.getAccountID();
-
         String tripIDStr = request.getParameter("tripID");
+
+        // Bắt lỗi: Nút bị lỗi truyền href trống hoặc id trống
         if (tripIDStr == null || tripIDStr.trim().isEmpty()) {
-            session.setAttribute("error", "Thiếu mã chuyến xe.");
+            session.setAttribute("error", "Dữ liệu không hợp lệ: Thiếu mã chuyến xe. Vui lòng tải lại trang.");
             response.sendRedirect(request.getContextPath() + "/driver/dashboard");
             return;
         }
 
         try {
-            int tripID = Integer.parseInt(tripIDStr);
-
-            // Gọi Service để xử lý nghiệp vụ kết thúc chuyến xe (truyền thêm driverID để validate)
-            driverTripService.finishTrip(tripID, driverID);
-
-            session.setAttribute("successMsg", "Kết thúc chuyến đi #" + tripID + " thành công!");
+            int tripID = Integer.parseInt(tripIDStr.trim());
+            driverTripService.startTrip(tripID, driverID);
+            session.setAttribute("successMsg", "Bắt đầu chuyến đi #" + tripID + " thành công!");
+        } catch (NumberFormatException e) {
+            session.setAttribute("error", "Mã chuyến xe không đúng định dạng.");
         } catch (Exception e) {
-            // Bắt trúng các thông báo lỗi từ Service và hiển thị cho tài xế
-            e.printStackTrace(); // Giữ lại để log ra console khi debug
+            // Nơi đây sẽ bắt toàn bộ thông báo chi tiết từ Service (Sai tài xế, chưa đến giờ,...)
             session.setAttribute("error", e.getMessage());
         }
 
