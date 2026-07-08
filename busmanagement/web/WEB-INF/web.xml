@@ -73,7 +73,7 @@
         <servlet-class>controller.customer.DashboardServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>ProfileServlet</servlet-name>
+        <servlet-name>CustomerProfileServlet</servlet-name>
         <servlet-class>controller.customer.ProfileServlet</servlet-class>
     </servlet>
     <servlet>
@@ -297,6 +297,10 @@
         <servlet-class>controller.payment.VNPayReturnServlet</servlet-class>
     </servlet>
     <servlet>
+        <servlet-name>BusTrackingServlet</servlet-name>
+        <servlet-class>controller.guest.bus.BusTrackingServlet</servlet-class>
+    </servlet>
+    <servlet>
         <servlet-name>DriverPassengerCheckServlet</servlet-name>
         <servlet-class>controller.driver.trip.DriverPassengerCheckServlet</servlet-class>
     </servlet>
@@ -341,7 +345,7 @@
         <url-pattern>/customer/dashboard</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>ProfileServlet</servlet-name>
+        <servlet-name>CustomerProfileServlet</servlet-name>
         <url-pattern>/customer/profile</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
@@ -553,6 +557,10 @@
         <url-pattern>/vnpay-return</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
+        <servlet-name>BusTrackingServlet</servlet-name>
+        <url-pattern>/guest/tracking</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
         <servlet-name>DriverPassengerCheckServlet</servlet-name>
         <url-pattern>/driver/passenger-check</url-pattern>
     </servlet-mapping>
@@ -568,7 +576,7 @@
         <servlet-class>controller.admin.AccountManagementServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>ProfileServlet</servlet-name>
+        <servlet-name>AdminProfileServlet</servlet-name>
         <servlet-class>controller.admin.ProfileServlet</servlet-class>
     </servlet>
     <servlet>
@@ -588,7 +596,7 @@
         <url-pattern>/admin/accounts</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>ProfileServlet</servlet-name>
+        <servlet-name>AdminProfileServlet</servlet-name>
         <url-pattern>/admin/profile</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
