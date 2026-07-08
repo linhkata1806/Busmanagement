@@ -86,27 +86,32 @@ public class CreatePaymentServlet extends HttpServlet {
         System.out.println("passTypeID request = " + passTypeIDStr);
         int passTypeID = (passTypeIDStr != null && !passTypeIDStr.isEmpty()) ? Integer.parseInt(passTypeIDStr) : 0;
 
-        Part filePart = request.getPart("imageProof");
-        String uploadPath = request.getServletContext().getRealPath("")
-                + File.separator + "uploads"
-                + File.separator + "pass-proof";
+        String imageProofPath = "";
 
-        String imageProofPath;
+        // Chỉ vé tháng / liên tuyến mới cần ảnh minh chứng. Vé lượt không có
+        // input file này trong form nên không được gọi getPart/processAndSaveProof
+        // cho loại vé đó (nếu không sẽ luôn bị lỗi "Vui lòng tải lên ảnh minh chứng").
+        if ("thang".equals(ticketType) || "lien_chuyen".equals(ticketType)) {
+            Part filePart = request.getPart("imageProof");
+            String uploadPath = request.getServletContext().getRealPath("")
+                    + File.separator + "uploads"
+                    + File.separator + "pass-proof";
 
-        try {
-            imageProofPath = monthlyPassService.processAndSaveProof(filePart, uploadPath);
-            session.setAttribute("pending_imageProof", imageProofPath);
-        } catch (IllegalArgumentException e) {
-            request.setAttribute("errorMsg", e.getMessage());
-            request.getRequestDispatcher("/view/customer/buy-ticket.jsp")
-                    .forward(request, response);
-            return;
-        } catch (Exception e) {
-            e.printStackTrace();
-            request.setAttribute("errorMsg", "Lỗi khi tải ảnh lên.");
-            request.getRequestDispatcher("/view/customer/buy-ticket.jsp")
-                    .forward(request, response);
-            return;
+            try {
+                imageProofPath = monthlyPassService.processAndSaveProof(filePart, uploadPath);
+                session.setAttribute("pending_imageProof", imageProofPath);
+            } catch (IllegalArgumentException e) {
+                request.setAttribute("errorMsg", e.getMessage());
+                request.getRequestDispatcher("/view/customer/buy-ticket.jsp")
+                        .forward(request, response);
+                return;
+            } catch (Exception e) {
+                e.printStackTrace();
+                request.setAttribute("errorMsg", "Lỗi khi tải ảnh lên.");
+                request.getRequestDispatcher("/view/customer/buy-ticket.jsp")
+                        .forward(request, response);
+                return;
+            }
         }
         // 3. XỬ LÝ VÉ MIỄN PHÍ (0 ĐỒNG - VÍ DỤ NGƯỜI CAO TUỔI)
         // VNPay không nhận giao dịch dưới 5,000 đ nên vé 0 đ sẽ được bypass gọi thẳng DB
