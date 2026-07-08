@@ -409,8 +409,8 @@ Author     : Administrator
                             id: ${stop.stopID},
                             name: "<c:out value='${stop.stopName}'/>",
                             distance: ${stop.distanceFromStart},
-                            lat: 21.0285 + (${status.index} * 0.005) - (Math.sin(${status.index} * 0.5) * 0.003),
-                            lng: 105.8542 + (${status.index} * 0.008) + (Math.cos(${status.index} * 0.5) * 0.002)
+                            lat: ${stop.latitude},
+                            lng: ${stop.longitude}
                         }<c:if test="${!status.last}">,</c:if>
                     </c:forEach>
                 ];
@@ -424,7 +424,12 @@ Author     : Administrator
                 // 3. Vẽ lộ trình
                 const latlngs = routeStops.map(s => [s.lat, s.lng]);
                 const polyline = L.polyline(latlngs, {color: '#1a73e8', weight: 5, opacity: 0.8}).addTo(map);
-                map.fitBounds(polyline.getBounds());
+                
+                // MẸO: Trì hoãn 300ms rồi ép map render lại + fitBounds để chắc chắn thẻ DIV đã load full chiều cao/rộng
+                setTimeout(function() {
+                    map.invalidateSize();
+                    map.fitBounds(polyline.getBounds(), {padding: [30, 30]}); 
+                }, 300);
 
                 // 4. Vẽ Marker các trạm dừng
                 routeStops.forEach((stop, index) => {
@@ -450,92 +455,94 @@ Author     : Administrator
                     iconAnchor: [16, 16]
                 });
 
-                let buses = [
-                    {
-                        id: 1,
-                        plate: "29B-145.88",
-                        currentSegment: 0,
-                        progress: 0.1,
-                        speed: 40,
-                        marker: null
-                    },
-                    {
-                        id: 2,
-                        plate: "29B-289.33",
-                        currentSegment: Math.max(1, Math.floor(routeStops.length / 2)),
-                        progress: 0.3,
-                        speed: 35,
-                        marker: null
-                    }
-                ];
+                // Object lưu trữ các marker xe buýt đang hiển thị theo TripID
+                let busMarkers = {};
 
-                function updateSimulation() {
-                    buses.forEach(bus => {
-                        // Tăng tiến độ dựa trên tốc độ
-                        bus.progress += 0.015 * (bus.speed / 40);
-                        if (bus.progress >= 1.0) {
-                            bus.progress = 0;
-                            bus.currentSegment = (bus.currentSegment + 1) % (routeStops.length - 1);
-                        }
-                        
-                        const startStop = routeStops[bus.currentSegment];
-                        const endStop = routeStops[bus.currentSegment + 1];
-                        
-                        const currentLat = startStop.lat + (endStop.lat - startStop.lat) * bus.progress;
-                        const currentLng = startStop.lng + (endStop.lng - startStop.lng) * bus.progress;
-                        
-                        if (!bus.marker) {
-                            bus.marker = L.marker([currentLat, currentLng], {icon: busIcon}).addTo(map);
-                            bus.marker.bindPopup(`<b>Xe bus \${bus.plate}</b><br>Tốc độ: \${bus.speed} km/h<br>Đang di chuyển tới: \${endStop.name}`);
-                        } else {
-                            bus.marker.setLatLng([currentLat, currentLng]);
-                            bus.marker.getPopup().setContent(`<b>Xe bus \${bus.plate}</b><br>Tốc độ: \${bus.speed} km/h<br>Đang di chuyển tới: \${endStop.name}`);
-                        }
-                    });
-                    
-                    updateBusesList();
+                function fetchRealBuses() {
+                    // Gọi API lấy toàn bộ vị trí xe đang chạy
+                    fetch('${pageContext.request.contextPath}/api/bus-location')
+                        .then(response => response.json())
+                        .then(data => {
+                            // Lọc ra CHỈ NHỮNG XE thuộc tuyến hiện tại (So sánh RouteNumber)
+                            const currentRouteBuses = data.filter(bus => bus.routeNumber === '${route.routeNumber}');
+                            
+                            let activeTripIDs = [];
+                            let htmlList = '';
+
+                            currentRouteBuses.forEach(bus => {
+                                activeTripIDs.push(bus.tripID);
+
+                                // Nội dung Popup khi click vào xe (Đã thêm Số lượng khách)
+                                const popupContent = `
+                                    <div style="font-size: 14px; min-width: 160px; text-align: center;">
+                                        <b style="color: #0d47a1; font-size: 16px;"><i class="fas fa-bus me-1"></i>\${bus.licensePlate}</b><br>
+                                        <hr style="margin: 5px 0;">
+                                        <b>Khách trên xe:</b> <span style="color: #d32f2f; font-weight: bold;">\${bus.passengerCount} / \${bus.capacity}</span><br>
+                                        <b>Tới trạm tiếp theo:</b> <span style="color: #2e7d32; font-weight: bold;">\${bus.etaMinutes} phút</span>
+                                    </div>
+                                `;
+
+                                // Cập nhật vị trí Marker trên bản đồ
+                                if (busMarkers[bus.tripID]) {
+                                    // Xe đã có -> Di chuyển tới tọa độ mới
+                                    busMarkers[bus.tripID].setLatLng([bus.lat, bus.lng]);
+                                    busMarkers[bus.tripID].getPopup().setContent(popupContent);
+                                } else {
+                                    // Xe mới xuất hiện -> Tạo marker
+                                    busMarkers[bus.tripID] = L.marker([bus.lat, bus.lng], {icon: busIcon}).addTo(map);
+                                    busMarkers[bus.tripID].bindPopup(popupContent);
+                                }
+
+                                // Tạo HTML cho danh sách bên phải
+                                htmlList += `
+                                    <div class="p-3 bg-light rounded-3 border-start border-warning border-4 d-flex justify-content-between align-items-center shadow-sm mb-3" style="cursor:pointer; transition: all 0.2s;" onclick="focusBus(\${bus.tripID})">
+                                        <div>
+                                            <div class="fw-bold text-dark mb-1"><i class="fas fa-bus me-2 text-primary"></i>\${bus.licensePlate}</div>
+                                            <div class="small text-muted mb-1" style="font-size: 0.85rem;">
+                                                <i class="fas fa-users me-1"></i>Số khách: <strong>\${bus.passengerCount} / \${bus.capacity}</strong>
+                                            </div>
+                                        </div>
+                                        <div class="text-end">
+                                            <span class="badge bg-warning text-dark px-2 py-1 mb-1" style="font-size: 0.75rem;">Sắp tới</span>
+                                            <strong class="text-success d-block fs-5">\${bus.etaMinutes} phút</strong>
+                                        </div>
+                                    </div>
+                                `;
+                            });
+
+                            // Xóa các xe không còn chạy (mất tín hiệu hoặc đã kết thúc chuyến)
+                            Object.keys(busMarkers).forEach(tripID => {
+                                if (!activeTripIDs.includes(parseInt(tripID))) {
+                                    map.removeLayer(busMarkers[tripID]);
+                                    delete busMarkers[tripID];
+                                }
+                            });
+
+                            // Đổ dữ liệu vào danh sách (Nếu không có xe nào thì báo trống)
+                            const listContainer = document.getElementById('upcomingBusesList');
+                            if (listContainer) {
+                                listContainer.innerHTML = htmlList || `
+                                    <div class="text-center py-4 text-muted border rounded-3 bg-light">
+                                        <i class="fas fa-bus-slash fa-2x mb-2 opacity-50"></i>
+                                        <p class="m-0 small">Hiện không có chuyến xe nào<br>đang chạy trên tuyến này.</p>
+                                    </div>`;
+                            }
+                        })
+                        .catch(error => console.error("Lỗi fetch API xe buýt:", error));
                 }
 
-                function updateBusesList() {
-                    const listContainer = document.getElementById('upcomingBusesList');
-                    if (!listContainer) return;
-                    
-                    let html = '';
-                    buses.forEach(bus => {
-                        const nextStop = routeStops[bus.currentSegment + 1];
-                        const totalDist = nextStop.distance - routeStops[bus.currentSegment].distance;
-                        const remainingDist = Math.max(0.1, (totalDist * (1.0 - bus.progress))).toFixed(1);
-                        const eta = Math.ceil((remainingDist / bus.speed) * 60);
-                        
-                        html += `
-                            <div class="p-3 bg-light rounded-3 border-start border-warning border-4 d-flex justify-content-between align-items-center shadow-sm" style="cursor:pointer; transition: all 0.2s;" onclick="focusBus(\${bus.id})">
-                                <div>
-                                    <div class="fw-bold text-dark mb-1"><i class="fas fa-bus me-2 text-primary"></i>\${bus.plate}</div>
-                                    <div class="small text-muted mb-1" style="font-size: 0.85rem;">Trạm tiếp theo: <strong>\${nextStop.name}</strong></div>
-                                    <div class="small text-secondary" style="font-size: 0.8rem;">Cách bến: \${remainingDist} km | Tốc độ: \${bus.speed} km/h</div>
-                                </div>
-                                <div class="text-end">
-                                    <span class="badge bg-warning text-dark px-2 py-1 mb-1" style="font-size: 0.75rem;">Sắp tới</span>
-                                    <strong class="text-success d-block fs-5">\${eta} phút</strong>
-                                </div>
-                            </div>
-                        `;
-                    });
-                    listContainer.innerHTML = html;
-                }
-
-                window.focusBus = function(busId) {
-                    const bus = buses.find(b => b.id === busId);
-                    if (bus && bus.marker) {
-                        map.setView(bus.marker.getLatLng(), 15);
-                        bus.marker.openPopup();
+                // Hàm click vào danh sách thì bản đồ focus vào xe đó
+                window.focusBus = function(tripID) {
+                    if (busMarkers[tripID]) {
+                        map.setView(busMarkers[tripID].getLatLng(), 15);
+                        busMarkers[tripID].openPopup();
                     }
                 };
 
-                // Chạy vòng lặp giả lập mỗi 1 giây
-                setInterval(updateSimulation, 1000);
-                updateSimulation();
-            </script>
+                // Chạy API ngay lập tức và cài đặt tự động làm mới mỗi 5 giây
+                fetchRealBuses();
+                setInterval(fetchRealBuses, 5000);
+                </script>
         </c:if>
         
         <script>
