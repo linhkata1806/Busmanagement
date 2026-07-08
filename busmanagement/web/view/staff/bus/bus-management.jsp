@@ -28,6 +28,21 @@
                 color: #1a73e8 !important;
                 text-decoration: underline !important;
             }
+            .table-dark th {
+                padding-top: 15px !important;
+                padding-bottom: 15px !important;
+                vertical-align: middle !important;
+                font-size: 0.9rem !important;
+                font-weight: 600 !important;
+            }
+            .table tbody td {
+                padding-top: 12px !important;
+                padding-bottom: 12px !important;
+                vertical-align: middle !important;
+            }
+            .table-responsive {
+                border-radius: 0.75rem;
+            }
         </style>
     </head>
     <body>
@@ -35,12 +50,12 @@
         <div class="container-fluid">
             <div class="row">
                 <jsp:include page="/view/staff/sidebar.jsp">
-                    <jsp:param name="activeMenu" value="dashboard" />
+                    <jsp:param name="activeMenu" value="bus" />
                 </jsp:include>
 
                 <main class="col-md-9 ms-sm-auto col-lg-10 main-content">
                     <div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom">
-                        <h2 class="fw-bold text-dark m-0">Danh mục Phương tiện Xe buýt</h2>
+                        <h2 class="fw-bold m-0" style="color: #5c67f2 !important;"><i class="fas fa-bus me-2"></i>Quản lý xe buýt</h2>
                         <a href="${pageContext.request.contextPath}/staff/bus/create" class="btn btn-primary fw-semibold shadow-sm">
                             <i class="fas fa-plus-circle me-2"></i>Thêm xe mới
                         </a>
@@ -106,15 +121,15 @@
                     <div class="card border-0 shadow-sm rounded-4 bg-white overflow-hidden">
                         <div class="card-body p-0">
                             <div class="table-responsive">
-                                <table class="table table-hover align-middle mb-0">
-                                    <thead class="table-light text-uppercase small text-secondary">
+                                <table class="table table-hover table-striped align-middle mb-0">
+                                    <thead class="table-dark">
                                         <tr>
-                                            <th class="ps-4 py-3">ID</th>
+                                            <th class="ps-4">ID</th>
                                             <th>Biển số xe</th>
                                             <th>Loại phương tiện</th>
                                             <th>Sức chứa</th>
-                                            <th>Trạng thái</th>
-                                            <th class="text-center pe-4">Thao tác</th>
+                                            <th class="text-center">Trạng thái</th>
+                                            <th class="text-center">Thao tác</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -143,7 +158,7 @@
                                                             </a>
                                                         </td>
                                                         <td><i class="fas fa-users text-secondary me-2"></i>${b.capacity} chỗ</td>
-                                                        <td>
+                                                        <td class="text-center">
                                                             <c:choose>
                                                                 <c:when test="${b.status eq 'ACTIVE'}">
                                                                     <span class="badge bg-success bg-opacity-10 text-success border border-success px-2 py-1"><i class="fas fa-check-circle me-1"></i>ACTIVE</span>
@@ -156,7 +171,7 @@
                                                                 </c:otherwise>
                                                             </c:choose>
                                                         </td>
-                                                        <td class="text-center pe-4">
+                                                        <td class="text-center">
                                                             <div class="d-inline-flex gap-2">
                                                                 <a href="${pageContext.request.contextPath}/staff/bus/update?id=${b.busID}" class="btn btn-sm btn-outline-primary shadow-sm" title="Hồ sơ chi tiết">
                                                                     <i class="fas fa-edit"></i>
