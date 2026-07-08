@@ -55,13 +55,10 @@
     <jsp:include page="/common/navbar.jsp" />
 
     <div class="container my-5 flex-grow-1" style="min-height: 700px;">
-        <div class="d-flex justify-content-between align-items-center mb-4">
+        <div class="mb-4">
             <h3 class="fw-bold text-secondary m-0">
                 <i class="fas fa-history me-2 text-primary"></i>Lịch sử chuyến đi của tôi
             </h3>
-            <a href="${pageContext.request.contextPath}/customer/profile" class="btn btn-light rounded-pill px-4 fw-bold text-dark shadow-sm">
-                <i class="fas fa-arrow-left me-2"></i>Quay lại Hồ sơ
-            </a>
         </div>
 
         <div class="card history-card p-4">

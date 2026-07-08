@@ -42,7 +42,7 @@ public class VNPayReturnServlet extends HttpServlet {
             // LỖI SỐ 2: Xử lý an toàn Session
             HttpSession session = request.getSession(false);
             if (session == null) {
-                response.sendRedirect(request.getContextPath() + "/view/customer/payment-fail.jsp?error=session_expired");
+                response.sendRedirect(request.getContextPath() + "/view/customer/payment-callback.jsp?status=fail&error=session_expired");
                 return;
             }
 
@@ -54,7 +54,7 @@ public class VNPayReturnServlet extends HttpServlet {
                     // LỖI SỐ 3: Bắt lỗi NullPointer khi parse AccountID
                     Integer accountID = (Integer) session.getAttribute("pending_accountID");
                     if (accountID == null) {
-                        response.sendRedirect(request.getContextPath() + "/view/customer/payment-fail.jsp?error=account_not_found");
+                        response.sendRedirect(request.getContextPath() + "/view/customer/payment-callback.jsp?status=fail&error=account_not_found");
                         return;
                     }
 
@@ -71,20 +71,20 @@ public class VNPayReturnServlet extends HttpServlet {
                     purchaseService.processPurchase(accountID, routeId, ticketType, passTypeID, imageProof);
 
                     clearPendingSession(session);
-                    response.sendRedirect(request.getContextPath() + "/view/customer/payment-success.jsp");
+                    response.sendRedirect(request.getContextPath() + "/view/customer/payment-callback.jsp?status=success");
                     return;
                 } catch (Exception e) {
                     e.printStackTrace();
-                    response.sendRedirect(request.getContextPath() + "/view/customer/payment-fail.jsp?error=insert_failed");
+                    response.sendRedirect(request.getContextPath() + "/view/customer/payment-callback.jsp?status=fail&error=insert_failed");
                     return;
                 }
             } else {
                 clearPendingSession(session);
-                response.sendRedirect(request.getContextPath() + "/view/customer/payment-fail.jsp?error=payment_failed");
+                response.sendRedirect(request.getContextPath() + "/view/customer/payment-callback.jsp?status=fail&error=payment_failed");
                 return;
             }
         } else {
-            response.sendRedirect(request.getContextPath() + "/view/customer/payment-fail.jsp?error=invalid_signature");
+            response.sendRedirect(request.getContextPath() + "/view/customer/payment-callback.jsp?status=fail&error=invalid_signature");
             return;
         }
     }

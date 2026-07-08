@@ -29,6 +29,8 @@ public class MonthlyPassDTO {
     private int accountID;
     private String fullName;
     private String qrCodeToken;
+    private long price;
+    private String createdAt;
     private String email;
     private String phone;
 
@@ -157,4 +159,19 @@ public class MonthlyPassDTO {
         this.qrCodeToken = qrCodeToken;
     }
 
+    public long getPrice() {
+        return price;
+    }
+
+    public void setPrice(long price) {
+        this.price = price;
+    }
+
+    public String getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(String createdAt) {
+        this.createdAt = createdAt;
+    }
 }

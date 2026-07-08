@@ -71,13 +71,18 @@ public class LoginServlet extends HttpServlet {
             if (account != null) {
                 // prevent Session Fixation Attack
                 HttpSession oldSession = request.getSession(false);
+                String redirectUrl = null;
                 if (oldSession != null) {
+                    redirectUrl = (String) oldSession.getAttribute("REDIRECT_URL");
                     oldSession.invalidate();
                 }
 
                 // start a new session
                 HttpSession newSession = request.getSession(true);
                 newSession.setAttribute("USER", account);
+                if (redirectUrl != null) {
+                    newSession.setAttribute("REDIRECT_URL", redirectUrl);
+                }
 
                 String remember = request.getParameter("remember");
                 if ("on".equals(remember)) {
@@ -106,7 +111,13 @@ public class LoginServlet extends HttpServlet {
                         break;
 
                     default:
-                        response.sendRedirect(request.getContextPath() + "/home");
+                        String targetUrl = (String) newSession.getAttribute("REDIRECT_URL");
+                        if (targetUrl != null) {
+                            newSession.removeAttribute("REDIRECT_URL");
+                            response.sendRedirect(targetUrl);
+                        } else {
+                            response.sendRedirect(request.getContextPath() + "/home");
+                        }
                         break;
                 }
             } else {

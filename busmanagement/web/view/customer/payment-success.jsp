@@ -15,12 +15,30 @@
     <jsp:include page="/common/head_imports.jsp" />
     <style>
         :root {
-            --primary: #0d47a1;
-            --bg-light: #f4f6f9;
+            --primary: #1a73e8;
+            --primary-dark: #1557b0;
+            --accent: #fbbc04;
+            --bg-light: #f8f9fa;
         }
         body {
             background-color: var(--bg-light);
             font-family: 'Outfit', sans-serif;
+        }
+        .navbar {
+            background: var(--primary) !important;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        }
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.3rem;
+            color: white !important;
+        }
+        .navbar-brand span {
+            color: var(--accent);
+        }
+        .nav-link {
+            color: rgba(255,255,255,0.9) !important;
+            font-weight: 500;
         }
     </style>
 </head>

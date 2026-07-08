@@ -323,7 +323,7 @@ Author     : Administrator
                             <c:if test="${not empty stops}">
                                 <div class="card info-card p-0 overflow-hidden mb-4" style="border: 1px solid #ced4da;">
                                     <div class="bg-primary text-white p-3 d-flex justify-content-between align-items-center" style="background: linear-gradient(135deg, var(--primary) 0%, #0d47a1 100%) !important;">
-                                        <h5 class="fw-bold m-0" style="font-size: 1.05rem;"><i class="fas fa-map-marked-alt me-2"></i>Bản đồ & Giả lập xe đang chạy</h5>
+                                        <h5 class="fw-bold m-0" style="font-size: 1.05rem;"><i class="fas fa-map-marked-alt me-2"></i>Bản đồ xe đang chạy</h5>
                                         <span class="badge bg-success"><i class="fas fa-sync-alt fa-spin me-1"></i> Live</span>
                                     </div>
                                     <div id="busMap" style="height: 380px; width: 100%;"></div>

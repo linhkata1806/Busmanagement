@@ -55,8 +55,8 @@ public class BuyTicketServlet extends HttpServlet {
             int routeId = Integer.parseInt(routeIdRaw);
             // 3. Lấy thông tin tuyến xe qua Service
             Route route = routeService.getRouteById(routeId);
-            // 4. Kiểm tra xem tuyến xe có tồn tại không
-            if (route == null) {
+            // 4. Kiểm tra xem tuyến xe có tồn tại không (Vé liên tuyến không yêu cầu tuyến cụ thể)
+            if (route == null && !"lien_chuyen".equals(ticketType)) {
                 session.setAttribute("errorMsg", "Tuyến xe bạn yêu cầu không tồn tại hoặc đã dừng vận hành.");
                 response.sendRedirect(request.getContextPath() + "/route-list");
                 return;
@@ -67,12 +67,12 @@ public class BuyTicketServlet extends HttpServlet {
                     displayPrice = (long) route.getTicketPrice();
                     break;
                 case "thang":
-                    // Gọi Service tính toán dựa trên cấu trúc giảm giá của bảng MonthlyPassTypes dưới DB V2
-                    displayPrice = monthlyPassService.calculatePassPrice(routeId, 1);
+                    // Gọi Service tính toán dựa trên cấu trúc giảm giá của bảng MonthlyPassTypes dưới DB V2 (mặc định đối tượng 4 - Bình thường)
+                    displayPrice = monthlyPassService.calculatePassPrice(routeId, 4);
                     break;
                 case "lien_chuyen":
                     // Truyền null cho routeId tương ứng với vé tháng liên tuyến
-                    displayPrice = monthlyPassService.calculatePassPrice(null, 1);
+                    displayPrice = monthlyPassService.calculatePassPrice(null, 4);
                     break;
                 default:
                     displayPrice = (long) route.getTicketPrice();
@@ -105,6 +105,9 @@ public class BuyTicketServlet extends HttpServlet {
         String routeIdRaw = request.getParameter("routeId");
         String ticketType = request.getParameter("ticketType");
         String passTypeIdRaw = request.getParameter("passTypeID");
+        if (passTypeIdRaw == null || passTypeIdRaw.isEmpty()) {
+            passTypeIdRaw = request.getParameter("passTypeId");
+        }
         int passTypeID = (passTypeIdRaw != null && !passTypeIdRaw.isEmpty()) ? Integer.parseInt(passTypeIdRaw) : 1;
 
         // Validate routeId
@@ -122,13 +125,16 @@ public class BuyTicketServlet extends HttpServlet {
         String imageProof = "";
         try {
             int routeId = Integer.parseInt(routeIdRaw);
-            // 1. Lấy thông tin tuyến xe qua Service
-            Route route = routeService.getRouteById(routeId);
-            if (route == null) {
-                request.setAttribute("errorMsg", "Tuyến xe không tồn tại hoặc đã bị gỡ bỏ.");
-                reloadFormContext(request, routeIdRaw, ticketType);
-                request.getRequestDispatcher("/view/customer/buy-ticket.jsp").forward(request, response);
-                return;
+            // 1. Lấy thông tin tuyến xe qua Service (Vé liên tuyến không cần tải tuyến cụ thể)
+            Route route = null;
+            if (!"lien_chuyen".equals(ticketType)) {
+                route = routeService.getRouteById(routeId);
+                if (route == null) {
+                    request.setAttribute("errorMsg", "Tuyến xe không tồn tại hoặc đã bị gỡ bỏ.");
+                    reloadFormContext(request, routeIdRaw, ticketType);
+                    request.getRequestDispatcher("/view/customer/buy-ticket.jsp").forward(request, response);
+                    return;
+                }
             }
             // 2. Kiểm tra trùng lặp vé tháng qua Service
             if (ticketType.equals("thang") && monthlyPassService.hasPendingOrApprovedPass(user.getAccountID(), routeId)) {
@@ -144,26 +150,31 @@ public class BuyTicketServlet extends HttpServlet {
                 return;
             }
             if ("thang".equals(ticketType) || "lien_chuyen".equals(ticketType)) {
-
-                Part filePart = request.getPart("imageProof");
-
-                String uploadPath = request.getServletContext().getRealPath("")
-                        + File.separator + "uploads"
-                        + File.separator + "pass-proof";
-
-                try {
-                    imageProof = monthlyPassService.processAndSaveProof(filePart, uploadPath);
-                } catch (IllegalArgumentException e) {
-                    request.setAttribute("errorMsg", e.getMessage());
-                    reloadFormContext(request, routeIdRaw, ticketType);
-                    request.getRequestDispatcher("/view/customer/buy-ticket.jsp").forward(request, response);
-                    return;
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    request.setAttribute("errorMsg", "Lỗi upload ảnh.");
-                    reloadFormContext(request, routeIdRaw, ticketType);
-                    request.getRequestDispatcher("/view/customer/buy-ticket.jsp").forward(request, response);
-                    return;
+                String contentType = request.getContentType();
+                if (contentType != null && contentType.startsWith("multipart/form-data")) {
+                    Part filePart = request.getPart("imageProof");
+                    String uploadPath = request.getServletContext().getRealPath("")
+                            + File.separator + "uploads"
+                            + File.separator + "pass-proof";
+                    try {
+                        imageProof = monthlyPassService.processAndSaveProof(filePart, uploadPath);
+                    } catch (IllegalArgumentException e) {
+                        request.setAttribute("errorMsg", e.getMessage());
+                        reloadFormContext(request, routeIdRaw, ticketType);
+                        request.getRequestDispatcher("/view/customer/buy-ticket.jsp").forward(request, response);
+                        return;
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        request.setAttribute("errorMsg", "Lỗi upload ảnh.");
+                        reloadFormContext(request, routeIdRaw, ticketType);
+                        request.getRequestDispatcher("/view/customer/buy-ticket.jsp").forward(request, response);
+                        return;
+                    }
+                } else {
+                    imageProof = request.getParameter("imageProof");
+                    if (imageProof == null || imageProof.trim().isEmpty()) {
+                        imageProof = "";
+                    }
                 }
             }
             // 3. Tính giá vé qua Service

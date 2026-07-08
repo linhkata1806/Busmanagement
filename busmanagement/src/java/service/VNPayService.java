@@ -39,7 +39,19 @@ public class VNPayService {
         vnp_Params.put("vnp_OrderInfo", "Thanh toan ve xe bus ma GD: " + vnp_TxnRef);
         vnp_Params.put("vnp_OrderType", "other");
         vnp_Params.put("vnp_Locale", "vn");
-        vnp_Params.put("vnp_ReturnUrl", VNPayConfig.vnp_ReturnUrl);
+        
+        // Build return URL dynamically using request to match server port
+        String scheme = request.getScheme();
+        String serverName = request.getServerName();
+        int serverPort = request.getServerPort();
+        String contextPath = request.getContextPath();
+        String dynamicReturnUrl = scheme + "://" + serverName;
+        if ((scheme.equals("http") && serverPort != 80) || (scheme.equals("https") && serverPort != 443)) {
+            dynamicReturnUrl += ":" + serverPort;
+        }
+        dynamicReturnUrl += contextPath + "/vnpay-return";
+        
+        vnp_Params.put("vnp_ReturnUrl", dynamicReturnUrl);
         vnp_Params.put("vnp_IpAddr", vnp_IpAddr);
 
         Calendar cld = Calendar.getInstance(TimeZone.getTimeZone("Etc/GMT+7"));
