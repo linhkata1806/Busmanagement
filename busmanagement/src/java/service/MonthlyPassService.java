@@ -255,9 +255,26 @@ public class MonthlyPassService {
             uploadDir.mkdirs();
         }
 
-        // 7. Ghi file vào ổ cứng của Server
+        // 7. Ghi file vào ổ cứng của Server (thư mục build của Tomcat)
         String savePath = realPath + File.separator + uniqueFileName;
         filePart.write(savePath);
+
+        // Đồng thời lưu vào thư mục nguồn của project (source folder) để tránh bị Clean & Build xóa mất file
+        try {
+            String sourcePath = realPath.replace("build" + File.separator + "web", "web");
+            File sourceDir = new File(sourcePath);
+            if (!sourceDir.exists()) {
+                sourceDir.mkdirs();
+            }
+            // Sao chép file từ build sang source
+            java.nio.file.Files.copy(
+                new java.io.File(savePath).toPath(),
+                new java.io.File(sourcePath + File.separator + uniqueFileName).toPath(),
+                java.nio.file.StandardCopyOption.REPLACE_EXISTING
+            );
+        } catch (Exception ex) {
+            System.out.println("Không thể lưu file copy vào thư mục nguồn: " + ex.getMessage());
+        }
 
         // 8. Trả về đường dẫn tương đối chuẩn xác để lưu vào Database
         return "uploads/pass-proof/" + uniqueFileName;

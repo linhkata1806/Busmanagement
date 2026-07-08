@@ -38,7 +38,7 @@
             .navbar-brand span {
                 color: var(--accent);
             }
-            .nav-link {
+            .navbar-nav .nav-link {
                 color: rgba(255,255,255,0.9) !important;
                 font-weight: 500;
             }
@@ -46,14 +46,73 @@
                 border: none;
             }
 
-            .nav-pills .nav-link.active {
-                background-color: var(--primary);
+            /* Style cho Tab Pills */
+            .nav-pills-custom {
+                background: #ffffff;
+                border-radius: 12px;
+                padding: 6px;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.05);
             }
-            .ticket-card {
-                transition: transform 0.2s;
+            .nav-pills-custom .nav-item .nav-link {
+                color: #5f6368 !important;
+                font-weight: 600;
+                padding: 10px 24px;
+                border-radius: 8px;
+                transition: all 0.3s ease;
+                background: transparent !important;
             }
-            .ticket-card:hover {
-                transform: translateY(-3px);
+            .nav-pills-custom .nav-item .nav-link.active {
+                background: linear-gradient(135deg, #1a73e8 0%, #0d47a1 100%) !important;
+                color: #ffffff !important;
+                box-shadow: 0 4px 10px rgba(26, 115, 232, 0.3);
+            }
+            .nav-pills-custom .nav-item .nav-link:hover:not(.active) {
+                background-color: #f1f3f4 !important;
+                color: #1a73e8 !important;
+            }
+
+            /* Custom ticket voucher card */
+            .ticket-card-custom {
+                background: #ffffff;
+                border-radius: 16px;
+                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+                border: 1px solid #e8eaed;
+                overflow: hidden;
+                position: relative;
+                transition: all 0.3s ease;
+            }
+            .ticket-card-custom:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+                border-color: #1a73e8;
+            }
+            .ticket-card-header {
+                background: #f8f9fa;
+                padding: 16px 20px;
+                border-bottom: 1px dashed #dee2e6;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+            .ticket-card-body {
+                padding: 20px;
+            }
+            /* Răng cưa hai bên hông vé */
+            .ticket-card-custom::before, .ticket-card-custom::after {
+                content: '';
+                position: absolute;
+                top: 48px;
+                width: 12px;
+                height: 12px;
+                background-color: var(--bg-light);
+                border-radius: 50%;
+                z-index: 2;
+            }
+            .ticket-card-custom::before {
+                left: -6px;
+            }
+            .ticket-card-custom::after {
+                right: -6px;
             }
             /* ===== FOOTER ===== */
             footer {
@@ -84,7 +143,7 @@
                 </h3>
             </div>
 
-            <ul class="nav nav-pills mb-4 shadow-sm bg-white p-2 rounded-3">
+            <ul class="nav nav-pills nav-pills-custom mb-4">
                 <li class="nav-item">
                     <a class="nav-link fw-bold py-2.5 px-4 ${activeTab eq 'ticket' ? 'active' : ''}" 
                        href="?tab=ticket">
@@ -116,18 +175,28 @@
                             <c:otherwise>
                                 <c:forEach var="t" items="${ticketList}">
                                     <div class="col-md-4">
-                                        <div class="card h-100 border-0 shadow-sm rounded-3 ticket-card">
-                                            <div class="card-body">
-                                                <div class="d-flex justify-content-between align-items-center mb-3">
-                                                    <span class="badge bg-primary fs-6 fw-bold">${t.ticketCode}</span>
-                                                    <span class="badge ${t.status == 'UNUSED' ? 'bg-success' : 'bg-secondary'}">${t.status}</span>
-                                                </div>
+                                        <div class="ticket-card-custom h-100">
+                                            <div class="ticket-card-header">
+                                                <span class="badge bg-primary-subtle text-primary border border-primary border-opacity-25 fs-7 fw-bold">${t.ticketCode}</span>
+                                                <c:choose>
+                                                    <c:when test="${t.status == 'UNUSED'}">
+                                                        <span class="badge bg-success-subtle text-success border border-success border-opacity-25"><i class="fas fa-check-circle me-1"></i>Chưa dùng</span>
+                                                    </c:when>
+                                                    <c:when test="${t.status == 'COMPLETED'}">
+                                                        <span class="badge bg-secondary-subtle text-secondary"><i class="fas fa-history me-1"></i>Đã sử dụng</span>
+                                                    </c:when>
+                                                    <c:otherwise>
+                                                        <span class="badge bg-danger-subtle text-danger"><i class="fas fa-exclamation-circle me-1"></i>${t.status}</span>
+                                                    </c:otherwise>
+                                                </c:choose>
+                                            </div>
+                                            <div class="ticket-card-body">
                                                 <h5 class="fw-bold text-dark mb-1">Tuyến ${t.routeNumber}</h5>
-                                                <p class="text-muted small mb-3 text-truncate">${t.routeName}</p>
+                                                <p class="text-muted small mb-3 text-truncate" title="${t.routeName}">${t.routeName}</p>
                                                 <hr class="text-muted opacity-25 my-2">
-                                                <div class="d-flex justify-content-between align-items-center text-secondary small">
+                                                <div class="d-flex justify-content-between align-items-center text-secondary small mt-3">
                                                     <span>Giá vé: <strong class="text-success"><fmt:formatNumber value="${t.price}" pattern="#,###"/> đ</strong></span>
-                                                    <button class="btn btn-sm btn-outline-primary py-0.5 px-2 rounded-2" 
+                                                    <button class="btn btn-sm btn-outline-primary py-1.5 px-3 rounded-pill fw-semibold" 
                                                             onclick="showTicketQR('${t.ticketCode}', '${t.routeNumber}', '${t.status}')">
                                                         <i class="fas fa-qrcode me-1"></i>Xem QR
                                                     </button>
@@ -158,30 +227,48 @@
                             <c:otherwise>
                                 <c:forEach var="mp" items="${routePassList}">
                                     <div class="col-md-4">
-                                        <div class="card h-100 border-0 shadow-sm border-start border-primary border-4 rounded-3 ticket-card">
-                                            <div class="card-body">
-                                                <div class="d-flex justify-content-between align-items-center mb-3">
-                                                    <span class="fw-bold text-primary fs-6"><i class="fas fa-barcode me-1"></i>${mp.passCode}</span>
-                                                    <span class="badge ${mp.status == 'APPROVED' ? 'bg-success' : (mp.status == 'PENDING' ? 'bg-warning text-dark' : 'bg-danger')}">${mp.status}</span>
-                                                </div>
+                                        <div class="ticket-card-custom h-100">
+                                            <div class="ticket-card-header" style="border-bottom-color: #dee2e6;">
+                                                <span class="fw-bold text-primary fs-7"><i class="fas fa-id-card me-1"></i>${mp.passCode}</span>
+                                                <c:choose>
+                                                    <c:when test="${mp.status == 'APPROVED'}">
+                                                        <span class="badge bg-success-subtle text-success border border-success border-opacity-25"><i class="fas fa-check-circle me-1"></i>Đã duyệt</span>
+                                                    </c:when>
+                                                    <c:when test="${mp.status == 'PENDING'}">
+                                                        <span class="badge bg-warning-subtle text-warning border border-warning border-opacity-25"><i class="fas fa-clock me-1"></i>Chờ duyệt</span>
+                                                    </c:when>
+                                                    <c:otherwise>
+                                                        <span class="badge bg-danger-subtle text-danger"><i class="fas fa-times-circle me-1"></i>Từ chối</span>
+                                                    </c:otherwise>
+                                                </c:choose>
+                                            </div>
+                                            <div class="ticket-card-body">
                                                 <h6 class="text-dark fw-bold mb-1">Tuyến áp dụng: ${mp.routeNumber}</h6>
-                                                <p class="small text-muted text-truncate mb-3">${mp.routeName}</p>
-                                                <div class="bg-light p-2 rounded-2 small text-secondary">
-                                                    <div class="mb-1"><strong>Đối tượng:</strong> <span class="text-dark">${mp.typeName}</span></div>
-                                                    <div><strong>Hiệu lực:</strong> <span class="text-dark">${mp.startDate} đến ${mp.endDate}</span></div>             
-                                                </div>
-                                                <c:if test="${not empty mp.imageProof}">
-                                                    <button class="btn btn-sm btn-outline-info w-100 mt-2 fw-semibold" 
-                                                            onclick="showProofImage('${pageContext.request.contextPath}/${mp.imageProof}')">
-                                                        <i class="fas fa-image me-1"></i>Ảnh giấy tờ đã nộp
-                                                    </button>
-                                                </c:if>
-                                                <c:if test="${mp.status == 'APPROVED' && not empty mp.qrCodeToken}">
-                                                    <div class="mt-2 text-primary fw-semibold small bg-primary bg-opacity-10 p-2 rounded-2 border border-primary border-opacity-25 text-center">
-                                                        <i class="fas fa-qrcode me-1"></i>Token soát vé:<br>
-                                                        <strong class="text-dark" style="font-size: 0.7rem; letter-spacing: 0.5px; word-break: break-all;">${mp.qrCodeToken}</strong>
+                                                <p class="small text-muted text-truncate mb-3" title="${mp.routeName}">${mp.routeName}</p>
+                                                <div class="bg-light p-3 rounded-3 small text-secondary mb-3">
+                                                    <div class="mb-2 d-flex justify-content-between">
+                                                        <span>Đối tượng:</span>
+                                                        <strong class="text-dark">${mp.typeName}</strong>
                                                     </div>
-                                                </c:if>
+                                                    <div class="d-flex justify-content-between">
+                                                        <span>Hiệu lực:</span>
+                                                        <strong class="text-dark">${mp.startDate} đến ${mp.endDate}</strong>
+                                                    </div>             
+                                                </div>
+                                                <div class="d-flex flex-column gap-2">
+                                                    <c:if test="${not empty mp.imageProof}">
+                                                        <button class="btn btn-sm btn-outline-secondary w-100 fw-semibold rounded-pill" 
+                                                                onclick="showProofImage('${pageContext.request.contextPath}/${mp.imageProof}')">
+                                                            <i class="fas fa-image me-1"></i>Ảnh giấy tờ đã nộp
+                                                        </button>
+                                                    </c:if>
+                                                    <c:if test="${mp.status == 'APPROVED' && not empty mp.qrCodeToken}">
+                                                        <div class="mt-1 text-primary fw-semibold small bg-primary bg-opacity-10 p-2 rounded-2 border border-primary border-opacity-25 text-center">
+                                                            <i class="fas fa-qrcode me-1"></i>Token soát vé:<br>
+                                                            <strong class="text-dark" style="font-size: 0.7rem; letter-spacing: 0.5px; word-break: break-all;">${mp.qrCodeToken}</strong>
+                                                        </div>
+                                                    </c:if>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -205,20 +292,36 @@
                             <c:otherwise>
                                 <c:forEach var="amp" items="${allRoutePassList}">
                                     <div class="col-md-4">
-                                        <div class="card h-100 border-0 shadow-sm border-start border-success border-4 rounded-3 ticket-card">
-                                            <div class="card-body">
-                                                <div class="d-flex justify-content-between align-items-center mb-3">
-                                                    <span class="fw-bold text-success fs-6"><i class="fas fa-globe me-1"></i>${amp.passCode}</span>
-                                                    <span class="badge ${amp.status == 'APPROVED' ? 'bg-success' : (amp.status == 'PENDING' ? 'bg-warning text-dark' : 'bg-danger')}">${amp.status}</span>
-                                                </div>
-                                                <h5 class="text-success fw-bold mb-1"><i class="fas fa-bus me-1"></i>Toàn mạng lưới</h5>
-                                                <p class="small text-muted mb-3">Áp dụng cho mọi tuyến thuộc hệ thống kết nối Bus Hà Nội</p>
-                                                <div class="bg-light p-2 rounded-2 small text-secondary">
-                                                    <div class="mb-1"><strong>Đối tượng ưu đãi:</strong> <span class="text-dark">${amp.typeName}</span></div>
-                                                    <div><strong>Hiệu lực:</strong> <span class="text-dark">${amp.startDate} đến ${amp.endDate}</span></div>
+                                        <div class="ticket-card-custom h-100">
+                                            <div class="ticket-card-header" style="border-bottom-color: #dee2e6;">
+                                                <span class="fw-bold text-success fs-7"><i class="fas fa-globe me-1"></i>${amp.passCode}</span>
+                                                <c:choose>
+                                                    <c:when test="${amp.status == 'APPROVED'}">
+                                                        <span class="badge bg-success-subtle text-success border border-success border-opacity-25"><i class="fas fa-check-circle me-1"></i>Đã duyệt</span>
+                                                    </c:when>
+                                                    <c:when test="${amp.status == 'PENDING'}">
+                                                        <span class="badge bg-warning-subtle text-warning border border-warning border-opacity-25"><i class="fas fa-clock me-1"></i>Chờ duyệt</span>
+                                                    </c:when>
+                                                    <c:otherwise>
+                                                        <span class="badge bg-danger-subtle text-danger"><i class="fas fa-times-circle me-1"></i>Từ chối</span>
+                                                    </c:otherwise>
+                                                </c:choose>
+                                            </div>
+                                            <div class="ticket-card-body">
+                                                <h5 class="text-success fw-bold mb-1"><i class="fas fa-bus me-1"></i>Vé liên tuyến</h5>
+                                                <p class="small text-muted mb-3">Toàn bộ mạng lưới xe bus nội đô Hà Nội</p>
+                                                <div class="bg-light p-3 rounded-3 small text-secondary mb-3">
+                                                    <div class="mb-2 d-flex justify-content-between">
+                                                        <span>Đối tượng:</span>
+                                                        <strong class="text-dark">${amp.typeName}</strong>
+                                                    </div>
+                                                    <div class="d-flex justify-content-between">
+                                                        <span>Hiệu lực:</span>
+                                                        <strong class="text-dark">${amp.startDate} đến ${amp.endDate}</strong>
+                                                    </div>
                                                 </div>
                                                 <c:if test="${amp.status == 'APPROVED' && not empty amp.qrCodeToken}">
-                                                    <div class="mt-2 text-success fw-semibold small bg-success bg-opacity-10 p-2 rounded-2 border border-success border-opacity-25 text-center">
+                                                    <div class="mt-1 text-success fw-semibold small bg-success bg-opacity-10 p-2 rounded-2 border border-success border-opacity-25 text-center">
                                                         <i class="fas fa-qrcode me-1"></i>Token soát vé:<br>
                                                         <strong class="text-dark" style="font-size: 0.7rem; letter-spacing: 0.5px; word-break: break-all;">${amp.qrCodeToken}</strong>
                                                     </div>
@@ -283,22 +386,56 @@
         </script>
         <div class="modal fade" id="customerProofModal" tabindex="-1" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content border-0 shadow">
-                    <div class="modal-header">
+                <div class="modal-content border-0 shadow rounded-4 overflow-hidden">
+                    <div class="modal-header border-0 pb-0">
                         <h5 class="modal-title fw-bold text-secondary">Giấy tờ chứng minh đã nộp</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
-                    <div class="modal-body text-center p-0 bg-dark">
-                        <img id="customerModalImg" src="" class="img-fluid w-100" style="max-height: 70vh; object-fit: contain;">
+                    <div class="modal-body text-center p-3 bg-light">
+                        <img id="customerModalImg" src="" class="img-fluid rounded shadow-sm w-100 mb-3" style="max-height: 55vh; object-fit: contain;" onerror="handleImageError(this)">
+                        
+                        <div id="imageErrorMsg" class="alert alert-warning d-none text-start small mb-3">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            <strong>Lưu ý:</strong> Tệp ảnh minh chứng của vé này không tồn tại trên máy chủ (có thể đã bị xóa khi Clean & Build).
+                        </div>
+                        
+                        <c:set var="avatarUrl" value="${sessionScope.USER.avatar}" />
+                        <c:if test="${not empty avatarUrl}">
+                            <c:if test="${not avatarUrl.startsWith('http')}">
+                                <c:set var="avatarUrl" value="${pageContext.request.contextPath}/${avatarUrl}" />
+                            </c:if>
+                            <div class="border-top pt-3 text-start">
+                                <span class="d-block small text-muted mb-1"><i class="fas fa-info-circle me-1"></i>Sử dụng giấy tờ đã tải lên ở mục hồ sơ cá nhân trước đó:</span>
+                                <a id="profileAvatarLink" href="${avatarUrl}" target="_blank" class="btn btn-sm btn-outline-primary fw-semibold rounded-pill px-3 mt-1">
+                                    <i class="fas fa-external-link-alt me-1"></i>Xem ảnh từ Hồ sơ cá nhân
+                                </a>
+                            </div>
+                        </c:if>
                     </div>
                 </div>
             </div>
         </div>
         <script>
             function showProofImage(imgUrl) {
-                document.getElementById('customerModalImg').src = imgUrl;
+                let cleanUrl = imgUrl;
+                // Nếu là chuỗi Base64 gửi kèm context path dư thừa, cắt bỏ để chạy chính xác
+                if (imgUrl.includes('data:image/')) {
+                    cleanUrl = imgUrl.substring(imgUrl.indexOf('data:image/'));
+                }
+                
+                // Ẩn thông báo lỗi trước đó
+                document.getElementById('imageErrorMsg').classList.add('d-none');
+                
+                document.getElementById('customerModalImg').src = cleanUrl;
                 var proofModal = new bootstrap.Modal(document.getElementById('customerProofModal'));
                 proofModal.show();
+            }
+
+            function handleImageError(imgElement) {
+                // Hiển thị hộp thông báo lỗi chi tiết
+                document.getElementById('imageErrorMsg').classList.remove('d-none');
+                // Gán ảnh placeholder để UI gọn gàng, tránh vỡ khung hình
+                imgElement.src = "https://placehold.co/600x400/e9ecef/495057?text=Anh+Minh+Chung+Khong+Ton+Tai";
             }
         </script>
         <!-- ===== FOOTER ===== -->
