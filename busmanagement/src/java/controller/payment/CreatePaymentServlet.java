@@ -15,7 +15,9 @@ import jakarta.servlet.http.Part;
 import java.io.File;
 import java.util.Enumeration;
 import model.Account;
+import model.Route;
 import service.MonthlyPassService;
+import service.RouteService;
 import service.PurchaseService;
 import service.VNPayService;
 
@@ -91,22 +93,28 @@ public class CreatePaymentServlet extends HttpServlet {
                 + File.separator + "uploads"
                 + File.separator + "pass-proof";
 
-        String imageProofPath;
+        String imageProofPath = null;
 
-        try {
-            imageProofPath = monthlyPassService.processAndSaveProof(filePart, uploadPath);
-            session.setAttribute("pending_imageProof", imageProofPath);
-        } catch (IllegalArgumentException e) {
-            request.setAttribute("errorMsg", e.getMessage());
-            request.getRequestDispatcher("/view/customer/buy-ticket.jsp")
-                    .forward(request, response);
-            return;
-        } catch (Exception e) {
-            e.printStackTrace();
-            request.setAttribute("errorMsg", "Lỗi khi tải ảnh lên.");
-            request.getRequestDispatcher("/view/customer/buy-ticket.jsp")
-                    .forward(request, response);
-            return;
+        if ("thang".equals(ticketType) || "lien_chuyen".equals(ticketType)) {
+            try {
+                imageProofPath = monthlyPassService.processAndSaveProof(filePart, uploadPath);
+                session.setAttribute("pending_imageProof", imageProofPath);
+            } catch (IllegalArgumentException e) {
+                request.setAttribute("errorMsg", e.getMessage());
+                reloadFormContext(request, routeIdStr, ticketType);
+                request.getRequestDispatcher("/view/customer/buy-ticket.jsp")
+                        .forward(request, response);
+                return;
+            } catch (Exception e) {
+                e.printStackTrace();
+                request.setAttribute("errorMsg", "Lỗi khi tải ảnh lên.");
+                reloadFormContext(request, routeIdStr, ticketType);
+                request.getRequestDispatcher("/view/customer/buy-ticket.jsp")
+                        .forward(request, response);
+                return;
+            }
+        } else {
+            session.setAttribute("pending_imageProof", null);
         }
         // 3. XỬ LÝ VÉ MIỄN PHÍ (0 ĐỒNG - VÍ DỤ NGƯỜI CAO TUỔI)
         // VNPay không nhận giao dịch dưới 5,000 đ nên vé 0 đ sẽ được bypass gọi thẳng DB
@@ -150,5 +158,16 @@ public class CreatePaymentServlet extends HttpServlet {
         // 5. Gọi VNPayService để lấy link và Redirect sang cổng thanh toán
         String paymentUrl = vnpayService.createPaymentURL(request, vnp_Amount, vnp_TxnRef);
         response.sendRedirect(paymentUrl);
+    }
+
+    private void reloadFormContext(HttpServletRequest request, String routeIdStr, String ticketType) {
+        try {
+            int routeId = (routeIdStr != null && !routeIdStr.isEmpty() && !routeIdStr.equals("0")) ? Integer.parseInt(routeIdStr) : 0;
+            RouteService routeService = new RouteService();
+            request.setAttribute("route", routeService.getRouteById(routeId));
+            request.setAttribute("ticketType", ticketType);
+            request.setAttribute("currentDate", new java.util.Date());
+        } catch (Exception ignored) {
+        }
     }
 }

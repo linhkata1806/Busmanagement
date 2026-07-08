@@ -80,6 +80,7 @@
                 overflow: hidden;
                 position: relative;
                 transition: all 0.3s ease;
+                cursor: pointer;
             }
             .ticket-card-custom:hover {
                 transform: translateY(-5px);
@@ -227,7 +228,7 @@
                             <c:otherwise>
                                 <c:forEach var="mp" items="${routePassList}">
                                     <div class="col-md-4">
-                                        <div class="ticket-card-custom h-100">
+                                        <div class="ticket-card-custom h-100" onclick="showPassDetails('${mp.passCode}', '${mp.routeName != null ? mp.routeName : 'Tuyến cố định'}', '${mp.createdAt}', '${mp.typeName}', 'Hà Nội', 'Vé tháng', '${mp.routeName != null ? 'Vé tháng tuyến cố định' : 'Vé tháng liên tuyến'}', '1 chu kỳ (30 ngày)', 'Xe buýt', '${mp.routeNumber != null ? 'Đơn tuyến' : 'Liên tuyến'}', '${mp.startDate} đến ${mp.endDate}', '${pageContext.request.contextPath}/${mp.imageProof}', 'Cổng thanh toán điện tử VNPAY', 'Miễn phí', '${mp.price}')">
                                             <div class="ticket-card-header" style="border-bottom-color: #dee2e6;">
                                                 <span class="fw-bold text-primary fs-7"><i class="fas fa-id-card me-1"></i>${mp.passCode}</span>
                                                 <c:choose>
@@ -244,7 +245,6 @@
                                             </div>
                                             <div class="ticket-card-body">
                                                 <h6 class="text-dark fw-bold mb-1">Tuyến áp dụng: ${mp.routeNumber}</h6>
-<<<<<<< HEAD
                                                 <p class="small text-muted text-truncate mb-3">${mp.routeName}</p>
                                                 <div class="bg-light p-2 rounded-2 small text-secondary">
                                                     <div class="mb-1"><strong>Đối tượng:</strong> <span class="text-dark">${mp.typeName}</span></div>
@@ -252,43 +252,16 @@
                                                 </div>
                                                 <c:if test="${not empty mp.imageProof}">
                                                     <button class="btn btn-sm btn-outline-info w-100 mt-2 fw-semibold" 
-                                                            onclick="showProofImage('${pageContext.request.contextPath}/${mp.imageProof}')">
+                                                            onclick="event.stopPropagation(); showProofImage('${pageContext.request.contextPath}/${mp.imageProof}')">
                                                         <i class="fas fa-image me-1"></i>Ảnh giấy tờ đã nộp
                                                     </button>
                                                 </c:if>
                                                 <c:if test="${(mp.status == 'APPROVED' or mp.status == 'EXPIRED') and not empty mp.qrCodeToken}">
                                                     <button class="btn btn-sm btn-outline-success w-100 mt-2 fw-semibold" 
-                                                            onclick="showQRCode('${mp.qrCodeToken}', '${mp.status}')">
+                                                            onclick="event.stopPropagation(); showQRCode('${mp.qrCodeToken}', '${mp.status}')">
                                                         <i class="fas fa-qrcode me-1"></i>Mã QR Check-in
                                                     </button>
                                                 </c:if>
-=======
-                                                <p class="small text-muted text-truncate mb-3" title="${mp.routeName}">${mp.routeName}</p>
-                                                <div class="bg-light p-3 rounded-3 small text-secondary mb-3">
-                                                    <div class="mb-2 d-flex justify-content-between">
-                                                        <span>Đối tượng:</span>
-                                                        <strong class="text-dark">${mp.typeName}</strong>
-                                                    </div>
-                                                    <div class="d-flex justify-content-between">
-                                                        <span>Hiệu lực:</span>
-                                                        <strong class="text-dark">${mp.startDate} đến ${mp.endDate}</strong>
-                                                    </div>             
-                                                </div>
-                                                <div class="d-flex flex-column gap-2">
-                                                    <c:if test="${not empty mp.imageProof}">
-                                                        <button class="btn btn-sm btn-outline-secondary w-100 fw-semibold rounded-pill" 
-                                                                onclick="showProofImage('${pageContext.request.contextPath}/${mp.imageProof}')">
-                                                            <i class="fas fa-image me-1"></i>Ảnh giấy tờ đã nộp
-                                                        </button>
-                                                    </c:if>
-                                                    <c:if test="${mp.status == 'APPROVED' && not empty mp.qrCodeToken}">
-                                                        <div class="mt-1 text-primary fw-semibold small bg-primary bg-opacity-10 p-2 rounded-2 border border-primary border-opacity-25 text-center">
-                                                            <i class="fas fa-qrcode me-1"></i>Token soát vé:<br>
-                                                            <strong class="text-dark" style="font-size: 0.7rem; letter-spacing: 0.5px; word-break: break-all;">${mp.qrCodeToken}</strong>
-                                                        </div>
-                                                    </c:if>
-                                                </div>
->>>>>>> ffd2518946857c03765639a0b3387d3a48d1fd3d
                                             </div>
                                         </div>
                                     </div>
@@ -312,7 +285,7 @@
                             <c:otherwise>
                                 <c:forEach var="amp" items="${allRoutePassList}">
                                     <div class="col-md-4">
-                                        <div class="ticket-card-custom h-100">
+                                        <div class="ticket-card-custom h-100" onclick="showPassDetails('${amp.passCode}', 'Toàn mạng lưới xe buýt', '${amp.createdAt}', '${amp.typeName}', 'Hà Nội', 'Vé tháng', 'Vé tháng liên tuyến', '1 chu kỳ (30 ngày)', 'Xe buýt', 'Liên tuyến', '${amp.startDate} đến ${amp.endDate}', '${pageContext.request.contextPath}/${amp.imageProof}', 'Cổng thanh toán điện tử VNPAY', 'Miễn phí', '${amp.price}')">
                                             <div class="ticket-card-header" style="border-bottom-color: #dee2e6;">
                                                 <span class="fw-bold text-success fs-7"><i class="fas fa-globe me-1"></i>${amp.passCode}</span>
                                                 <c:choose>
@@ -341,12 +314,17 @@
                                                     </div>
                                                 </div>
 
+                                                <c:if test="${not empty amp.imageProof}">
+                                                    <button class="btn btn-sm btn-outline-info w-100 mt-2 fw-semibold mb-2" 
+                                                            onclick="event.stopPropagation(); showProofImage('${pageContext.request.contextPath}/${amp.imageProof}')">
+                                                        <i class="fas fa-image me-1"></i>Ảnh giấy tờ đã nộp
+                                                    </button>
+                                                </c:if>
                                                 <c:if test="${(amp.status == 'APPROVED' or amp.status == 'EXPIRED') and not empty amp.qrCodeToken}">
                                                     <button class="btn btn-sm btn-outline-success w-100 mt-2 fw-semibold" 
-                                                            onclick="showQRCode('${amp.qrCodeToken}', '${amp.status}')">
+                                                            onclick="event.stopPropagation(); showQRCode('${amp.qrCodeToken}', '${amp.status}')">
                                                         <i class="fas fa-qrcode me-1"></i>Mã QR Check-in
                                                     </button>
-
                                                 </c:if>
                                             </div>
                                         </div>
@@ -496,6 +474,151 @@
 
                 var qrModal = new bootstrap.Modal(document.getElementById('qrCodeModal'));
                 qrModal.show();
+            }
+        </script>
+
+        <!-- Modal chi tiết đăng ký vé tháng -->
+        <div class="modal fade" id="passDetailsModal" tabindex="-1" aria-labelledby="passDetailsModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-lg">
+                <div class="modal-content border-0 shadow rounded-4 overflow-hidden">
+                    <div class="modal-header bg-primary text-white border-0 py-3">
+                        <h5 class="modal-title fw-bold" id="passDetailsModalLabel">
+                            <i class="fas fa-info-circle me-2"></i>Chi tiết đăng ký vé tháng
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body p-4 bg-light">
+                        <div class="row g-4">
+                            <!-- Cột trái: Thông tin chi tiết -->
+                            <div class="col-md-7">
+                                <div class="card border-0 shadow-sm rounded-3 p-3 bg-white h-100">
+                                    <h6 class="fw-bold text-primary border-bottom pb-2 mb-3">
+                                        <i class="fas fa-id-card me-2"></i>Thông tin đăng ký thẻ
+                                    </h6>
+                                    <div class="d-flex flex-column gap-2 small">
+                                        <div class="d-flex justify-content-between border-bottom pb-2">
+                                            <span class="text-muted">Mã đăng ký:</span>
+                                            <strong class="text-dark" id="detailPassCode"></strong>
+                                        </div>
+                                        <div class="d-flex justify-content-between border-bottom pb-2">
+                                            <span class="text-muted">Mã đơn hàng:</span>
+                                            <strong class="text-dark" id="detailOrderCode"></strong>
+                                        </div>
+                                        <div class="d-flex justify-content-between border-bottom pb-2">
+                                            <span class="text-muted">Tên vé:</span>
+                                            <strong class="text-dark" id="detailTicketName"></strong>
+                                        </div>
+                                        <div class="d-flex justify-content-between border-bottom pb-2">
+                                            <span class="text-muted">Thời gian tạo:</span>
+                                            <strong class="text-dark" id="detailCreatedAt"></strong>
+                                        </div>
+                                        <div class="d-flex justify-content-between border-bottom pb-2">
+                                            <span class="text-muted">Đối tượng:</span>
+                                            <strong class="text-dark" id="detailTypeName"></strong>
+                                        </div>
+                                        <div class="d-flex justify-content-between border-bottom pb-2">
+                                            <span class="text-muted">Địa chỉ:</span>
+                                            <strong class="text-dark" id="detailAddress"></strong>
+                                        </div>
+                                        <div class="d-flex justify-content-between border-bottom pb-2">
+                                            <span class="text-muted">Loại thẻ:</span>
+                                            <strong class="text-dark" id="detailCardType"></strong>
+                                        </div>
+                                        <div class="d-flex justify-content-between border-bottom pb-2">
+                                            <span class="text-muted">Số chu kỳ:</span>
+                                            <strong class="text-dark" id="detailCycle"></strong>
+                                        </div>
+                                        <div class="d-flex justify-content-between border-bottom pb-2">
+                                            <span class="text-muted">Loại hình phương tiện:</span>
+                                            <strong class="text-dark" id="detailVehicleType"></strong>
+                                        </div>
+                                        <div class="d-flex justify-content-between border-bottom pb-2">
+                                            <span class="text-muted">Loại tuyến:</span>
+                                            <strong class="text-dark" id="detailRouteType"></strong>
+                                        </div>
+                                        <div class="d-flex justify-content-between border-bottom pb-2">
+                                            <span class="text-muted">Thời gian sử dụng:</span>
+                                            <strong class="text-dark" id="detailValidity"></strong>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Cột phải: Thanh toán và Ảnh minh chứng -->
+                            <div class="col-md-5">
+                                <div class="d-flex flex-column gap-3 h-100">
+                                    <!-- Block thanh toán -->
+                                    <div class="card border-0 shadow-sm rounded-3 p-3 bg-white">
+                                        <h6 class="fw-bold text-success border-bottom pb-2 mb-3">
+                                            <i class="fas fa-wallet me-2"></i>Thanh toán
+                                        </h6>
+                                        <div class="d-flex flex-column gap-2 small">
+                                            <div class="d-flex justify-content-between">
+                                                <span class="text-muted">Phương thức:</span>
+                                                <strong class="text-dark" id="detailPaymentMethod"></strong>
+                                            </div>
+                                            <div class="d-flex justify-content-between">
+                                                <span class="text-muted">Phí phát hành thẻ:</span>
+                                                <strong class="text-success" id="detailIssuanceFee"></strong>
+                                            </div>
+                                            <div class="d-flex justify-content-between border-top pt-2">
+                                                <span class="text-muted fw-bold">Phí mua vé:</span>
+                                                <strong class="text-danger fs-5" id="detailPrice"></strong>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Block ảnh minh chứng -->
+                                    <div class="card border-0 shadow-sm rounded-3 p-3 bg-white flex-grow-1 text-center">
+                                        <h6 class="fw-bold text-secondary border-bottom pb-2 mb-3 text-start">
+                                            <i class="fas fa-image me-2"></i>Ảnh đăng ký
+                                        </h6>
+                                        <div class="bg-light p-2 rounded border" style="min-height: 120px; display: flex; align-items: center; justify-content: center;">
+                                            <img id="detailImageProof" src="" class="img-fluid rounded" style="max-height: 180px; object-fit: contain; width: 100%;" onerror="this.src='https://placehold.co/300x200/e9ecef/495057?text=Khong+co+anh+minh+chung'">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            function showPassDetails(passCode, ticketName, createdAt, typeName, address, cardType, ticketTypeName, cycle, vehicleType, routeType, validity, imgUrl, paymentMethod, issuanceFee, price) {
+                document.getElementById('detailPassCode').innerText = passCode;
+                document.getElementById('detailOrderCode').innerText = passCode;
+                document.getElementById('detailTicketName').innerText = ticketName;
+                document.getElementById('detailCreatedAt').innerText = createdAt || 'Chưa cập nhật';
+                document.getElementById('detailTypeName').innerText = typeName;
+                document.getElementById('detailAddress').innerText = address;
+                document.getElementById('detailCardType').innerText = cardType;
+                document.getElementById('detailCycle').innerText = cycle;
+                document.getElementById('detailVehicleType').innerText = vehicleType;
+                document.getElementById('detailRouteType').innerText = routeType;
+                document.getElementById('detailValidity').innerText = validity;
+                
+                document.getElementById('detailPaymentMethod').innerText = paymentMethod;
+                document.getElementById('detailIssuanceFee').innerText = issuanceFee;
+                
+                // Định dạng tiền tệ
+                const numericPrice = parseFloat(price);
+                if (!isNaN(numericPrice)) {
+                    document.getElementById('detailPrice').innerText = new Intl.NumberFormat('vi-VN').format(numericPrice) + ' đ';
+                } else {
+                    document.getElementById('detailPrice').innerText = price;
+                }
+                
+                // Gắn ảnh minh chứng
+                let cleanUrl = imgUrl;
+                if (imgUrl.includes('data:image/')) {
+                    cleanUrl = imgUrl.substring(imgUrl.indexOf('data:image/'));
+                }
+                document.getElementById('detailImageProof').src = cleanUrl;
+                
+                var passModal = new bootstrap.Modal(document.getElementById('passDetailsModal'));
+                passModal.show();
             }
         </script>
         <!-- ===== FOOTER ===== -->

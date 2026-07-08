@@ -200,12 +200,12 @@
                                             <c:when test="${ticketType == 'thang'}">
                                                 <option value="1" data-discount="50">Học sinh / Sinh viên (1 Tuyến) - Giảm 50%</option>
                                                 <option value="3" data-discount="100">Người cao tuổi - Miễn phí 100%</option>
-                                                <option value="4" data-discount="0">Đối tượng khác (Phổ thông) - Nguyên giá</option>
+                                                <option value="4" data-discount="0" selected>Bình thường - Nguyên giá</option>
                                             </c:when>
                                             <c:otherwise>
                                                 <option value="2" data-discount="50">Học sinh / Sinh viên (Liên Tuyến) - Giảm 50%</option>
                                                 <option value="3" data-discount="100">Người cao tuổi - Miễn phí 100%</option>
-                                                <option value="4" data-discount="0">Đối tượng khác (Phổ thông) - Nguyên giá</option>
+                                                <option value="4" data-discount="0" selected>Bình thường - Nguyên giá</option>
                                             </c:otherwise>
                                         </c:choose>
                                     </select>
@@ -218,7 +218,7 @@
 
                                 <!-- ĐÃ SỬA: Khối Upload Ảnh Chuẩn -->
                                 <div class="mb-3" id="proofUploadSection">
-                                    <label class="form-label fw-bold text-secondary small">TẢI ẢNH THẺ HSSV / CCCD (MINH CHỨNG ƯU TIÊN)</label>
+                                    <label class="form-label fw-bold text-secondary small" id="proofUploadLabel">TẢI ẢNH THẺ HSSV / CCCD (MINH CHỨNG ƯU TIÊN)</label>
                                     <input type="file" name="imageProof" id="imageProofFile" class="form-control rounded-3" accept=".jpg,.jpeg,.png" required>
                                     <div class="form-text small text-muted">Chỉ nhận JPG/PNG, dung lượng tối đa 5MB.</div>
                                 </div>
@@ -252,6 +252,25 @@
 
                                 document.getElementById('priceDisplay').textContent = new Intl.NumberFormat('vi-VN').format(finalPrice) + ' đ';
                                 document.getElementById('hiddenPrice').value = finalPrice; // Gán giá trị vào thẻ ẩn để gửi về Server
+
+                                toggleProofUpload();
+                            }
+
+                            // Cập nhật nhãn minh chứng động theo đối tượng đăng ký
+                            function toggleProofUpload() {
+                                const select = document.getElementById('passTypeSelect');
+                                const uploadLabel = document.getElementById('proofUploadLabel');
+                                if (!select || !uploadLabel)
+                                    return;
+
+                                const val = select.value;
+                                if (val === "1" || val === "2") {
+                                    uploadLabel.textContent = "TẢI ẢNH THẺ HSSV (BẮT BUỘC ĐỂ HƯỞNG ƯU ĐÃI)";
+                                } else if (val === "3") {
+                                    uploadLabel.textContent = "TẢI ẢNH CCCD (BẮT BUỘC ĐỂ HƯỞNG ƯU ĐÃI)";
+                                } else {
+                                    uploadLabel.textContent = "TẢI ẢNH CHÂN DUNG HOẶC CCCD (BẮT BUỘC ĐỂ XÁC THỰC NGƯỜI DÙNG)";
+                                }
                             }
 
                             // Xử lý Preview và Validate dung lượng ảnh (Max 5MB)

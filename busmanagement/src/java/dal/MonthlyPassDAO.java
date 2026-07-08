@@ -142,7 +142,7 @@ public class MonthlyPassDAO extends DBContext {
     //===Customer
     public List<MonthlyPassDTO> getRoutePasses(int accountID) {
         List<dto.MonthlyPassDTO> list = new ArrayList<>();
-        String sql = "SELECT mp.PassCode, mp.StartDate, mp.EndDate, mp.Status, mp.QRCodeToken, mp.ImageProof, "
+        String sql = "SELECT mp.PassCode, mp.StartDate, mp.EndDate, mp.Status, mp.QRCodeToken, mp.ImageProof, mp.CreatedAt, mp.Price, "
                 + "r.RouteNumber, r.RouteName, mpt.TypeName "
                 + "FROM MonthlyPasses mp "
                 + "LEFT JOIN Routes r ON mp.RouteID = r.RouteID "
@@ -166,7 +166,7 @@ public class MonthlyPassDAO extends DBContext {
     //====Customer
     public List<MonthlyPassDTO> getAllRoutePasses(int accountID) {
         List<dto.MonthlyPassDTO> list = new ArrayList<>();
-        String sql = "SELECT mp.PassCode, mp.StartDate, mp.EndDate, mp.Status, mp.QRCodeToken, mp.ImageProof, "
+        String sql = "SELECT mp.PassCode, mp.StartDate, mp.EndDate, mp.Status, mp.QRCodeToken, mp.ImageProof, mp.CreatedAt, mp.Price, "
                 + "r.RouteNumber, r.RouteName, mpt.TypeName "
                 + "FROM MonthlyPasses mp "
                 + "LEFT JOIN Routes r ON mp.RouteID = r.RouteID "
@@ -195,6 +195,9 @@ public class MonthlyPassDAO extends DBContext {
                 + "    mp.StartDate, "
                 + "    mp.EndDate, "
                 + "    mp.Status, "
+                + "    mp.ImageProof, "
+                + "    mp.CreatedAt, "
+                + "    mp.Price, "
                 + "    r.RouteNumber, "
                 + "    r.RouteName, "
                 + "    mpt.TypeName "
@@ -291,6 +294,15 @@ public class MonthlyPassDAO extends DBContext {
         dto.setTypeName(rs.getString("TypeName"));
         dto.setQrCodeToken(rs.getString("QRCodeToken"));
         dto.setImageProof(rs.getString("ImageProof"));
+        dto.setPrice(rs.getLong("Price"));
+
+        java.sql.Timestamp createdAt = rs.getTimestamp("CreatedAt");
+        if (createdAt != null) {
+            java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm");
+            dto.setCreatedAt(sdf.format(createdAt));
+        } else {
+            dto.setCreatedAt("");
+        }
 
         return dto;
     }
