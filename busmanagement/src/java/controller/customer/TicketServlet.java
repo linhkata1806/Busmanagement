@@ -126,7 +126,7 @@ public class TicketServlet extends HttpServlet {
                 // Lỗi file rác, quá 5MB -> Trả về chữ đỏ
                 request.setAttribute("errorMsg", e.getMessage());
                 // Chuyển hướng lại trang form đăng ký
-                request.getRequestDispatcher("/view/customer/register-pass.jsp").forward(request, response);
+                request.getRequestDispatcher("/view/customer/buy-ticket.jsp").forward(request, response);
             } catch (Exception e) {
                 // Lỗi hệ thống
                 request.setAttribute("errorMsg", "Lỗi hệ thống khi tải ảnh lên.");

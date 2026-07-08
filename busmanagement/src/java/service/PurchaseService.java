@@ -30,46 +30,65 @@ public class PurchaseService {
         monthlyPassService = new MonthlyPassService();
     }
 
-    public void processPurchase(int accountID, int routeId, String ticketType,
-            int passTypeID, String imageProof) throws Exception {
-        // 1. Lấy thông tin tuyến xe qua RouteService (Service gọi RouteService 
-        Route route = routeService.getRouteById(routeId);
-        if (route == null) {
-            throw new Exception("Tuyến xe không tồn tại hoặc đã bị gỡ bỏ.");
-        }
+    public void processPurchase(Integer accountID, int routeId, String ticketType, int passTypeID, String imageProof) throws Exception {
         PurchaseDAO purchaseDAO = new PurchaseDAO();
-        // 3. Xử lý theo loại vé
-        switch (ticketType) {
-            case "luot": {
-                Ticket ticket = buildTicket(accountID, routeId, route.getTicketPrice());
-                Notification noti = buildNotification(accountID,
-                        "Mua vé lượt thành công",
-                        "Bạn đã thanh toán vé lượt tuyến số " + route.getRouteNumber() + " thành công.");
-                purchaseDAO.executePurchaseTicket(ticket, noti);
-                break;
-            }
-            case "thang": {
-                long price = monthlyPassService.calculatePassPrice(routeId, passTypeID);
-                MonthlyPass pass = buildMonthlyPass(accountID, routeId, passTypeID, price, imageProof);
-                Notification noti = buildNotification(accountID,
-                        "Đăng ký vé tháng thành công",
-                        "Bạn đã đăng ký vé tháng cho tuyến số " + route.getRouteNumber() + " thành công.");
-                purchaseDAO.executePurchaseMonthlyPass(pass, noti);
-                break;
-            }
-            case "lien_chuyen": {
-                long price = monthlyPassService.calculatePassPrice(null, passTypeID);
-                MonthlyPass pass = buildMonthlyPass(accountID, null, passTypeID, price, imageProof);
-                Notification noti = buildNotification(accountID,
-                        "Đăng ký vé liên tuyến thành công",
-                        "Bạn đã đăng ký thành công vé liên tuyến đi toàn mạng lưới.");
-                purchaseDAO.executePurchaseMonthlyPass(pass, noti);
-                break;
-            }
-            default:
-                throw new Exception("Loại vé không hợp lệ.");
+        System.out.println("====== PROCESS PURCHASE ======");
+        System.out.println("ticketType = " + ticketType);
+        System.out.println("passTypeID = " + passTypeID);
+        System.out.println("==============================");
+        // Vé lượt
+        if ("luot".equals(ticketType)) {
+
+            Route route = routeService.getRouteById(routeId);
+
+            // Build Ticket
+            Ticket ticket = buildTicket(accountID, routeId, route.getTicketPrice());
+
+            // Build Notification
+            Notification noti = buildNotification(
+                    accountID,
+                    "Mua vé lượt thành công",
+                    "Bạn đã thanh toán vé lượt tuyến số " + route.getRouteNumber() + " thành công."
+            );
+
+            purchaseDAO.executePurchaseTicket(ticket, noti);
+            return;
         }
 
+// Vé tháng
+        if ("thang".equals(ticketType) || "lien_chuyen".equals(ticketType)) {
+
+            Integer targetRouteId
+                    = "lien_chuyen".equals(ticketType) ? null : routeId;
+
+            long price
+                    = monthlyPassService.calculatePassPrice(targetRouteId, passTypeID);
+
+            MonthlyPass pass
+                    = buildMonthlyPass(
+                            accountID,
+                            targetRouteId,
+                            passTypeID,
+                            price,
+                            imageProof
+                    );
+
+            Notification noti = buildNotification(
+                    accountID,
+                    "Đăng ký vé tháng thành công",
+                    targetRouteId != null
+                            ? "Bạn đã đăng ký thành công vé tháng tuyến số " + targetRouteId + "."
+                            : "Bạn đã đăng ký thành công vé tháng liên tuyến."
+            );
+
+            purchaseDAO.executePurchaseMonthlyPass(pass, noti);
+            return;
+        }
+
+        // ==========================================
+        // NGOẠI LỆ: Dữ liệu rác lọt qua bộ lọc
+        // ==========================================
+        throw new Exception("Dữ liệu giao dịch không hợp lệ, không thể xác định loại vé.");
     }
 
     private Ticket buildTicket(int accountID, int routeId, long price) {

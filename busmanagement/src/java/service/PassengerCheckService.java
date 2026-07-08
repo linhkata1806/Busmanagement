@@ -16,10 +16,13 @@ public class PassengerCheckService {
         this.validationService = new TicketValidationService();
     }
 
-    public void checkInPassenger(String code, int tripID) throws Exception {
-        if (code == null || code.trim().isEmpty()) {
-            throw new IllegalArgumentException("Mã vé/thẻ không được để trống.");
+    public void checkInPassenger(String inputCode, int tripID) throws Exception {
+        if (inputCode == null || inputCode.trim().isEmpty()) {
+            throw new IllegalArgumentException("Mã vé/Token không được để trống.");
         }
+
+        String code = inputCode.trim();
+
         dal.TripDAO tripDAO = new dal.TripDAO();
         model.Trip trip = tripDAO.getById(tripID);
         if (trip == null) {
@@ -30,110 +33,123 @@ public class PassengerCheckService {
         model.Bus bus = busDAO.getBusById(trip.getBusID());
         int currentPassengers = ticketDAO.getTicketsByTrip(tripID).size();
         if (bus != null && bus.getCapacity() > 0 && currentPassengers >= bus.getCapacity()) {
-            throw new IllegalArgumentException("Xe đã đạt số lượng hành khách tối đa (" + bus.getCapacity() + " người). Không thể soát thêm!");
+            throw new IllegalArgumentException("Xe đã đạt số lượng tối đa (" + bus.getCapacity() + " người). Không thể soát thêm!");
         }
-        Ticket ticket = ticketDAO.getByCode(code.trim());
-        if (ticket != null) {
-            // It is a regular ticket
-            Ticket validatedTicket = validationService.validateTicketForCheckIn(code, tripID);
 
-            Connection conn = ticketDAO.getConnection();
-            try {
-                conn.setAutoCommit(false);
-                ticketDAO.setConnection(conn);
-
-                Ticket freshTicket = ticketDAO.getByCode(code.trim());
-                if (freshTicket == null || freshTicket.getStatus() != TicketStatus.UNUSED) {
-                    throw new IllegalArgumentException("Vé đã bị thay đổi trạng thái hoặc không khả dụng.");
-                }
-                if (ticketDAO.hasPassengerConflict(freshTicket.getAccountID(), tripID, trip.getTripDate().toString())) {
-                    throw new IllegalArgumentException("Hành khách này đã check-in trên một chuyến xe khác chạy song song cùng khung giờ!");
-                }
-                boolean success = ticketDAO.checkInTicket(freshTicket.getTicketID(), tripID, TicketStatus.CHECKED_IN.name());
-                if (!success) {
-                    throw new Exception("Lỗi hệ thống: Không thể cập nhật trạng thái soát vé.");
-                }
-
-                conn.commit();
-            } catch (Exception e) {
-                try {
-                    conn.rollback();
-                } catch (SQLException ex) {
-                    ex.printStackTrace();
-                }
-                throw e;
-            } finally {
-                try {
-                    conn.setAutoCommit(true);
-                } catch (SQLException ex) {
-                    ex.printStackTrace();
-                }
-            }
+        // BIỂN BÁO ĐIỀU HƯỚNG MỚI: Dựa vào tiền tố để rẽ nhánh
+        if (code.startsWith("TK-")) {
+            // NHÁNH 1: LUỒNG KIỂM TRA VÉ NGÀY (TICKET)
+            processTicketCheckIn(code, tripID, trip);
         } else {
-            // It might be a monthly pass
-            dal.MonthlyPassDAO monthlyPassDAO = new dal.MonthlyPassDAO();
-            model.MonthlyPass pass = monthlyPassDAO.getByCode(code.trim());
-            if (pass == null) {
-                throw new IllegalArgumentException("Mã vé/thẻ không tồn tại trên hệ thống.");
+            // NHÁNH 2: LUỒNG KIỂM TRA VÉ THÁNG (MONTHLY PASS BẰNG QR TOKEN)
+            processMonthlyPassCheckIn(code, tripID, trip);
+        }
+    }
+
+    // --- TÁCH HÀM XỬ LÝ VÉ NGÀY ---
+    private void processTicketCheckIn(String code, int tripID, model.Trip trip) throws Exception {
+        Ticket ticket = ticketDAO.getByCode(code);
+        if (ticket == null) {
+            throw new IllegalArgumentException("Mã vé ngày không tồn tại.");
+        }
+
+        // Gọi Service validation cũ của cậu (Không đổi logic)
+        validationService.validateTicketForCheckIn(code, tripID);
+
+        Connection conn = ticketDAO.getConnection();
+        try {
+            conn.setAutoCommit(false);
+            ticketDAO.setConnection(conn);
+
+            Ticket freshTicket = ticketDAO.getByCode(code);
+            if (freshTicket == null || freshTicket.getStatus() != TicketStatus.UNUSED) {
+                throw new IllegalArgumentException("Vé lượt đã được sử dụng hoặc không khả dụng.");
+            }
+            if (ticketDAO.hasPassengerConflict(freshTicket.getAccountID(), tripID, trip.getTripDate().toString())) {
+                throw new IllegalArgumentException("Khách này đang được check-in trên 1 xe khác cùng khung giờ!");
             }
 
-            // Validate Monthly Pass
-            if (pass.getStatus() != enums.PassStatus.APPROVED) {
-                throw new IllegalArgumentException("Thẻ tháng chưa được duyệt hoặc không hợp lệ.");
-            }
-            java.time.LocalDate today = java.time.LocalDate.now();
-            if (today.isBefore(pass.getStartDate()) || today.isAfter(pass.getEndDate())) {
-                throw new IllegalArgumentException("Thẻ tháng đã hết hạn hoặc chưa có hiệu lực.");
+            boolean success = ticketDAO.checkInTicket(freshTicket.getTicketID(), tripID, TicketStatus.CHECKED_IN.name());
+            if (!success) {
+                throw new Exception("Lỗi hệ thống: Không thể cập nhật trạng thái vé lượt.");
             }
 
-            if (trip == null) {
-                throw new IllegalArgumentException("Chuyến đi #" + tripID + " không tồn tại.");
+            conn.commit();
+        } catch (Exception e) {
+            try {
+                conn.rollback();
+            } catch (SQLException ex) {
+                ex.printStackTrace();
             }
-
-            // Vé tháng cũng chỉ đi đúng ngày chạy
-            if (trip.getTripDate() == null || !trip.getTripDate().equals(today)) {
-                throw new IllegalArgumentException("Thẻ tháng chỉ hợp lệ check-in vào ngày xe chạy.");
+            throw e;
+        } finally {
+            try {
+                conn.setAutoCommit(true);
+            } catch (SQLException ex) {
+                ex.printStackTrace();
             }
+        }
+    }
 
-            if (pass.getRouteID() != null && pass.getRouteID() != trip.getRouteID()) {
-                throw new IllegalArgumentException("Thẻ tháng không áp dụng cho tuyến đường này.");
-            }
-            int hasCheckedInPass = ticketDAO.countPassengerCheckIn(pass.getAccountID(), tripID);
-            if (hasCheckedInPass > 0) {
-                throw new IllegalArgumentException("Thẻ tháng này đã thực hiện soát vé trên chuyến xe này rồi!");
-            }
+    // --- TÁCH HÀM XỬ LÝ VÉ THÁNG ---
+    private void processMonthlyPassCheckIn(String token, int tripID, model.Trip trip) throws Exception {
+        dal.MonthlyPassDAO monthlyPassDAO = new dal.MonthlyPassDAO();
 
-            if (ticketDAO.hasPassengerConflict(pass.getAccountID(), tripID, trip.getTripDate().toString())) {
-                throw new IllegalArgumentException("Hành khách dùng thẻ tháng này hiện đã leo lên một xe khác chạy cùng khung giờ!");
-            }
+        // DAO đã hỗ trợ tìm bằng QRCodeToken thông qua lệnh OR trong SQL
+        model.MonthlyPass pass = monthlyPassDAO.getByCode(token);
+        if (pass == null) {
+            throw new IllegalArgumentException("Mã Token QR Thẻ tháng không hợp lệ.");
+        }
 
-            // Check if already checked in to avoid double check-in?
-            // To do this simply, we assume lastUsedAt prevents rapid double scans if we want,
-            // but the requirements say "chưa có check in vé tháng".
-            // Update last used time
-            boolean ok = monthlyPassDAO.updateLastUsed(pass.getPassID());
-            if (!ok) {
-                throw new Exception("Lỗi hệ thống khi cập nhật thẻ tháng.");
-            }
+        if (pass.getStatus() != enums.PassStatus.APPROVED) {
+            throw new IllegalArgumentException("Thẻ tháng chưa được duyệt hoặc đã bị khóa.");
+        }
 
-            // Insert a virtual ticket so it shows up in checked-in list
-            Ticket t = new Ticket();
-            t.setAccountID(pass.getAccountID());
-            t.setTripID(tripID);
-            t.setRouteID(trip.getRouteID());
-            t.setTicketCode(code.trim() + "-" + System.currentTimeMillis());
-            t.setPrice(0);
-            t.setSaleChannel(enums.SaleChannel.ON_BUS);
-            t.setStatus(enums.TicketStatus.CHECKED_IN);
-            t.setPurchasedAt(java.time.LocalDateTime.now());
+        java.time.LocalDate today = java.time.LocalDate.now();
+        if (today.isBefore(pass.getStartDate()) || today.isAfter(pass.getEndDate())) {
+            throw new IllegalArgumentException("Thẻ tháng đã hết hạn hoặc chưa có hiệu lực.");
+        }
 
-            ticketDAO.insert(t);
+        if (trip.getTripDate() == null || !trip.getTripDate().equals(today)) {
+            throw new IllegalArgumentException("Chuyến xe này không khởi hành trong ngày hôm nay.");
+        }
 
-            // To make sure UsedAt is recorded properly for the dashboard list:
-            Ticket newTicket = ticketDAO.getByCode(t.getTicketCode());
-            if (newTicket != null) {
-                ticketDAO.checkInTicket(newTicket.getTicketID(), tripID, enums.TicketStatus.CHECKED_IN.name());
-            }
+        // Logic cũ: RouteID = NULL là liên tuyến, nếu có RouteID thì phải khớp tuyến
+        if (pass.getRouteID() != null && pass.getRouteID() != trip.getRouteID()) {
+            throw new IllegalArgumentException("Thẻ tháng này KHÔNG áp dụng cho tuyến xe số " + trip.getRouteID());
+        }
+
+        if (ticketDAO.countPassengerCheckIn(pass.getAccountID(), tripID) > 0) {
+            throw new IllegalArgumentException("Thẻ tháng này đã được quẹt trên xe rồi, không quẹt lại!");
+        }
+
+        if (ticketDAO.hasPassengerConflict(pass.getAccountID(), tripID, trip.getTripDate().toString())) {
+            throw new IllegalArgumentException("Khách này đang quẹt thẻ trên 1 xe khác cùng khung giờ!");
+        }
+
+        // Cập nhật LastUsedAt
+        if (!monthlyPassDAO.updateLastUsed(pass.getPassID())) {
+            throw new Exception("Lỗi hệ thống: Không thể ghi nhận thời gian dùng thẻ.");
+        }
+
+        // Sinh vé ảo (0 đồng) để đếm số lượng người trên xe
+        Ticket t = new Ticket();
+        t.setAccountID(pass.getAccountID());
+        t.setTripID(tripID);
+        t.setRouteID(trip.getRouteID());
+        // Đánh dấu vé ảo bằng chữ MP (Monthly Pass) để dễ phân biệt
+        t.setTicketCode("MP-" + pass.getPassID() + "-" + System.currentTimeMillis());
+        t.setPrice(0);
+        t.setSaleChannel(enums.SaleChannel.ON_BUS);
+        t.setStatus(enums.TicketStatus.CHECKED_IN);
+        t.setPurchasedAt(java.time.LocalDateTime.now());
+
+        ticketDAO.insert(t);
+
+        // Đóng dấu UsedAt
+        Ticket newTicket = ticketDAO.getByCode(t.getTicketCode());
+        if (newTicket != null) {
+            ticketDAO.checkInTicket(newTicket.getTicketID(), tripID, enums.TicketStatus.CHECKED_IN.name());
         }
     }
 }
