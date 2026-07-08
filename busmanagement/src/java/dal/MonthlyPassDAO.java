@@ -375,6 +375,8 @@ public class MonthlyPassDAO extends DBContext {
                 + "    mp.PassCode, \n"
                 + "    mp.AccountID, \n"
                 + "    a.FullName, \n"
+                + "    a.Email, \n"
+                + "    a.Phone, \n"             
                 + "    mp.StartDate, \n"
                 + "    mp.EndDate, \n"
                 + "    mp.Status, \n"
@@ -405,6 +407,8 @@ public class MonthlyPassDAO extends DBContext {
                 + "    mp.PassCode, \n"
                 + "    mp.AccountID, \n"
                 + "    a.FullName, \n"
+                + "    a.Email, \n" // <--- BỔ SUNG
+                + "    a.Phone, \n"
                 + "    mp.StartDate, \n"
                 + "    mp.EndDate, \n"
                 + "    mp.Status, \n"
@@ -466,7 +470,8 @@ public class MonthlyPassDAO extends DBContext {
         dto.setPassID(rs.getInt("PassID"));
         dto.setAccountID(rs.getInt("AccountID"));
         dto.setFullName(rs.getString("FullName")); // Cột này sinh ra từ việc JOIN bảng Accounts
-
+        dto.setEmail(rs.getString("Email"));
+        dto.setPhone(rs.getString("Phone"));
         // Các cột hiển thị cơ bản
         dto.setPassCode(rs.getString("PassCode"));
         dto.setStartDate(rs.getDate("StartDate").toLocalDate());
@@ -483,6 +488,7 @@ public class MonthlyPassDAO extends DBContext {
         String sql = "SELECT * FROM MonthlyPasses WHERE PassCode = ? OR QRCodeToken = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, passCode);
+            ps.setString(2, passCode);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     return mapRowToMonthlyPass(rs);

@@ -12,17 +12,18 @@ import java.time.LocalDate;
  * @author Administrator
  */
 public class MonthlyPassDTO {
+
     private String passCode;
     private LocalDate startDate;
     private LocalDate endDate;
     private PassStatus status;
     private String imageProof;
-    
+
     //cac truong join themm
     private String routeNumber;
     private String routeName;
     private String typeName;
-    
+
     //cac truong cho staff quan ly
     private int passID;
     private int accountID;
@@ -30,6 +31,24 @@ public class MonthlyPassDTO {
     private String qrCodeToken;
     private long price;
     private String createdAt;
+    private String email;
+    private String phone;
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
 
     public MonthlyPassDTO() {
     }
@@ -41,8 +60,6 @@ public class MonthlyPassDTO {
     public void setImageProof(String imageProof) {
         this.imageProof = imageProof;
     }
-    
-    
 
     public MonthlyPassDTO(String passCode, LocalDate startDate, LocalDate endDate, PassStatus status, String routeNumber, String routeName, String typeName) {
         this.passCode = passCode;

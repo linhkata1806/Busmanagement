@@ -4,6 +4,12 @@
     Author     : Administrator
 --%>
 
+<%-- 
+    Document   : monthly-pass
+    Created on : Jun 28, 2026, 8:10:52 PM
+    Author     : Administrator
+--%>
+
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
@@ -24,7 +30,6 @@
                 background-color: var(--bg-light);
                 font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             }
-            /* Sidebar Navigation Layout */
             .sidebar {
                 background-color: var(--sidebar-bg);
                 min-height: 100vh;
@@ -42,7 +47,6 @@
             .main-content {
                 padding: 2rem;
             }
-            /* Filter Tabs */
             .filter-tab .nav-link {
                 color: #64748b;
                 font-weight: 600;
@@ -134,7 +138,6 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <%-- 👑 BỘ PHÒNG THỦ: Kiểm tra kĩ lưỡng xem passList có bị null hoặc rỗng không --%>
                                         <c:choose>
                                             <c:when test="${empty passList}">
                                                 <tr>
@@ -148,7 +151,6 @@
                                                 </tr>
                                             </c:when>
                                             <c:otherwise>
-                                                <%-- Duyệt danh sách an toàn tuyệt đối khi passList đã chắc chắn tồn tại dữ liệu --%>
                                                 <c:forEach var="p" items="${passList}">
                                                     <tr>
                                                         <td class="ps-4 fw-bold text-primary">#${p.passCode}</td>
@@ -191,26 +193,12 @@
                                                             </c:choose>
                                                         </td>
 
+                                                        <!-- ĐÃ SỬA: Gom lại thành 1 nút duy nhất -->
                                                         <td class="text-center pe-4">
-                                                            <div class="btn-group btn-group-sm">
-                                                                <c:if test="${p.status eq 'PENDING'}">
-                                                                    <a href="${pageContext.request.contextPath}/staff/monthly-pass/approve?id=${p.passID}" 
-                                                                       class="btn btn-success fw-semibold px-2.5" 
-                                                                       onclick="return confirm('Xác nhận DUYỆT đơn #${p.passCode}?')">
-                                                                        <i class="fas fa-check me-1"></i>Duyệt
-                                                                    </a>
-                                                                    <a href="${pageContext.request.contextPath}/staff/monthly-pass/reject?id=${p.passID}" 
-                                                                       class="btn btn-danger fw-semibold px-2.5" 
-                                                                       onclick="return confirm('Xác nhận TỪ CHỐI đơn #${p.passCode}?')">
-                                                                        <i class="fas fa-ban me-1"></i>Từ chối
-                                                                    </a>
-                                                                </c:if>
-                                                                <!-- ĐÃ SỬA: Nút gọi Modal xem ảnh -->
-                                                                <button type="button" class="btn btn-outline-secondary px-2.5" title="Xem hồ sơ gốc chi tiết"
-                                                                        onclick="showProofImage('${pageContext.request.contextPath}/${p.imageProof}', '${p.fullName}')">
-                                                                    <i class="fas fa-image"></i> Xem ảnh
-                                                                </button>
-                                                            </div>
+                                                            <button type="button" class="btn btn-outline-primary btn-sm px-3" title="Xem chi tiết hồ sơ"
+                                                                    onclick="showDetailModal('${p.passID}', '${p.passCode}', '${p.fullName}', '${p.email}', '${p.phone}', '${pageContext.request.contextPath}/${p.imageProof}', '${p.status}')">
+                                                                <i class="fas fa-eye me-1"></i> View Detail
+                                                            </button>
                                                         </td>
                                                     </tr>
                                                 </c:forEach>
@@ -226,28 +214,83 @@
         </div>
 
         <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
-        <div class="modal fade" id="imageProofModal" tabindex="-1" aria-hidden="true">
+
+        <!-- ĐÃ SỬA: Modal mới chứa toàn bộ thông tin và nút thao tác -->
+        <div class="modal fade" id="detailModal" tabindex="-1" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered modal-lg">
                 <div class="modal-content border-0 shadow">
-                    <div class="modal-header bg-light">
-                        <h5 class="modal-title fw-bold text-dark"><i class="fas fa-id-badge me-2 text-primary"></i>Giấy tờ minh chứng: <span id="modalCustomerName" class="text-primary"></span></h5>
+                    <div class="modal-header bg-light border-bottom-0 pb-2">
+                        <h5 class="modal-title fw-bold text-dark"><i class="fas fa-file-invoice me-2 text-primary"></i>Chi tiết hồ sơ: <span id="modalPassCode" class="text-primary"></span></h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                     </div>
-                    <div class="modal-body text-center bg-dark p-0">
-                        <img id="modalProofImg" src="" alt="Không có ảnh minh chứng" class="img-fluid w-100" style="max-height: 80vh; object-fit: contain;">
+                    <div class="modal-body p-4 pt-2">
+                        <!-- Xóa sạch code cũ, chỉ dùng 1 block thẻ row duy nhất này cho thông tin -->
+                        <div class="row mb-3 bg-light p-3 rounded border align-items-center">
+                            <div class="col-md-4 mb-2 mb-md-0">
+                                <span class="text-secondary small d-block mb-1">Họ và tên khách hàng</span>
+                                <strong class="fs-5 text-dark" id="modalFullName"></strong>
+                            </div>
+                            <div class="col-md-5 mb-2 mb-md-0 border-start">
+                                <span class="text-secondary small d-block mb-1">Email liên hệ (Định danh)</span>
+                                <strong class="fs-6 text-primary" id="modalEmail"></strong>
+                            </div>
+                            <div class="col-md-3 border-start">
+                                <span class="text-secondary small d-block mb-1">Số điện thoại</span>
+                                <strong class="fs-6 text-danger" id="modalPhone"></strong>
+                            </div>
+                        </div>
+                        
+                        <!-- Block ảnh minh chứng -->
+                        <div class="text-center bg-dark p-2 rounded" style="border: 2px dashed #ccc;">
+                            <img id="modalProofImg" src="" alt="Không có ảnh minh chứng" class="img-fluid w-100 rounded" style="max-height: 55vh; object-fit: contain;">
+                        </div>
+                    </div>
+                    <!-- Footer chứa nút thao tác linh hoạt -->
+                    <div class="modal-footer bg-light" id="modalActionButtons">
+                        <!-- JS sẽ tự động bơm nút Duyệt/Từ chối hoặc Đóng vào đây -->
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- JS để truyền link ảnh vào Modal -->
+        <!-- JS điều khiển Modal -->
         <script>
-            function showProofImage(imageUrl, customerName) {
-                document.getElementById('modalCustomerName').innerText = customerName;
-                document.getElementById('modalProofImg').src = imageUrl;
-                var myModal = new bootstrap.Modal(document.getElementById('imageProofModal'));
-                myModal.show();
-            }
+                                                                        // Đã thay đổi tham số truyền vào: cccd -> email, phone
+                                                                        function showDetailModal(passID, passCode, fullName, email, phone, imageUrl, status) {
+                                                                            document.getElementById('modalPassCode').innerText = '#' + passCode;
+                                                                            document.getElementById('modalFullName').innerText = fullName;
+
+                                                                            // Xử lý hiển thị Email và Phone
+                                                                            document.getElementById('modalEmail').innerText = (email && email !== 'null' && email !== '') ? email : 'Chưa cập nhật';
+                                                                            document.getElementById('modalPhone').innerText = (phone && phone !== 'null' && phone !== '') ? phone : 'Chưa cập nhật';
+
+                                                                            document.getElementById('modalProofImg').src = imageUrl;
+
+                                                                            var actionFooter = document.getElementById('modalActionButtons');
+                                                                            actionFooter.innerHTML = '';
+
+                                                                            if (status === 'PENDING') {
+                                                                                actionFooter.innerHTML = `
+                        <a href="${pageContext.request.contextPath}/staff/monthly-pass/reject?id=\${passID}" 
+                           class="btn btn-outline-danger px-4" 
+                           onclick="return confirm('Xác nhận TỪ CHỐI hồ sơ #\${passCode}?')">
+                            <i class="fas fa-times me-1"></i> Từ chối
+                        </a>
+                        <a href="${pageContext.request.contextPath}/staff/monthly-pass/approve?id=\${passID}" 
+                           class="btn btn-success px-4" 
+                           onclick="return confirm('Xác nhận DUYỆT hồ sơ #\${passCode}?')">
+                            <i class="fas fa-check me-1"></i> Duyệt hồ sơ
+                        </a>
+                    `;
+                                                                            } else {
+                                                                                actionFooter.innerHTML = `
+                        <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal">Đóng</button>
+                    `;
+                                                                            }
+
+                                                                            var myModal = new bootstrap.Modal(document.getElementById('detailModal'));
+                                                                            myModal.show();
+                                                                        }
         </script>
     </body>
 </html>
