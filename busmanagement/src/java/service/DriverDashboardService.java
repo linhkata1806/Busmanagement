@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class DriverDashboardService {
+
     private final TripDAO tripDAO;
     private final BusDAO busDAO;
     private final RouteDAO routeDAO;
@@ -26,8 +27,7 @@ public class DriverDashboardService {
     public Map<String, Object> getDashboardStats(int driverID) {
         Map<String, Object> stats = new HashMap<>();
 
-        // 1. Get current active or upcoming trip for driver
-        // (getCurrentTripByDriver already prioritizes IN_PROGRESS trips first)
+        // 1. Lấy chuyến đi hiện tại hoặc sắp tới của tài xế
         TripDTO currentTrip = tripDAO.getCurrentTripByDriver(driverID);
         stats.put("currentTrip", currentTrip);
 
@@ -46,11 +46,11 @@ public class DriverDashboardService {
             }
         }
 
-        // 2. Count today's trips
+        // 2. Đếm số chuyến xe trong ngày hôm nay
         int todaysTrips = tripDAO.countDriverTripsToday(driverID);
         stats.put("todaysTrips", todaysTrips);
 
-        // 3. Count pending (unread) notifications
+        // 3. Đếm số thông báo chưa đọc
         int pendingNotifications = notificationDAO.countUnreadNotifications(driverID);
         stats.put("pendingNotifications", pendingNotifications);
 

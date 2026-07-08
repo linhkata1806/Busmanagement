@@ -1,4 +1,4 @@
-package controller.driver;
+package controller.driver.account;
 
 import dal.AccountDAO;
 import java.io.File;
@@ -52,7 +52,7 @@ public class ProfileServlet extends HttpServlet {
         int unreadCount = notificationService.countUnreadNotifications(accountId);
         request.setAttribute("unreadCount", unreadCount);
 
-        request.getRequestDispatcher("/view/driver/profile.jsp").forward(request, response);
+        request.getRequestDispatcher("/view/driver/account/profile.jsp").forward(request, response);
     }
 
     @Override

@@ -1,0 +1,115 @@
+package controller.driver.trip;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+import java.io.IOException;
+import java.util.List;
+import model.Account;
+import model.Ticket;
+import model.Trip;
+import service.PassengerCheckService;
+import service.TicketService;
+import service.TripService;
+
+public class DriverPassengerCheckServlet extends HttpServlet {
+
+    private TripService tripService;
+    private TicketService ticketService;
+    private PassengerCheckService passengerCheckService;
+
+    @Override
+    public void init() throws ServletException {
+        tripService = new TripService();
+        ticketService = new TicketService();
+        passengerCheckService = new PassengerCheckService();
+    }
+
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        HttpSession session = request.getSession(false);
+        Account user = (Account) session.getAttribute("USER");
+        int driverID = user.getAccountID();
+
+        String tripIDStr = request.getParameter("tripID");
+        if (tripIDStr == null || tripIDStr.trim().isEmpty()) {
+            // Chuyển hướng về trang danh sách chuyến của tài xế
+            response.sendRedirect(request.getContextPath() + "/driver/my-trip");
+            return;
+        }
+
+        try {
+            int tripID = Integer.parseInt(tripIDStr);
+            Trip trip = tripService.getTripById(tripID);
+
+            if (trip == null) {
+                request.setAttribute("error", "Chuyến xe không tồn tại.");
+                request.getRequestDispatcher("/view/driver/trip/passenger-check.jsp").forward(request, response);
+                return;
+            }
+
+            // Kiểm tra quyền của tài xế (Lưu ý: Nếu cậu giữ driverID là kiểu int, chỉ cần check khác nhau)
+            if (trip.getDriverID() != driverID) {
+                request.setAttribute("error", "Bạn không có quyền thực hiện soát vé trên chuyến đi này.");
+                request.getRequestDispatcher("/view/driver/trip/passenger-check.jsp").forward(request, response);
+                return;
+            }
+
+            // Retrieve checked-in tickets list
+            List<Ticket> checkedTickets = ticketService.getTicketsByTrip(tripID);
+
+            // Pop messages from session if any
+            String successMsg = (String) session.getAttribute("successMessage");
+            if (successMsg != null) {
+                request.setAttribute("successMessage", successMsg);
+                session.removeAttribute("successMessage");
+            }
+            String errorMsg = (String) session.getAttribute("errorMessage");
+            if (errorMsg != null) {
+                request.setAttribute("errorMessage", errorMsg);
+                session.removeAttribute("errorMessage");
+            }
+
+            request.setAttribute("trip", trip);
+            request.setAttribute("checkedTickets", checkedTickets);
+            request.getRequestDispatcher("/view/driver/trip/passenger-check.jsp").forward(request, response);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Lỗi hệ thống.");
+        }
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        HttpSession session = request.getSession(false);
+        String tripIDStr = request.getParameter("tripID");
+        String ticketCode = request.getParameter("ticketCode");
+
+        if (tripIDStr == null || tripIDStr.trim().isEmpty() || ticketCode == null || ticketCode.trim().isEmpty()) {
+            session.setAttribute("errorMessage", "Vui lòng nhập đầy đủ thông tin.");
+            response.sendRedirect("passenger-check?tripID=" + tripIDStr);
+            return;
+        }
+
+        try {
+            int tripID = Integer.parseInt(tripIDStr);
+
+            // Perform check-in business logic
+            passengerCheckService.checkInPassenger(ticketCode, tripID);
+
+            session.setAttribute("successMessage", "Soát vé & Check-In thành công vé mã: " + ticketCode);
+        } catch (IllegalArgumentException e) {
+            session.setAttribute("errorMessage", e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            session.setAttribute("errorMessage", "Hệ thống gặp lỗi: " + e.getMessage());
+        }
+
+        response.sendRedirect("passenger-check?tripID=" + tripIDStr);
+    }
+}

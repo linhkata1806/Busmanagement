@@ -54,28 +54,32 @@
     <body>
         <div class="container-fluid">
             <div class="row">
-                <jsp:include page="sidebar.jsp">
+                <jsp:include page="../sidebar.jsp">
                     <jsp:param name="activeMenu" value="trip" />
                 </jsp:include>
 
                 <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 main-content">
                     <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-                        <h1 class="h2 text-dark fw-bold">Chi Tiết Chuyến Đi #${trip.tripID}</h1>
+                        <h1 class="h2 text-dark fw-bold">
+                            <c:choose>
+                                <c:when test="${not empty trip}">Chi Tiết Chuyến Đi #${trip.tripID}</c:when>
+                                <c:otherwise>Chi Tiết Chuyến Đi</c:otherwise>
+                            </c:choose>
+                        </h1>
                         <a href="${pageContext.request.contextPath}/driver/trip" class="btn btn-outline-secondary btn-sm">
                             <i class="fas fa-arrow-left me-1"></i>Quay lại danh sách
                         </a>
                     </div>
 
-                    <c:if test="${not empty sessionScope.error}">
-                        <div class="alert alert-danger d-flex align-items-center alert-dismissible fade show" role="alert">
-                            <i class="fas fa-exclamation-circle me-2"></i>
-                            <div>${sessionScope.error}</div>
+                    <c:if test="${not empty errorMessage}">
+                        <div class="alert alert-danger d-flex align-items-center alert-dismissible fade show shadow-sm" role="alert">
+                            <i class="fas fa-exclamation-circle me-2 fs-5"></i>
+                            <div><strong>Lỗi truy cập: </strong>${errorMessage}</div>
                             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                         </div>
-                        <c:remove var="error" scope="session"/>
                     </c:if>
 
-                    <c:if test="${empty sessionScope.error}">
+                    <c:if test="${empty errorMessage and not empty trip}">
                         <div class="row g-4">
                             <div class="col-12 col-lg-4">
                                 <div class="card shadow-sm border-0 rounded-3 mb-4">
@@ -137,6 +141,12 @@
                                             </c:if>
 
                                             <div class="mt-3 pt-3 border-top">
+                                                <c:if test="${(trip.status == 'SCHEDULED' || trip.status == 'IN_PROGRESS') && empty trip.assistantName}">
+                                                    <a href="${pageContext.request.contextPath}/driver/passenger-check?tripID=${trip.tripID}" class="btn btn-primary w-100 py-2 mb-3">
+                                                        <i class="fas fa-ticket-alt me-2"></i>Soát vé hành khách (Tài xế)
+                                                    </a>
+                                                </c:if>
+
                                                 <c:choose>
                                                     <c:when test="${trip.status == 'SCHEDULED'}">
                                                         <form action="${pageContext.request.contextPath}/driver/trip/start" method="POST" onsubmit="return confirm('Bạn có chắc chắn muốn BẮT ĐẦU chuyến đi này?');">
@@ -180,18 +190,18 @@
                                                             <div class="fw-bold text-dark mb-1">
                                                                 Trạm ${s.stopOrder}: ${s.stopName}
                                                             </div>
-                                                            <div class="text-secondary fs-7 mb-1">
-                                                                <i class="fas fa-map-marker-alt me-1 text-secondary"></i> ${s.address}
-                                                            </div>
-                                                            <div class="text-info fs-7 fw-semibold">
-                                                                Khoảng cách từ trạm đầu: ${s.distanceFromStart} km
+                                                            <div class="text-secondary small">
+                                                                <i class="fas fa-map-marker-alt me-1"></i>${not empty s.address ? s.address : 'Đang cập nhật địa chỉ'}
                                                             </div>
                                                         </li>
                                                     </c:forEach>
                                                 </ul>
                                             </c:when>
                                             <c:otherwise>
-                                                <p class="text-center py-4 text-secondary mb-0">Chưa thiết lập danh sách điểm dừng cho tuyến đường này.</p>
+                                                <div class="text-center py-5 text-secondary">
+                                                    <i class="fas fa-map-signs fa-3x mb-3 text-light"></i>
+                                                    <p class="mb-0">Chưa có dữ liệu trạm dừng cho lộ trình này.</p>
+                                                </div>
                                             </c:otherwise>
                                         </c:choose>
                                     </div>
