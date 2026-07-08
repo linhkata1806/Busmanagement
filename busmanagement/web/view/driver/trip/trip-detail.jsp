@@ -141,6 +141,12 @@
                                             </c:if>
 
                                             <div class="mt-3 pt-3 border-top">
+                                                <c:if test="${(trip.status == 'SCHEDULED' || trip.status == 'IN_PROGRESS') && empty trip.assistantName}">
+                                                    <a href="${pageContext.request.contextPath}/driver/passenger-check?tripID=${trip.tripID}" class="btn btn-primary w-100 py-2 mb-3">
+                                                        <i class="fas fa-ticket-alt me-2"></i>Soát vé hành khách (Tài xế)
+                                                    </a>
+                                                </c:if>
+
                                                 <c:choose>
                                                     <c:when test="${trip.status == 'SCHEDULED'}">
                                                         <form action="${pageContext.request.contextPath}/driver/trip/start" method="POST" onsubmit="return confirm('Bạn có chắc chắn muốn BẮT ĐẦU chuyến đi này?');">
