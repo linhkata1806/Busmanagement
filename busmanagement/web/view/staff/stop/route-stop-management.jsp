@@ -19,24 +19,40 @@
                 overflow-x: hidden;
             }
             .main-content {
-                width: 100%;
+                padding: 2rem;
+            }
+            .table-responsive {
+                border-radius: 0.75rem;
+            }
+            .table-dark th {
+                padding-top: 15px !important;
+                padding-bottom: 15px !important;
+                vertical-align: middle !important;
+                font-size: 0.9rem !important;
+                font-weight: 600 !important;
+            }
+            .table tbody td {
+                padding-top: 12px !important;
+                padding-bottom: 12px !important;
+                vertical-align: middle !important;
             }
         </style>
     </head>
     <body class="bg-light">
 
-        <!-- Bọc toàn bộ trang bằng d-flex để tạo layout Sidebar (Trái) - Content (Phải) -->
-        <div class="d-flex">
+        <div class="container-fluid">
+            <div class="row">
 
-            <!-- NHÚNG SIDEBAR: Sáng menu "Quản lý tuyến" -->
-            <jsp:include page="/view/staff/sidebar.jsp">
-                <jsp:param name="activeMenu" value="dashboard" />
-            </jsp:include>
+                <!-- NHÚNG SIDEBAR -->
+                <jsp:include page="/view/staff/sidebar.jsp">
+                    <jsp:param name="activeMenu" value="stop" />
+                </jsp:include>
 
-            <!-- NỘI DUNG CHÍNH -->
-            <div class="main-content">
-                <div class="container-fluid py-4">
-                    <h2 class="mb-4 text-primary"><i class="fas fa-route me-2"></i>Quản lý Điểm dừng - Tuyến #${routeId}</h2>
+                <!-- NỘI DUNG CHÍNH -->
+                <main class="col-md-9 ms-sm-auto col-lg-10 main-content">
+                    <div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom">
+                        <h2 class="fw-bold m-0" style="color: #5c67f2 !important;"><i class="fas fa-map-signs me-2"></i>Quản lý Điểm dừng - Tuyến #${routeId}</h2>
+                    </div>
 
                     <!-- THÔNG BÁO -->
                     <c:if test="${not empty sessionScope.msgSuccess}">
@@ -55,7 +71,7 @@
                     </c:if>
 
                     <!-- BẢNG DANH SÁCH TRẠM CỦA TUYẾN -->
-                    <div class="card shadow-sm border-0 mb-4">
+                    <div class="card border-0 shadow-sm rounded-4 bg-white mb-4">
                         <div class="card-body p-0">
                             <div class="table-responsive">
                                 <table class="table table-hover table-striped mb-0 align-middle">
@@ -108,7 +124,7 @@
                     </div>
 
                     <!-- FORM THÊM ĐIỂM DỪNG VÀO TUYẾN -->
-                    <div class="card shadow-sm border-0">
+                    <div class="card border-0 shadow-sm rounded-4 bg-white">
                         <div class="card-header bg-white fw-bold"><i class="fas fa-plus-circle me-1"></i>Thêm điểm dừng vào tuyến</div>
                         <div class="card-body">
                             <form action="${pageContext.request.contextPath}/staff/route-stop/add" method="POST" class="row g-3 align-items-end">
@@ -147,7 +163,7 @@
                         </a>
                     </div>
 
-                </div>
+                </main>
             </div>
         </div>
 

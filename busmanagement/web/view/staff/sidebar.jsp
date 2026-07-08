@@ -4,19 +4,47 @@
 <style>
     /* CSS ĐỘC LẬP BẢO VỆ SIDEBAR KHỎI VỠ GIAO DIỆN */
     .bus-sidebar {
-        background-color: #1e293b;
+        background-color: #0d47a1 !important; /* Đổi sang màu xanh đậm giống của customer */
         min-height: 100vh;
-        color: #cbd5e1;
+        color: #e3effd;
     }
     .bus-sidebar .nav-link {
-        color: #94a3b8;
+        color: rgba(255, 255, 255, 0.8) !important;
         border-radius: 0.375rem;
         transition: all 0.2s;
         font-weight: 500;
     }
     .bus-sidebar .nav-link:hover, .bus-sidebar .nav-link.active {
-        color: #fff;
-        background-color: rgba(255, 255, 255, 0.1);
+        color: #fff !important;
+        background-color: rgba(255, 255, 255, 0.2) !important;
+    }
+    
+    /* HỖ TRỢ CHIA ĐÔI MÀN HÌNH / MOBILE VIEW */
+    @media (max-width: 767.98px) {
+        .bus-sidebar {
+            min-height: auto !important;
+            width: 100% !important;
+            position: relative !important;
+            padding: 10px !important;
+        }
+        .bus-sidebar ul.nav {
+            flex-direction: row !important;
+            flex-wrap: nowrap !important;
+            overflow-x: auto;
+            padding-bottom: 5px;
+            margin-bottom: 0 !important;
+        }
+        .bus-sidebar .nav-item {
+            flex: 0 0 auto;
+        }
+        .bus-sidebar hr {
+            display: none !important;
+        }
+        .bus-sidebar .position-absolute {
+            position: static !important;
+            padding: 0 !important;
+            margin-top: 10px;
+        }
     }
 </style>
 
@@ -79,8 +107,8 @@
     
     <div class="position-absolute bottom-0 start-0 w-100 p-3">
         <hr class="text-secondary">
-        <a href="${pageContext.request.contextPath}/logout" class="nav-link py-2.5 px-3 text-danger fw-bold">
-            <i class="fas fa-sign-out-alt me-2"></i>Đăng xuất
+        <a href="${pageContext.request.contextPath}/logout" class="nav-link py-2.5 px-3 fw-bold" style="color: #ff4d4d !important;">
+            <i class="fas fa-sign-out-alt me-2" style="color: #ff4d4d !important;"></i>Đăng xuất
         </a>
     </div>
 </nav>

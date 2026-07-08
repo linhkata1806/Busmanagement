@@ -48,13 +48,13 @@
         <div class="container-fluid">
             <div class="row">
                 <jsp:include page="/view/staff/sidebar.jsp">
-                    <jsp:param name="activeMenu" value="dashboard" />
+                    <jsp:param name="activeMenu" value="route" />
                 </jsp:include>
 
                 <main class="col-md-9 ms-sm-auto col-lg-10 main-content">
                     <div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom">
                         <div>
-                            <h2 class="fw-bold text-dark m-0">Thêm mới Tuyến xe</h2>
+                            <h2 class="fw-bold m-0" style="color: #5c67f2 !important;">Thêm mới Tuyến xe</h2>
                             <p class="text-muted small m-0">Tạo hành trình khai thác mới cho hệ thống xe buýt.</p>
                         </div>
                         <a href="${pageContext.request.contextPath}/staff/route" class="btn btn-light border fw-semibold">

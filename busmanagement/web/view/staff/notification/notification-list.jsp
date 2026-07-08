@@ -39,6 +39,21 @@
             .main-content {
                 padding: 2rem;
             }
+            .table-responsive {
+                border-radius: 0.75rem;
+            }
+            .table-dark th {
+                padding-top: 15px !important;
+                padding-bottom: 15px !important;
+                vertical-align: middle !important;
+                font-size: 0.9rem !important;
+                font-weight: 600 !important;
+            }
+            .table tbody td {
+                padding-top: 12px !important;
+                padding-bottom: 12px !important;
+                vertical-align: middle !important;
+            }
         </style>
     </head>
     <body>
@@ -46,12 +61,12 @@
         <div class="container-fluid">
             <div class="row">
                 <jsp:include page="/view/staff/sidebar.jsp">
-                    <jsp:param name="activeMenu" value="dashboard" />
+                    <jsp:param name="activeMenu" value="notification" />
                 </jsp:include>
 
                 <main class="col-md-9 ms-sm-auto col-lg-10 main-content">
                     <div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom">
-                        <h2 class="fw-bold text-dark m-0">Quản lý thông báo</h2>
+                        <h2 class="fw-bold m-0" style="color: #5c67f2 !important;"><i class="fas fa-bell me-2"></i>Thông báo chung</h2>
                         <a href="${pageContext.request.contextPath}/staff/notification/create" class="btn btn-primary fw-semibold">
                             <i class="fas fa-plus-circle me-2"></i>Tạo thông báo mới
                         </a>
@@ -68,16 +83,16 @@
                     <div class="card border-0 shadow-sm rounded-4 bg-white">
                         <div class="card-body p-0">
                             <div class="table-responsive">
-                                <table class="table table-hover align-middle mb-0">
-                                    <thead class="table-light text-uppercase small text-secondary">
+                                <table class="table table-hover table-striped align-middle mb-0">
+                                    <thead class="table-dark">
                                         <tr>
-                                            <th class="ps-4 py-3">ID</th>
+                                            <th class="ps-4">ID</th>
                                             <th>Người nhận</th>
                                             <th>Loại</th>
                                             <th>Tiêu đề</th>
                                             <th>Nội dung</th>
                                             <th>Ngày tạo</th>
-                                            <th class="text-center pe-4">Hành động</th>
+                                            <th class="text-center">Hành động</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -105,7 +120,7 @@
                                                         <td class="fw-semibold text-dark">${n.title}</td>
                                                         <td class="text-muted small text-truncate" style="max-width: 200px;">${n.content}</td>
                                                         <td class="small text-secondary">${n.createdAt}</td>
-                                                        <td class="text-center pe-4">
+                                                        <td class="text-center">
                                                             <div class="d-inline-flex gap-2">
                                                                 <a href="${pageContext.request.contextPath}/staff/notification/edit?id=${n.notificationID}" class="btn btn-sm btn-outline-primary px-2.5">
                                                                     <i class="fas fa-edit me-1"></i>Sửa

@@ -82,7 +82,7 @@
                 <main class="col-md-9 ms-sm-auto col-lg-10 main-content">
                     <div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom">
                         <div>
-                            <h2 class="fw-bold text-dark m-0">Bảng điều khiển tổng quan</h2>
+                            <h2 class="fw-bold m-0" style="color: #5c67f2 !important;"><i class="fas fa-chart-pie me-2"></i>Tổng quan</h2>
                             <p class="text-muted small m-0">Chào mừng quay trở lại, <span class="fw-bold text-primary">${staff.fullName}</span> (Nhân viên vận hành)</p>
                         </div>
 
@@ -96,7 +96,7 @@
 
                     <div class="row g-4 mb-5">
                         <div class="col-md-4">
-                            <div class="card h-100 shadow-sm stat-card bg-white">
+                            <div class="card h-100 border-0 shadow-sm stat-card rounded-4 bg-white">
                                 <div class="card-body p-4 d-flex flex-column justify-content-between">
                                     <div class="d-flex justify-content-between align-items-start mb-4">
                                         <div>
@@ -118,7 +118,7 @@
                         </div>
 
                         <div class="col-md-4">
-                            <div class="card h-100 shadow-sm stat-card bg-white">
+                            <div class="card h-100 border-0 shadow-sm stat-card rounded-4 bg-white">
                                 <div class="card-body p-4 d-flex flex-column justify-content-between">
                                     <div class="d-flex justify-content-between align-items-start mb-4">
                                         <div>
@@ -140,7 +140,7 @@
                         </div>
 
                         <div class="col-md-4">
-                            <div class="card h-100 shadow-sm stat-card bg-white">
+                            <div class="card h-100 border-0 shadow-sm stat-card rounded-4 bg-white">
                                 <div class="card-body p-4 d-flex flex-column justify-content-between">
                                     <div class="d-flex justify-content-between align-items-start mb-4">
                                         <div>

@@ -61,6 +61,18 @@
             .table-responsive {
                 border-radius: 0.75rem;
             }
+            .table-dark th {
+                padding-top: 15px !important;
+                padding-bottom: 15px !important;
+                vertical-align: middle !important;
+                font-size: 0.9rem !important;
+                font-weight: 600 !important;
+            }
+            .table tbody td {
+                padding-top: 12px !important;
+                padding-bottom: 12px !important;
+                vertical-align: middle !important;
+            }
         </style>
     </head>
     <body>
@@ -68,12 +80,12 @@
         <div class="container-fluid">
             <div class="row">
                 <jsp:include page="/view/staff/sidebar.jsp">
-                    <jsp:param name="activeMenu" value="dashboard" />
+                    <jsp:param name="activeMenu" value="pass" />
                 </jsp:include>
 
                 <main class="col-md-9 ms-sm-auto col-lg-10 main-content">
                     <div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom">
-                        <h2 class="fw-bold text-dark m-0">Hồ sơ Đăng ký Vé tháng</h2>
+                        <h2 class="fw-bold m-0" style="color: #5c67f2 !important;"><i class="fas fa-id-card me-2"></i>Quản lý vé tháng</h2>
                     </div>
 
                     <c:if test="${not empty sessionScope.msgSuccess}">
@@ -97,37 +109,41 @@
                         <c:remove var="msgError" scope="session"/>
                     </c:if>
 
-                    <div class="row g-3 mb-4 align-items-center">
-                        <div class="col-md-7">
-                            <ul class="nav nav-pills filter-tab gap-2 bg-white p-1.5 shadow-sm rounded-3 border d-inline-flex">
-                                <li class="nav-item">
-                                    <a class="nav-link ${currentStatus eq 'ALL' ? 'active' : ''}" href="?status=ALL&search=${searchQuery}">Tất cả</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link ${currentStatus eq 'PENDING' ? 'active' : ''}" href="?status=PENDING&search=${searchQuery}">Chờ duyệt</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link ${currentStatus eq 'APPROVED' ? 'active' : ''}" href="?status=APPROVED&search=${searchQuery}">Đã duyệt</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link ${currentStatus eq 'REJECTED' ? 'active' : ''}" href="?status=REJECTED&search=${searchQuery}">Bị từ chối</a>
-                                </li>
-                            </ul>
-                        </div>
-                        <div class="col-md-5">
-                            <form action="${pageContext.request.contextPath}/staff/monthly-pass" method="GET" class="input-group shadow-sm">
-                                <input type="hidden" name="status" value="${currentStatus}">
-                                <input type="text" name="search" class="form-control border-end-0" placeholder="Tìm kiếm tên, mã vé..." value="${searchQuery}">
-                                <button class="btn btn-primary px-4" type="submit"><i class="fas fa-search"></i></button>
-                            </form>
+                    <div class="card border-0 shadow-sm rounded-4 bg-white mb-4">
+                        <div class="card-body">
+                            <div class="row g-3 align-items-center">
+                                <div class="col-md-7">
+                                    <ul class="nav nav-pills filter-tab gap-2 bg-white p-1.5 rounded-3 d-inline-flex">
+                                        <li class="nav-item">
+                                            <a class="nav-link ${currentStatus eq 'ALL' ? 'active' : ''}" href="?status=ALL&search=${searchQuery}">Tất cả</a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link ${currentStatus eq 'PENDING' ? 'active' : ''}" href="?status=PENDING&search=${searchQuery}">Chờ duyệt</a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link ${currentStatus eq 'APPROVED' ? 'active' : ''}" href="?status=APPROVED&search=${searchQuery}">Đã duyệt</a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link ${currentStatus eq 'REJECTED' ? 'active' : ''}" href="?status=REJECTED&search=${searchQuery}">Bị từ chối</a>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div class="col-md-5">
+                                    <form action="${pageContext.request.contextPath}/staff/monthly-pass" method="GET" class="input-group">
+                                        <input type="hidden" name="status" value="${currentStatus}">
+                                        <input type="text" name="search" class="form-control border-end-0" placeholder="Tìm kiếm tên, mã vé..." value="${searchQuery}">
+                                        <button class="btn btn-primary px-4" type="submit"><i class="fas fa-search"></i></button>
+                                    </form>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
                     <div class="card border-0 shadow-sm rounded-4 bg-white">
                         <div class="card-body p-0">
                             <div class="table-responsive">
-                                <table class="table table-hover align-middle mb-0">
-                                    <thead class="table-light text-secondary small text-uppercase">
+                                <table class="table table-hover table-striped align-middle mb-0">
+                                    <thead class="table-dark">
                                         <tr>
                                             <th class="ps-4 py-3">Mã vé</th>
                                             <th class="py-3">Khách hàng</th>

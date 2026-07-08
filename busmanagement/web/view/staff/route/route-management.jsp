@@ -13,26 +13,41 @@
                 overflow-x: hidden;
             }
             .main-content {
-                width: 100%;
+                padding: 2rem;
+            }
+            .table-dark th {
+                padding-top: 15px !important;
+                padding-bottom: 15px !important;
+                vertical-align: middle !important;
+                font-size: 0.9rem !important;
+                font-weight: 600 !important;
+            }
+            .table tbody td {
+                padding-top: 12px !important;
+                padding-bottom: 12px !important;
+                vertical-align: middle !important;
+            }
+            .table-responsive {
+                border-radius: 0.75rem;
             }
         </style>
     </head>
     <body class="bg-light">
 
-        <!-- Layout Flexbox chia 2 cột: Sidebar & Content -->
-        <div class="d-flex">
-
-            <!-- NHÚNG SIDEBAR: Đánh dấu menu Route đang active -->
-            <jsp:include page="/view/staff/sidebar.jsp">
-                <jsp:param name="activeMenu" value="dashboard" />
-            </jsp:include>
-
-            <!-- NỘI DUNG CHÍNH -->
-            <div class="main-content">
-                <div class="container-fluid py-4">
-
-                    <h2 class="mb-4 text-primary"><i class="fas fa-route me-2"></i>Quản lý Tuyến xe</h2>
-
+        <div class="container-fluid">
+            <div class="row">
+                <!-- NHÚNG SIDEBAR: Đánh dấu menu Route đang active -->
+                <jsp:include page="/view/staff/sidebar.jsp">
+                    <jsp:param name="activeMenu" value="route" />
+                </jsp:include>
+ 
+                <!-- NỘI DUNG CHÍNH -->
+                <main class="col-md-9 ms-sm-auto col-lg-10 main-content">
+ 
+                    <div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom">
+                        <h2 class="fw-bold m-0" style="color: #5c67f2 !important;"><i class="fas fa-map-marked-alt me-2"></i>Quản lý tuyến xe</h2>
+                    </div>
+ 
                     <!-- HIỂN THỊ THÔNG BÁO FLASH MESSAGE -->
                     <c:if test="${not empty sessionScope.msgSuccess}">
                         <div class="alert alert-success alert-dismissible fade show shadow-sm" role="alert">
@@ -48,9 +63,9 @@
                         </div>
                         <c:remove var="msgError" scope="session"/>
                     </c:if>
-
+ 
                     <!-- KHU VỰC TÌM KIẾM VÀ THÊM MỚI -->
-                    <div class="card shadow-sm border-0 mb-4">
+                    <div class="card border-0 shadow-sm rounded-4 bg-white mb-4">
                         <div class="card-body">
                             <form action="${pageContext.request.contextPath}/staff/route" method="GET" class="row g-3 align-items-center">
                                 <div class="col-md-5">
@@ -79,7 +94,7 @@
                     </div>
 
                     <!-- BẢNG DANH SÁCH TUYẾN XE -->
-                    <div class="card shadow-sm border-0">
+                    <div class="card border-0 shadow-sm rounded-4 bg-white">
                         <div class="card-body p-0">
                             <div class="table-responsive">
                                 <table class="table table-hover table-striped mb-0 align-middle">
@@ -151,7 +166,7 @@
                         </div>
                     </div>
 
-                </div>
+                </main>
             </div>
         </div>
 

@@ -49,13 +49,13 @@
             <div class="row">
                 <!-- SIDEBAR -->
                 <jsp:include page="/view/staff/sidebar.jsp">
-                    <jsp:param name="activeMenu" value="dashboard" />
+                    <jsp:param name="activeMenu" value="bus" />
                 </jsp:include>
 
                 <main class="col-md-9 ms-sm-auto col-lg-10 main-content">
                     <div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom">
                         <div>
-                            <h2 class="fw-bold text-dark m-0">Thêm phương tiện mới</h2>
+                            <h2 class="fw-bold m-0" style="color: #5c67f2 !important;">Thêm phương tiện mới</h2>
                             <p class="text-muted small m-0">Đăng ký hồ sơ xe buýt mới vào hệ thống vận hành.</p>
                         </div>
                         <a href="${pageContext.request.contextPath}/staff/bus" class="btn btn-light border fw-semibold shadow-sm">

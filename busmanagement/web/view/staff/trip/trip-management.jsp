@@ -39,6 +39,21 @@
             .main-content {
                 padding: 2rem;
             }
+            .table-dark th {
+                padding-top: 15px !important;
+                padding-bottom: 15px !important;
+                vertical-align: middle !important;
+                font-size: 0.9rem !important;
+                font-weight: 600 !important;
+            }
+            .table tbody td {
+                padding-top: 12px !important;
+                padding-bottom: 12px !important;
+                vertical-align: middle !important;
+            }
+            .table-responsive {
+                border-radius: 0.75rem;
+            }
         </style>
     </head>
     <body>
@@ -46,12 +61,12 @@
         <div class="container-fluid">
             <div class="row">
                 <jsp:include page="/view/staff/sidebar.jsp">
-                    <jsp:param name="activeMenu" value="dashboard" />
+                    <jsp:param name="activeMenu" value="trip" />
                 </jsp:include>
 
                 <main class="col-md-9 ms-sm-auto col-lg-10 main-content">
                     <div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom">
-                        <h2 class="fw-bold text-dark m-0">Lịch chạy thực tế của Xe Buýt</h2>
+                        <h2 class="fw-bold m-0" style="color: #5c67f2 !important;"><i class="fas fa-route me-2"></i>Quản lý chuyến xe</h2>
                         <a href="${pageContext.request.contextPath}/staff/trip/create" class="btn btn-primary fw-semibold shadow-sm">
                             <i class="fas fa-plus-circle me-2"></i>Thêm chuyến mới
                         </a>
@@ -119,20 +134,20 @@
                         </form>
                     </div>
 
-                    <div class="card border-0 shadow-sm rounded-4 bg-white overflow-hidden">
+                    <div class="card border-0 shadow-sm rounded-4 bg-white">
                         <div class="card-body p-0">
                             <div class="table-responsive">
-                                <table class="table table-hover align-middle mb-0">
-                                    <thead class="table-light text-uppercase small text-secondary">
+                                <table class="table table-hover table-striped align-middle mb-0">
+                                    <thead class="table-dark">
                                         <tr>
-                                            <th class="ps-4 py-3">Mã Chuyến</th>
+                                            <th class="ps-4">Mã Chuyến</th>
                                             <th>Thông tin Tuyến</th>
                                             <th>Phương tiện</th>
                                             <th>Nhân sự phụ trách</th>
                                             <th>Lịch trình</th>
-                                            <th>Chiều chạy</th>
-                                            <th>Trạng thái</th>
-                                            <th class="text-center pe-4">Thao tác</th>
+                                            <th class="text-center">Chiều chạy</th>
+                                            <th class="text-center">Trạng thái</th>
+                                            <th class="text-center">Thao tác</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -177,13 +192,13 @@
                                                                 <div class="text-secondary fw-semibold mt-1" style="font-size: 0.8rem;"><i class="fas fa-flag-checkered me-1"></i>Kết thúc: ${t.actualEndTime}</div>
                                                             </c:if>
                                                         </td>
-                                                        <td>
+                                                        <td class="text-center">
                                                             <c:choose>
                                                                 <c:when test="${t.direction == 1}"><span class="badge text-success bg-success bg-opacity-10 px-2 py-1"><i class="fas fa-arrow-right me-1"></i>Lượt đi</span></c:when>
                                                                 <c:otherwise><span class="badge text-warning bg-warning bg-opacity-10 px-2 py-1"><i class="fas fa-arrow-left me-1"></i>Lượt về</span></c:otherwise>
                                                             </c:choose>
                                                         </td>
-                                                        <td>
+                                                        <td class="text-center">
                                                             <c:choose>
                                                                 <c:when test="${t.status eq 'SCHEDULED'}"><span class="badge bg-primary px-2 py-1">SCHEDULED</span></c:when>
                                                                 <c:when test="${t.status eq 'IN_PROGRESS'}"><span class="badge bg-warning text-dark px-2 py-1">IN_PROGRESS</span></c:when>
@@ -191,7 +206,7 @@
                                                                 <c:otherwise><span class="badge bg-danger px-2 py-1">CANCELLED</span></c:otherwise>
                                                             </c:choose>
                                                         </td>
-                                                        <td class="text-center pe-4">
+                                                        <td class="text-center">
                                                             <div class="d-inline-flex gap-2">
                                                                 <a href="${pageContext.request.contextPath}/staff/trip/update?id=${t.tripID}" class="btn btn-sm btn-outline-primary shadow-sm" title="Sửa lịch trình">
                                                                     <i class="fas fa-edit"></i>
