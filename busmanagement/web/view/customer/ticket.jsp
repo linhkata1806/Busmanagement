@@ -176,11 +176,11 @@
                                                         <i class="fas fa-image me-1"></i>Ảnh giấy tờ đã nộp
                                                     </button>
                                                 </c:if>
-                                                <c:if test="${mp.status == 'APPROVED' && not empty mp.qrCodeToken}">
-                                                    <div class="mt-2 text-primary fw-semibold small bg-primary bg-opacity-10 p-2 rounded-2 border border-primary border-opacity-25 text-center">
-                                                        <i class="fas fa-qrcode me-1"></i>Token soát vé:<br>
-                                                        <strong class="text-dark" style="font-size: 0.7rem; letter-spacing: 0.5px; word-break: break-all;">${mp.qrCodeToken}</strong>
-                                                    </div>
+                                                <c:if test="${(mp.status == 'APPROVED' or mp.status == 'EXPIRED') and not empty mp.qrCodeToken}">
+                                                    <button class="btn btn-sm btn-outline-success w-100 mt-2 fw-semibold" 
+                                                            onclick="showQRCode('${mp.qrCodeToken}', '${mp.status}')">
+                                                        <i class="fas fa-qrcode me-1"></i>Mã QR Check-in
+                                                    </button>
                                                 </c:if>
                                             </div>
                                         </div>
@@ -217,11 +217,11 @@
                                                     <div class="mb-1"><strong>Đối tượng ưu đãi:</strong> <span class="text-dark">${amp.typeName}</span></div>
                                                     <div><strong>Hiệu lực:</strong> <span class="text-dark">${amp.startDate} đến ${amp.endDate}</span></div>
                                                 </div>
-                                                <c:if test="${amp.status == 'APPROVED' && not empty amp.qrCodeToken}">
-                                                    <div class="mt-2 text-success fw-semibold small bg-success bg-opacity-10 p-2 rounded-2 border border-success border-opacity-25 text-center">
-                                                        <i class="fas fa-qrcode me-1"></i>Token soát vé:<br>
-                                                        <strong class="text-dark" style="font-size: 0.7rem; letter-spacing: 0.5px; word-break: break-all;">${amp.qrCodeToken}</strong>
-                                                    </div>
+                                                <c:if test="${(amp.status == 'APPROVED' or amp.status == 'EXPIRED') and not empty amp.qrCodeToken}">
+                                                    <button class="btn btn-sm btn-outline-success w-100 mt-2 fw-semibold" 
+                                                            onclick="showQRCode('${amp.qrCodeToken}', '${amp.status}')">
+                                                        <i class="fas fa-qrcode me-1"></i>Mã QR Check-in
+                                                    </button>
                                                 </c:if>
                                             </div>
                                         </div>
@@ -299,6 +299,44 @@
                 document.getElementById('customerModalImg').src = imgUrl;
                 var proofModal = new bootstrap.Modal(document.getElementById('customerProofModal'));
                 proofModal.show();
+            }
+        </script>
+        <!-- Modal hiển thị QR Code -->
+        <div class="modal fade" id="qrCodeModal" tabindex="-1" aria-labelledby="qrCodeModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-sm">
+                <div class="modal-content">
+                    <div class="modal-header bg-primary text-white">
+                        <h5 class="modal-title fw-bold" id="qrCodeModalLabel"><i class="fas fa-qrcode"></i> Mã Soát Vé</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body text-center">
+                        <!-- Chỗ này để nhét ảnh QR từ Google Chart -->
+                        <img id="qrImage" src="" alt="QR Code" class="img-fluid mb-3 shadow-sm rounded" style="width: 200px; height: 200px;">
+                        <p class="text-muted mb-1">Mã xác thực:</p>
+                        <h5 id="qrText" class="fw-bold text-primary"></h5>
+                        <p class="text-danger small mt-2" id="qrWarning" style="display: none;">Vé đã hết hạn, không thể sử dụng!</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            function showQRCode(codeData, status) {
+                // Gọi Google Chart API để ép chuỗi codeData thành ảnh QR
+                var qrUrl = "https://chart.googleapis.com/chart?chs=250x250&cht=qr&chl=" + encodeURIComponent(codeData);
+
+                document.getElementById('qrImage').src = qrUrl;
+                document.getElementById('qrText').innerText = codeData;
+
+                // Hiện cảnh báo nếu vé hết hạn (EXPIRED)
+                if (status === 'EXPIRED') {
+                    document.getElementById('qrWarning').style.display = 'block';
+                } else {
+                    document.getElementById('qrWarning').style.display = 'none';
+                }
+
+                var qrModal = new bootstrap.Modal(document.getElementById('qrCodeModal'));
+                qrModal.show();
             }
         </script>
         <!-- ===== FOOTER ===== -->

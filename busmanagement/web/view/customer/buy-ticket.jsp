@@ -184,9 +184,8 @@
                             </span>
                         </div>
 
-                      <!-- ĐÃ SỬA: Đổi action, thêm enctype="multipart/form-data" -->
-                        <form action="${pageContext.request.contextPath}/customer/ticket?action=registerPass" method="POST" enctype="multipart/form-data" class="mt-4 needs-validation" novalidate>
-                            <!-- ĐÃ SỬA: name="routeID" cho khớp với Servlet -->
+                        <!-- ĐÃ SỬA: Đổi action, thêm enctype="multipart/form-data" -->
+                        <form action="${pageContext.request.contextPath}/create-payment" method="POST" enctype="multipart/form-data" class="mt-4 needs-validation" novalidate>                            <!-- ĐÃ SỬA: name="routeID" cho khớp với Servlet -->
                             <input type="hidden" name="routeID" value="${route.routeID != null ? route.routeID : 0}">
                             <input type="hidden" name="ticketType" value="${ticketType}">
                             <!-- THÊM MỚI: input ẩn để gửi giá tiền về Servlet -->
@@ -223,7 +222,7 @@
                                     <input type="file" name="imageProof" id="imageProofFile" class="form-control rounded-3" accept=".jpg,.jpeg,.png" required>
                                     <div class="form-text small text-muted">Chỉ nhận JPG/PNG, dung lượng tối đa 5MB.</div>
                                 </div>
-                                
+
                                 <!-- THÊM MỚI: Khung Preview Ảnh -->
                                 <div class="mb-3 text-center d-none" id="previewContainer">
                                     <p class="mb-1 fw-bold text-secondary small text-start">Ảnh xem trước:</p>
@@ -245,7 +244,8 @@
                             // Cập nhật giá tiền
                             function updatePrice() {
                                 const select = document.getElementById('passTypeSelect');
-                                if (!select) return;
+                                if (!select)
+                                    return;
                                 const discount = parseFloat(select.options[select.selectedIndex].getAttribute('data-discount'));
                                 const basePrice = ${basePrice};
                                 const finalPrice = basePrice * (100 - discount) / 100;
@@ -255,21 +255,21 @@
                             }
 
                             // Xử lý Preview và Validate dung lượng ảnh (Max 5MB)
-                            document.getElementById('imageProofFile')?.addEventListener('change', function(e) {
+                            document.getElementById('imageProofFile')?.addEventListener('change', function (e) {
                                 const file = e.target.files[0];
                                 const previewContainer = document.getElementById('previewContainer');
                                 const imagePreview = document.getElementById('imagePreview');
-                                
+
                                 if (file) {
                                     if (file.size > 5 * 1024 * 1024) {
                                         alert('Dung lượng ảnh vượt quá 5MB. Vui lòng chọn ảnh khác!');
-                                        this.value = ''; 
+                                        this.value = '';
                                         previewContainer.classList.add('d-none');
                                         return;
                                     }
-                                    
+
                                     const reader = new FileReader();
-                                    reader.onload = function(evt) {
+                                    reader.onload = function (evt) {
                                         imagePreview.src = evt.target.result;
                                         previewContainer.classList.remove('d-none');
                                     }
@@ -284,7 +284,7 @@
                             });
                         </script>
 
-                           
+
 
                     </div>
                 </div>

@@ -10,6 +10,8 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import jakarta.servlet.http.Part;
+import java.io.File;
 import model.Account;
 import model.Route;
 import service.MonthlyPassService;
@@ -102,12 +104,9 @@ public class BuyTicketServlet extends HttpServlet {
         String action = request.getParameter("action");
         String routeIdRaw = request.getParameter("routeId");
         String ticketType = request.getParameter("ticketType");
-        String passTypeIdRaw = request.getParameter("passTypeId");
+        String passTypeIdRaw = request.getParameter("passTypeID");
         int passTypeID = (passTypeIdRaw != null && !passTypeIdRaw.isEmpty()) ? Integer.parseInt(passTypeIdRaw) : 1;
-        String imageProof = request.getParameter("imageProof");
-        if (imageProof == null) {
-            imageProof = "";
-        }
+
         // Validate routeId
         if (routeIdRaw == null || routeIdRaw.isEmpty()) {
             response.sendRedirect(request.getContextPath() + "/route-list");
@@ -120,12 +119,14 @@ public class BuyTicketServlet extends HttpServlet {
             request.getRequestDispatcher("/view/customer/buy-ticket.jsp").forward(request, response);
             return;
         }
+        String imageProof = "";
         try {
             int routeId = Integer.parseInt(routeIdRaw);
             // 1. Lấy thông tin tuyến xe qua Service
             Route route = routeService.getRouteById(routeId);
             if (route == null) {
                 request.setAttribute("errorMsg", "Tuyến xe không tồn tại hoặc đã bị gỡ bỏ.");
+                reloadFormContext(request, routeIdRaw, ticketType);
                 request.getRequestDispatcher("/view/customer/buy-ticket.jsp").forward(request, response);
                 return;
             }
@@ -141,6 +142,29 @@ public class BuyTicketServlet extends HttpServlet {
                 reloadFormContext(request, routeIdRaw, ticketType);
                 request.getRequestDispatcher("/view/customer/buy-ticket.jsp").forward(request, response);
                 return;
+            }
+            if ("thang".equals(ticketType) || "lien_chuyen".equals(ticketType)) {
+
+                Part filePart = request.getPart("imageProof");
+
+                String uploadPath = request.getServletContext().getRealPath("")
+                        + File.separator + "uploads"
+                        + File.separator + "pass-proof";
+
+                try {
+                    imageProof = monthlyPassService.processAndSaveProof(filePart, uploadPath);
+                } catch (IllegalArgumentException e) {
+                    request.setAttribute("errorMsg", e.getMessage());
+                    reloadFormContext(request, routeIdRaw, ticketType);
+                    request.getRequestDispatcher("/view/customer/buy-ticket.jsp").forward(request, response);
+                    return;
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    request.setAttribute("errorMsg", "Lỗi upload ảnh.");
+                    reloadFormContext(request, routeIdRaw, ticketType);
+                    request.getRequestDispatcher("/view/customer/buy-ticket.jsp").forward(request, response);
+                    return;
+                }
             }
             // 3. Tính giá vé qua Service
             long price;

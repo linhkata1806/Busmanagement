@@ -284,10 +284,17 @@
         <servlet-name>ResetPasswordServlet</servlet-name>
         <servlet-class>controller.admin.ResetPasswordServlet</servlet-class>
     </servlet>
-    
     <servlet>
         <servlet-name>AddStopToRouteServlet</servlet-name>
         <servlet-class>controller.staff.stop.AddStopToRouteServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>CreatePaymentServlet</servlet-name>
+        <servlet-class>controller.payment.CreatePaymentServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>VNPayReturnServlet</servlet-name>
+        <servlet-class>controller.payment.VNPayReturnServlet</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>LoginServlet</servlet-name>
@@ -533,6 +540,14 @@
         <servlet-name>AddStopToRouteServlet</servlet-name>
         <url-pattern>/staff/route-stop/add</url-pattern>
     </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>CreatePaymentServlet</servlet-name>
+        <url-pattern>/create-payment</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>VNPayReturnServlet</servlet-name>
+        <url-pattern>/vnpay-return</url-pattern>
+    </servlet-mapping>
     <welcome-file-list>
         <welcome-file>home</welcome-file>
     </welcome-file-list>
@@ -556,7 +571,6 @@
         <servlet-name>SystemReportServlet</servlet-name>
         <servlet-class>controller.admin.SystemReportServlet</servlet-class>
     </servlet>
-
     <servlet-mapping>
         <servlet-name>AdminDashboardServlet</servlet-name>
         <url-pattern>/admin/dashboard</url-pattern>
