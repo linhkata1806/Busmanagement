@@ -106,12 +106,6 @@
         <div class="container my-5">
             <div class="ticket-container">
 
-                <div class="mb-3 text-start">
-                    <a href="javascript:history.back()" class="btn btn-light rounded-pill px-4 fw-bold text-dark shadow-sm">
-                        <i class="fas fa-arrow-left me-2"></i>Quay lại
-                    </a>
-                </div>
-
                 <c:if test="${not empty errorMsg}">
                     <div class="alert alert-danger alert-dismissible fade show shadow-sm mb-4" role="alert">
                         <i class="fas fa-exclamation-triangle me-2"></i> ${errorMsg}
@@ -198,12 +192,12 @@
                                     <select name="passTypeID" class="form-select rounded-3" id="passTypeSelect" onchange="updatePrice()">
                                         <c:choose>
                                             <c:when test="${ticketType == 'thang'}">
-                                                <option value="1" data-discount="50">Học sinh / Sinh viên (1 Tuyến) - Giảm 50%</option>
+                                                <option value="1" data-discount="50">Học sinh / Sinh viên - Giảm 50%</option>
                                                 <option value="3" data-discount="100">Người cao tuổi - Miễn phí 100%</option>
                                                 <option value="4" data-discount="0" selected>Bình thường - Nguyên giá</option>
                                             </c:when>
                                             <c:otherwise>
-                                                <option value="2" data-discount="50">Học sinh / Sinh viên (Liên Tuyến) - Giảm 50%</option>
+                                                <option value="2" data-discount="50">Học sinh / Sinh viên - Giảm 50%</option>
                                                 <option value="3" data-discount="100">Người cao tuổi - Miễn phí 100%</option>
                                                 <option value="4" data-discount="0" selected>Bình thường - Nguyên giá</option>
                                             </c:otherwise>
@@ -300,6 +294,48 @@
 
                             window.addEventListener('DOMContentLoaded', () => {
                                 updatePrice();
+                                
+                                const form = document.querySelector('form.needs-validation');
+                                if (form) {
+                                    form.addEventListener('submit', function (event) {
+                                        if (!form.checkValidity()) {
+                                            return;
+                                        }
+                                        
+                                        // Kiểm tra nếu là vé mất phí (thanh toán qua VNPAY)
+                                        const select = document.getElementById('passTypeSelect');
+                                        let isPaid = true;
+                                        if (select) {
+                                            const discount = parseFloat(select.options[select.selectedIndex].getAttribute('data-discount'));
+                                            if (discount === 100) {
+                                                isPaid = false;
+                                            }
+                                        }
+                                        
+                                        if (isPaid) {
+                                            const width = 900;
+                                            const height = 750;
+                                            const left = (screen.width / 2) - (width / 2);
+                                            const top = (screen.height / 2) - (height / 2);
+                                            
+                                            // Mở cửa sổ pop-up ngay trong sự kiện click để trình duyệt không chặn
+                                            window.open(
+                                                'about:blank', 
+                                                'VNPayGateway', 
+                                                'width=' + width + ',height=' + height + ',left=' + left + ',top=' + top + ',status=yes,resizable=yes'
+                                            );
+                                            
+                                            form.target = 'VNPayGateway';
+                                            
+                                            // Chuyển trang chính sang giao diện chờ sau khi submit được kích hoạt
+                                            setTimeout(() => {
+                                                window.location.href = '${pageContext.request.contextPath}/view/customer/vnpay-loading.jsp';
+                                            }, 200);
+                                        } else {
+                                            form.removeAttribute('target');
+                                        }
+                                    });
+                                }
                             });
                         </script>
 

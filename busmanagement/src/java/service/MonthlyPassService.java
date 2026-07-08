@@ -90,7 +90,8 @@ public class MonthlyPassService {
         MonthlyPassType passType = monthlyPassType.getById(passTypeID);
 
         if (passType == null) {
-            throw new IllegalArgumentException("Loại vé tháng không tồn tại.");
+            // Fallback: Nếu không tìm thấy loại đối tượng dưới DB, trả về nguyên giá gốc
+            return basePrice;
         }
 
         double discount = passType.getDiscountPercentage();

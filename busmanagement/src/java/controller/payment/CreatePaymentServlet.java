@@ -158,7 +158,7 @@ public class CreatePaymentServlet extends HttpServlet {
         session.setAttribute("pending_ticketType", ticketType);
         session.setAttribute("pending_passTypeID", request.getParameter("passTypeID"));
 
-        // 5. Gọi VNPayService để lấy link và Redirect sang cổng thanh toán
+        // 5. Gọi VNPayService để lấy link và Redirect sang cổng thanh toán (chạy trực tiếp trong pop-up)
         String paymentUrl = vnpayService.createPaymentURL(request, vnp_Amount, vnp_TxnRef);
         response.sendRedirect(paymentUrl);
     }

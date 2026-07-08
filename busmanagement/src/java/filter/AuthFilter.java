@@ -166,6 +166,12 @@ public class AuthFilter implements Filter {
         }
 
         if (user == null) {
+            String targetUrl = req.getRequestURI();
+            String queryString = req.getQueryString();
+            if (queryString != null) {
+                targetUrl += "?" + queryString;
+            }
+            req.getSession(true).setAttribute("REDIRECT_URL", targetUrl);
             res.sendRedirect(req.getContextPath() + "/login");
             return;
         }
