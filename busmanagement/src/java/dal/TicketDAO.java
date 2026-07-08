@@ -291,4 +291,16 @@ public class TicketDAO extends DBContext {
         }
         return false;
     }
+    public boolean updateTicketStatusByTrip(int tripID, String status) {
+        String sql = "UPDATE Tickets SET Status = ? WHERE TripID = ? AND Status = 'CHECKED_IN'";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, status);
+            ps.setInt(2, tripID);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            
+            return false;
+        }
+    }
 }
