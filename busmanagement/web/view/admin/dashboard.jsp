@@ -33,6 +33,10 @@
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
             transition: transform 0.2s;
             background: #ffffff;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
         }
         .stat-card:hover {
             transform: translateY(-2px);
@@ -66,7 +70,7 @@
 
             <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 main-content">
                 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-                    <h1 class="h2 text-dark fw-bold">Tổng Quan Quản Trị Hệ Thống</h1>
+                    <h1 class="h2 text-dark fw-bold">Tổng Quan</h1>
                     <div class="text-secondary fw-semibold">
                         Xin chào, <span class="text-primary">${sessionScope.USER.fullName}</span>
                     </div>
@@ -94,7 +98,7 @@
                         <div class="stat-card p-4">
                             <div class="d-flex justify-content-between align-items-center">
                                 <div>
-                                    <h6 class="text-secondary mb-1">Khách Hàng (CUSTOMER)</h6>
+                                    <h6 class="text-secondary mb-1">Khách Hàng</h6>
                                     <h4 class="fw-bold mb-0 text-dark">${dashboardData.totalCustomers}</h4>
                                 </div>
                                 <div class="stat-icon bg-card-green">
@@ -119,9 +123,9 @@
                                 </div>
                             </div>
                             <div class="mt-2 text-warning fs-7 d-flex justify-content-between align-items-center">
-                                <span>Cần staff xử lý (PENDING)</span>
+                                <span>Cần staff xử lý</span>
                                 <a href="${pageContext.request.contextPath}/staff/monthly-pass" class="text-decoration-none fw-bold text-warning hover-link">
-                                    Đi tới trang duyệt <i class="fas fa-arrow-right ms-1"></i>
+                                    Đi tới trang duyệt 
                                 </a>
                             </div>
                         </div>

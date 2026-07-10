@@ -377,9 +377,9 @@ INSERT INTO MonthlyPassTypes (TypeName, DiscountPercentage, Description) VALUES
 (N'Phổ thông (Liên Tuyến)', 0.00, N'Đi tất cả các tuyến');
 
 INSERT INTO MonthlyPasses (AccountID, RouteID, PassTypeID, PassCode, QRCodeToken, StartDate, EndDate, Price, Status, ImageProof, ApprovedBy, ApprovedAt, LastUsedAt) VALUES
-(12, 1, 1, 'MP-SV-107-A1', 'QR-LINHKATA-107', '2026-07-01', '2026-07-31', 50000, 'APPROVED', 'uploads/pass-proof/4b090f77-026e-4d2e-9ae5-c4106a7baa18.jpg', 2, DATEADD(day, -5, GETDATE()), GETDATE()),
-(13, 2, 1, 'MP-SV-032-A2', 'QR-NAM-032', '2026-07-01', '2026-07-31', 50000, 'APPROVED', 'uploads/pass-proof/076dd183-d4f9-4b70-920b-57ed2df438c6.png', 3, DATEADD(day, -3, GETDATE()), DATEADD(day, -1, GETDATE())),
-(15, NULL, 2, 'MP-PT-ALL-B1', 'QR-HUNG-ALL', '2026-07-01', '2026-07-31', 200000, 'PENDING', 'uploads/pass-proof/4b2d21d7-14d1-43df-b0ab-c6858bad1a2d.png', NULL, NULL, NULL);
+(12, 1, 1, 'MP-SV-107-A1', 'QR-LINHKATA-107', '2026-07-01', '2026-07-31', 50000, 'APPROVED', NULL, 2, DATEADD(day, -5, GETDATE()), GETDATE()),
+(13, 2, 1, 'MP-SV-032-A2', 'QR-NAM-032', '2026-07-01', '2026-07-31', 50000, 'APPROVED', NULL, 3, DATEADD(day, -3, GETDATE()), DATEADD(day, -1, GETDATE())),
+(15, NULL, 2, 'MP-PT-ALL-B1', 'QR-HUNG-ALL', '2026-07-01', '2026-07-31', 200000, 'PENDING', NULL, NULL, NULL, NULL);
 
 INSERT INTO Payments (AccountID, TicketID, PassID, Amount, PaymentMethod, TransactionCode, PaymentStatus, PaidAt) VALUES
 (12, 1, NULL, 9000, 'VNPAY', 'VNP20260701_01', 'SUCCESS', DATEADD(day, -1, GETDATE())),

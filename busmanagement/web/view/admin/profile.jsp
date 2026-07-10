@@ -13,11 +13,11 @@
         <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
         <style>
             .profile-header {
-                background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+                background: linear-gradient(135deg, #0d47a1 0%, #1e3a8a 100%);
                 color: white;
-                border-top-left-radius: 12px;
-                border-top-right-radius: 12px;
-                padding: 2rem 1rem;
+                border-top-left-radius: 1rem;
+                border-top-right-radius: 1rem;
+                padding: 2.5rem 1rem;
                 text-align: center;
             }
             .profile-avatar {
@@ -44,7 +44,7 @@
             }
             .custom-card {
                 border: none;
-                border-radius: 12px;
+                border-radius: 1rem;
             }
         </style>
     </head>
@@ -53,40 +53,44 @@
             <div class="row">
                 <jsp:include page="sidebar.jsp"><jsp:param name="activeMenu" value="profile" /></jsp:include>
 
-                    <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 py-5">
+                <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 py-4">
+                    
+                    <!-- TIÊU ĐỀ GÓC TRÁI ĐỒNG NHẤT -->
+                    <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-2">
+                        <div>
+                            <h2 class="fw-bold text-dark mb-0"><i class="fas fa-id-badge me-2" style="color: #0d47a1;"></i>Hồ sơ cá nhân</h2>
+                        </div>
+                    </div>
 
-                        <div class="row justify-content-center">
-                            <div class="col-md-8 col-lg-6">
-                                <h3 class="fw-bold mb-4 text-dark"><i class="fas fa-id-badge me-2"></i>Hồ sơ Quản trị viên</h3>
-
-                                <div class="card shadow custom-card">
-                                    <div class="profile-header">
-                                        <div class="profile-avatar">
-                                            <i class="fas fa-user-shield"></i>
-                                        </div>
-                                        <h4 class="fw-bold mb-1">${profile.fullName}</h4>
-                                    <p class="mb-0 text-light opacity-75">@${profile.username}</p>
+                    <!-- BẢNG THÔNG TIN VỪA TOÀN BỘ SCREEN -->
+                    <div class="card shadow-sm border-0 rounded-4 bg-white mb-4">
+                        <div class="profile-header">
+                            <div class="profile-avatar">
+                                <i class="fas fa-user-shield"></i>
+                            </div>
+                            <h3 class="fw-bold mb-1">${profile.fullName}</h3>
+                            <p class="mb-0 text-light opacity-75">@${profile.username}</p>
+                        </div>
+                        <div class="card-body p-4">
+                            <div class="row g-4">
+                                <div class="col-md-6 border-end">
+                                    <div class="py-3 border-bottom d-flex justify-content-between align-items-center">
+                                        <span class="info-label"><i class="fas fa-envelope text-primary me-2"></i>Email</span>
+                                        <span class="info-value text-dark fw-medium">${profile.email}</span>
+                                    </div>
+                                    <div class="py-3 d-flex justify-content-between align-items-center">
+                                        <span class="info-label"><i class="fas fa-phone-alt text-success me-2"></i>Số điện thoại</span>
+                                        <span class="info-value text-dark fw-medium">${profile.phone}</span>
+                                    </div>
                                 </div>
-
-                                <div class="card-body p-4">
-                                    <ul class="list-group list-group-flush">
-                                        <li class="list-group-item d-flex justify-content-between align-items-center py-3 px-0 border-bottom">
-                                            <span class="info-label"><i class="fas fa-envelope text-primary me-2"></i>Email</span>
-                                            <span class="info-value">${profile.email}</span>
-                                        </li>
-                                        <li class="list-group-item d-flex justify-content-between align-items-center py-3 px-0 border-bottom">
-                                            <span class="info-label"><i class="fas fa-phone-alt text-success me-2"></i>Số điện thoại</span>
-                                            <span class="info-value">${profile.phone}</span>
-                                        </li>
-                                        <li class="list-group-item d-flex justify-content-between align-items-center py-3 px-0">
-                                            <span class="info-label"><i class="fas fa-user-tag text-warning me-2"></i>Vai trò hệ thống</span>
-                                            <span class="badge bg-danger px-3 py-2 fs-6 shadow-sm"><i class="fas fa-crown me-1"></i>${profile.roleName}</span>
-                                        </li>
-                                    </ul>
-
-                                    <div class="mt-4 text-center">
-                                        <button class="btn btn-outline-primary px-4 rounded-pill" disabled title="Tài khoản hệ thống không thể tự sửa">
-                                        </button>
+                                <div class="col-md-6">
+                                    <div class="py-3 border-bottom d-flex justify-content-between align-items-center">
+                                        <span class="info-label"><i class="fas fa-user-tag text-warning me-2"></i>Vai trò hệ thống</span>
+                                        <span class="badge bg-danger px-3 py-2 fs-6 shadow-sm"><i class="fas fa-crown me-1"></i>${profile.roleName}</span>
+                                    </div>
+                                    <div class="py-3 d-flex justify-content-between align-items-center">
+                                        <span class="info-label"><i class="fas fa-toggle-on text-info me-2"></i>Trạng thái</span>
+                                        <span class="badge bg-success px-3 py-2 fs-6 shadow-sm">Hoạt động</span>
                                     </div>
                                 </div>
                             </div>

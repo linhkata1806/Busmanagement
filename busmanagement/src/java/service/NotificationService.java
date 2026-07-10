@@ -36,8 +36,7 @@ public class NotificationService {
             LocalDateTime now = LocalDateTime.now();
             noti.setCreatedAt(now);
 
-            notificationDAO.insert(noti);
-            return true;
+            return notificationDAO.insert(noti);
         } catch (Exception e) {
             System.out.println("Lỗi tạo thông báo: " + e.getMessage());
             // 3. Nếu xảy ra lỗi, trả về false để Servlet báo lỗi ra màn hình

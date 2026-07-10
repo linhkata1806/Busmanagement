@@ -67,7 +67,7 @@
                                 <label class="form-label small fw-bold">Loại thông báo</label>
                                 <select name="notificationType" class="form-select">
                                     <option value="SYSTEM_ALERT">SYSTEM (Hệ thống)</option>
-                                    <option value="MAINTENANCE">MAINTENANCE (Bảo trì)</option>
+                                    <option value="SYSTEM_MAINTENANCE">MAINTENANCE (Bảo trì)</option>
                                     <option value="ROUTE_DELAY">ROUTE_DELAY (Trễ tuyến)</option>
                                     <option value="ROUTE_CHANGE">ROUTE_CHANGE (Thay đổi lộ trình)</option>
                                 </select>

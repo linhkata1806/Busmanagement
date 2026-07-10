@@ -188,6 +188,7 @@ public class NotificationDAO extends DBContext {
             }
         } catch (Exception e) {
             e.printStackTrace();
+            throw new RuntimeException("Lỗi truy vấn danh sách thông báo: " + e.getMessage(), e);
         }
         return list;
     }

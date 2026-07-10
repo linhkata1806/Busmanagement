@@ -1,6 +1,8 @@
 package controller.admin;
 
 import dal.DashboardDAO;
+import dal.RouteDAO;
+import model.Route;
 import java.io.IOException;
 import java.sql.Date;
 import java.time.LocalDate;
@@ -13,13 +15,6 @@ import jakarta.servlet.http.HttpServletResponse;
 
 public class RevenueReportServlet extends HttpServlet {
 
-    private DashboardDAO dashboardDAO;
-
-    @Override
-    public void init() throws ServletException {
-        dashboardDAO = new DashboardDAO();
-    }
-
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -28,6 +23,11 @@ public class RevenueReportServlet extends HttpServlet {
         String period = request.getParameter("period");
         if (period == null || period.isEmpty()) {
             period = "this_month"; // Mặc định khi mới vào trang
+        }
+        
+        String routeIdParam = request.getParameter("routeId");
+        if (routeIdParam == null || routeIdParam.isEmpty()) {
+            routeIdParam = "ALL";
         }
 
         LocalDate now = LocalDate.now();
@@ -47,25 +47,48 @@ public class RevenueReportServlet extends HttpServlet {
         }
 
         // 3. Gọi dữ liệu từ tầng DAO
+        DashboardDAO dashboardDAO = new DashboardDAO();
         List<Map<String, Object>> data = dashboardDAO.getRevenueByRouteAndType(Date.valueOf(start), Date.valueOf(end));
 
-        // 4. Xây dựng mảng chuỗi dữ liệu cho đồ thị Chart.js
+        // 4. Lấy thông tin Tuyến lọc (nếu có)
+        int selectedRouteId = -1;
+        String selectedRouteNumber = null;
+        RouteDAO routeDAO = new RouteDAO();
+        if (!"ALL".equals(routeIdParam)) {
+            try {
+                selectedRouteId = Integer.parseInt(routeIdParam);
+                Route selRoute = routeDAO.getRouteById(selectedRouteId);
+                if (selRoute != null) {
+                    selectedRouteNumber = selRoute.getRouteNumber();
+                }
+            } catch (NumberFormatException e) {
+                // Ignore
+            }
+        }
+
+        // 5. Xây dựng mảng chuỗi dữ liệu cho đồ thị Chart.js
         StringBuilder labels = new StringBuilder("[");
         StringBuilder ticketData = new StringBuilder("[");
         StringBuilder passData = new StringBuilder("[");
         double totalTicket = 0;
         double totalPass = 0;
+        boolean hasFilteredData = false;
 
         for (Map<String, Object> item : data) {
-            labels.append("'Tuyến ").append(item.get("route")).append("',");
+            String routeNumber = (String) item.get("route");
+            if (selectedRouteNumber != null && !selectedRouteNumber.equals(routeNumber)) {
+                continue; // Lọc bỏ tuyến không chọn
+            }
+            labels.append("'Tuyến ").append(routeNumber).append("',");
             ticketData.append(item.get("ticket")).append(",");
             passData.append(item.get("pass")).append(",");
             totalTicket += (double) item.get("ticket");
             totalPass += (double) item.get("pass");
+            hasFilteredData = true;
         }
 
         // Loại bỏ dấu phẩy thừa ở cuối phần tử
-        if (!data.isEmpty()) {
+        if (hasFilteredData) {
             labels.setLength(labels.length() - 1);
             ticketData.setLength(ticketData.length() - 1);
             passData.setLength(passData.length() - 1);
@@ -74,7 +97,7 @@ public class RevenueReportServlet extends HttpServlet {
         ticketData.append("]");
         passData.append("]");
 
-        // 5. Đẩy toàn bộ dữ liệu thật sang giao diện hiển thị
+        // 6. Đẩy toàn bộ dữ liệu thật sang giao diện hiển thị
         request.setAttribute("labels", labels.toString());
         request.setAttribute("ticketData", ticketData.toString());
         request.setAttribute("passData", passData.toString());
@@ -82,6 +105,8 @@ public class RevenueReportServlet extends HttpServlet {
         request.setAttribute("totalPass", totalPass);
         request.setAttribute("totalAll", totalTicket + totalPass);
         request.setAttribute("selectedPeriod", period);
+        request.setAttribute("selectedRoute", routeIdParam);
+        request.setAttribute("routes", routeDAO.getAllActiveRoutes());
 
         request.getRequestDispatcher("/view/admin/revenue-report.jsp").forward(request, response);
     }

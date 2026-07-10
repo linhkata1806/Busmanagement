@@ -109,33 +109,29 @@
                         <c:remove var="msgError" scope="session"/>
                     </c:if>
 
-                    <div class="card border-0 shadow-sm rounded-4 bg-white mb-4">
-                        <div class="card-body">
-                            <div class="row g-3 align-items-center">
-                                <div class="col-md-7">
-                                    <ul class="nav nav-pills filter-tab gap-2 bg-white p-1.5 rounded-3 d-inline-flex">
-                                        <li class="nav-item">
-                                            <a class="nav-link ${currentStatus eq 'ALL' ? 'active' : ''}" href="?status=ALL&search=${searchQuery}">Tất cả</a>
-                                        </li>
-                                        <li class="nav-item">
-                                            <a class="nav-link ${currentStatus eq 'PENDING' ? 'active' : ''}" href="?status=PENDING&search=${searchQuery}">Chờ duyệt</a>
-                                        </li>
-                                        <li class="nav-item">
-                                            <a class="nav-link ${currentStatus eq 'APPROVED' ? 'active' : ''}" href="?status=APPROVED&search=${searchQuery}">Đã duyệt</a>
-                                        </li>
-                                        <li class="nav-item">
-                                            <a class="nav-link ${currentStatus eq 'REJECTED' ? 'active' : ''}" href="?status=REJECTED&search=${searchQuery}">Bị từ chối</a>
-                                        </li>
-                                    </ul>
-                                </div>
-                                <div class="col-md-5">
-                                    <form action="${pageContext.request.contextPath}/staff/monthly-pass" method="GET" class="input-group">
-                                        <input type="hidden" name="status" value="${currentStatus}">
-                                        <input type="text" name="search" class="form-control border-end-0" placeholder="Tìm kiếm tên, mã vé..." value="${searchQuery}">
-                                        <button class="btn btn-primary px-4" type="submit"><i class="fas fa-search"></i></button>
-                                    </form>
-                                </div>
-                            </div>
+                    <div class="row g-3 mb-4 align-items-center">
+                        <div class="col-md-7">
+                            <ul class="nav nav-pills filter-tab gap-2 bg-white p-1.5 shadow-sm rounded-3 border d-inline-flex">
+                                <li class="nav-item">
+                                    <a class="nav-link ${currentStatus eq 'ALL' ? 'active' : ''}" href="?status=ALL&search=${searchQuery}">Tất cả</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link ${currentStatus eq 'PENDING' ? 'active' : ''}" href="?status=PENDING&search=${searchQuery}">Chờ duyệt</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link ${currentStatus eq 'APPROVED' ? 'active' : ''}" href="?status=APPROVED&search=${searchQuery}">Đã duyệt</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link ${currentStatus eq 'REJECTED' ? 'active' : ''}" href="?status=REJECTED&search=${searchQuery}">Bị từ chối</a>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="col-md-5">
+                            <form action="${pageContext.request.contextPath}/staff/monthly-pass" method="GET" class="input-group shadow-sm">
+                                <input type="hidden" name="status" value="${currentStatus}">
+                                <input type="text" name="search" class="form-control border-end-0" placeholder="Tìm kiếm tên, mã vé..." value="${searchQuery}">
+                                <button class="btn btn-primary px-4" type="submit"><i class="fas fa-search"></i></button>
+                            </form>
                         </div>
                     </div>
 

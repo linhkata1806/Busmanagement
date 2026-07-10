@@ -111,11 +111,17 @@
                                                         <td class="ps-4 text-secondary">#${n.notificationID}</td>
                                                         <td><span class="badge bg-dark">Mã TK: ${n.accountID}</span></td>
                                                         <td>
-                                                            <c:choose>
-                                                                <c:when test="${n.notificationType.name() eq 'SYSTEM'}"><span class="badge bg-primary">${n.notificationType}</span></c:when>
-                                                                <c:when test="${n.notificationType.name() eq 'ALERT' || n.notificationType.name() eq 'ROUTE_DELAY'}"><span class="badge bg-danger">${n.notificationType}</span></c:when>
-                                                                <c:otherwise><span class="badge bg-secondary">${n.notificationType}</span></c:otherwise>
-                                                            </c:choose>
+                                                             <c:choose>
+                                                                 <c:when test="${n.notificationType.name() eq 'SYSTEM_ALERT' || n.notificationType.name() eq 'SYSTEM_MAINTENANCE'}">
+                                                                     <span class="badge bg-primary">${n.notificationType}</span>
+                                                                 </c:when>
+                                                                 <c:when test="${n.notificationType.name() eq 'ROUTE_DELAY'}">
+                                                                     <span class="badge bg-danger">${n.notificationType}</span>
+                                                                 </c:when>
+                                                                 <c:otherwise>
+                                                                     <span class="badge bg-secondary">${n.notificationType}</span>
+                                                                 </c:otherwise>
+                                                             </c:choose>
                                                         </td>
                                                         <td class="fw-semibold text-dark">${n.title}</td>
                                                         <td class="text-muted small text-truncate" style="max-width: 200px;">${n.content}</td>
