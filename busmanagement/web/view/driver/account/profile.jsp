@@ -5,7 +5,7 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Hồ Sơ Cá Nhân - Tài Xế</title>
+        <title>Thông tin cá nhân - Tài xế</title>
         <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
         <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
         <style>
@@ -63,7 +63,7 @@
                 <!-- Main Content Area -->
                 <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 main-content">
                     <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-                        <h1 class="h2 text-dark fw-bold">Thông Tin Cá Nhân</h1>
+                        <h1 class="h2 text-dark fw-bold">Thông tin cá nhân</h1>
                     </div>
 
                     <!-- Alert Messages -->

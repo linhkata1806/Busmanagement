@@ -66,7 +66,7 @@
 
                 <main class="col-md-9 ms-sm-auto col-lg-10 main-content">
                     <div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom">
-                        <h2 class="fw-bold m-0" style="color: #5c67f2 !important;"><i class="fas fa-bell me-2"></i>Thông báo chung</h2>
+                        <h2 class="fw-bold text-dark m-0">Thông báo chung</h2>
                         <a href="${pageContext.request.contextPath}/staff/notification/create" class="btn btn-primary fw-semibold">
                             <i class="fas fa-plus-circle me-2"></i>Tạo thông báo mới
                         </a>

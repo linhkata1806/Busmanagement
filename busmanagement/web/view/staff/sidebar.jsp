@@ -68,7 +68,34 @@
     <div class="mobile-nav-container w-100 d-md-none">
         <div class="dropdown">
             <button class="btn btn-outline-light dropdown-toggle w-100 py-2.5 px-3 text-start d-flex align-items-center justify-content-between" type="button" id="mobileMenuDropdown" data-bs-toggle="dropdown" aria-expanded="false" style="background-color: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.25); border-radius: 0.5rem;">
-                <span class="fw-semibold text-white"><i class="fas fa-bus-alt text-info me-2"></i>Bus Hà Nội</span>
+                <span class="fw-semibold text-white">
+                    <c:choose>
+                        <c:when test="${param.activeMenu == 'dashboard'}">
+                            <i class="fas fa-chart-pie text-info me-2"></i>Tổng quan
+                        </c:when>
+                        <c:when test="${param.activeMenu == 'pass'}">
+                            <i class="fas fa-id-card text-info me-2"></i>Quản lý vé tháng
+                        </c:when>
+                        <c:when test="${param.activeMenu == 'route'}">
+                            <i class="fas fa-map-marked-alt text-info me-2"></i>Quản lý tuyến xe
+                        </c:when>
+                        <c:when test="${param.activeMenu == 'stop'}">
+                            <i class="fas fa-map-signs text-info me-2"></i>Quản lý điểm dừng
+                        </c:when>
+                        <c:when test="${param.activeMenu == 'trip'}">
+                            <i class="fas fa-route text-info me-2"></i>Quản lý chuyến xe
+                        </c:when>
+                        <c:when test="${param.activeMenu == 'bus'}">
+                            <i class="fas fa-bus text-info me-2"></i>Quản lý xe buýt
+                        </c:when>
+                        <c:when test="${param.activeMenu == 'notification'}">
+                            <i class="fas fa-bell text-info me-2"></i>Thông báo chung
+                        </c:when>
+                        <c:otherwise>
+                            <i class="fas fa-bus-alt text-info me-2"></i>Bus Hà Nội
+                        </c:otherwise>
+                    </c:choose>
+                </span>
             </button>
             <ul class="dropdown-menu dropdown-menu-dark w-100 shadow border-0 mt-2" aria-labelledby="mobileMenuDropdown" style="background-color: #0d47a1; border: 1px solid rgba(255,255,255,0.15); border-radius: 0.5rem; padding: 0.5rem;">
                 <li>

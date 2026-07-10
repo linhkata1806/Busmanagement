@@ -58,7 +58,7 @@
                     <!-- TIÊU ĐỀ GÓC TRÁI ĐỒNG NHẤT -->
                     <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-2">
                         <div>
-                            <h2 class="fw-bold text-dark mb-0"><i class="fas fa-id-badge me-2" style="color: #0d47a1;"></i>Hồ sơ cá nhân</h2>
+                            <h2 class="fw-bold text-dark mb-0">Hồ sơ cá nhân</h2>
                         </div>
                     </div>
 

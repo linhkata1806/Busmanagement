@@ -68,7 +68,28 @@
     <div class="mobile-nav-container w-100 d-md-none">
         <div class="dropdown">
             <button class="btn btn-outline-light dropdown-toggle w-100 py-2.5 px-3 text-start d-flex align-items-center justify-content-between" type="button" id="mobileMenuDropdown" data-bs-toggle="dropdown" aria-expanded="false" style="background-color: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.25); border-radius: 0.5rem;">
-                <span class="fw-semibold text-white"><i class="fas fa-user-shield text-warning me-2"></i>Quản Trị Viên</span>
+                <span class="fw-semibold text-white">
+                    <c:choose>
+                        <c:when test="${param.activeMenu == 'dashboard'}">
+                            <i class="fas fa-chart-pie text-warning me-2"></i>Tổng quan
+                        </c:when>
+                        <c:when test="${param.activeMenu == 'accounts'}">
+                            <i class="fas fa-users-cog text-warning me-2"></i>Quản lý Tài khoản
+                        </c:when>
+                        <c:when test="${param.activeMenu == 'revenue'}">
+                            <i class="fas fa-chart-line text-warning me-2"></i>Báo cáo Doanh thu
+                        </c:when>
+                        <c:when test="${param.activeMenu == 'system'}">
+                            <i class="fas fa-server text-warning me-2"></i>Tài nguyên Hệ thống
+                        </c:when>
+                        <c:when test="${param.activeMenu == 'profile'}">
+                            <i class="fas fa-id-badge text-warning me-2"></i>Hồ sơ cá nhân
+                        </c:when>
+                        <c:otherwise>
+                            <i class="fas fa-user-shield text-warning me-2"></i>Quản Trị Viên
+                        </c:otherwise>
+                    </c:choose>
+                </span>
             </button>
             <ul class="dropdown-menu dropdown-menu-dark w-100 shadow border-0 mt-2" aria-labelledby="mobileMenuDropdown" style="background-color: #0d47a1; border: 1px solid rgba(255,255,255,0.15); border-radius: 0.5rem; padding: 0.5rem;">
                 <li>

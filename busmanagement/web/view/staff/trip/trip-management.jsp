@@ -66,7 +66,7 @@
 
                 <main class="col-md-9 ms-sm-auto col-lg-10 main-content">
                     <div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom">
-                        <h2 class="fw-bold m-0" style="color: #5c67f2 !important;"><i class="fas fa-route me-2"></i>Quản lý chuyến xe</h2>
+                        <h2 class="fw-bold text-dark m-0">Quản lý chuyến xe</h2>
                         <a href="${pageContext.request.contextPath}/staff/trip/create" class="btn btn-primary fw-semibold shadow-sm">
                             <i class="fas fa-plus-circle me-2"></i>Thêm chuyến mới
                         </a>
