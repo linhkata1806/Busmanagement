@@ -257,8 +257,12 @@
                         </div>
                         
                         <!-- Block ảnh minh chứng -->
-                        <div class="text-center bg-dark p-2 rounded" style="border: 2px dashed #ccc;">
-                            <img id="modalProofImg" src="" alt="Không có ảnh minh chứng" class="img-fluid w-100 rounded" style="max-height: 55vh; object-fit: contain;">
+                        <div class="text-center bg-dark p-2 rounded" style="border: 2px dashed #ccc; min-height: 200px; display: flex; align-items: center; justify-content: center;">
+                            <img id="modalProofImg" src="" alt="Ảnh minh chứng" class="img-fluid w-100 rounded d-none" style="max-height: 55vh; object-fit: contain;">
+                            <div id="noProofMessage" class="text-white opacity-50 py-4 text-center d-none">
+                                <i class="far fa-image fa-3x mb-2 d-block"></i>
+                                <span>Không có ảnh minh chứng</span>
+                            </div>
                         </div>
                     </div>
                     <!-- Footer chứa nút thao tác linh hoạt -->
@@ -280,7 +284,17 @@
                                                                             document.getElementById('modalEmail').innerText = (email && email !== 'null' && email !== '') ? email : 'Chưa cập nhật';
                                                                             document.getElementById('modalPhone').innerText = (phone && phone !== 'null' && phone !== '') ? phone : 'Chưa cập nhật';
 
-                                                                            document.getElementById('modalProofImg').src = imageUrl;
+                                                                            var imgEl = document.getElementById('modalProofImg');
+                                                                            var msgEl = document.getElementById('noProofMessage');
+                                                                            if (!imageUrl || imageUrl.endsWith('/') || imageUrl.endsWith('/null') || imageUrl.trim() === '') {
+                                                                                imgEl.src = '';
+                                                                                imgEl.classList.add('d-none');
+                                                                                msgEl.classList.remove('d-none');
+                                                                            } else {
+                                                                                imgEl.src = imageUrl;
+                                                                                imgEl.classList.remove('d-none');
+                                                                                msgEl.classList.add('d-none');
+                                                                            }
 
                                                                             var actionFooter = document.getElementById('modalActionButtons');
                                                                             actionFooter.innerHTML = '';
