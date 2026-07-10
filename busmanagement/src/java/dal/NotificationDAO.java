@@ -42,14 +42,16 @@ public class NotificationDAO extends DBContext {
      * Dành cho Phụ xe: roleName = "ASSISTANT"
      */
     public int countUnreadByAccountAndRole(int accountId, String roleName) {
-        String sql = "SELECT COUNT(*) FROM Notifications "
-                + "WHERE IsRead = 0 AND ("
-                + "  AccountID = ? "
-                + "  OR (AccountID IS NULL AND TargetRole IN (?, 'ALL'))"
+        String sql = "SELECT COUNT(*) FROM Notifications n "
+                + "LEFT JOIN NotificationReads nr ON n.NotificationID = nr.NotificationID AND nr.AccountID = ? "
+                + "WHERE nr.ReadID IS NULL AND ("
+                + "  (n.AccountID = ? AND n.IsRead = 0) "
+                + "  OR (n.AccountID IS NULL AND n.TargetRole IN (?, 'ALL'))"
                 + ")";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, accountId);
-            ps.setString(2, roleName);
+            ps.setInt(2, accountId);
+            ps.setString(3, roleName);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     return rs.getInt(1);
@@ -115,13 +117,21 @@ public class NotificationDAO extends DBContext {
      */
     public List<Notification> getByAccountAndRole(int accountID, String roleName) {
         List<Notification> list = new ArrayList<>();
-        String sql = "SELECT * FROM Notifications "
-                + "WHERE AccountID = ? "
-                + "   OR (AccountID IS NULL AND TargetRole IN (?, 'ALL')) "
-                + "ORDER BY CreatedAt DESC";
+        String sql = "SELECT n.NotificationID, n.AccountID, n.NotificationType, n.Title, n.Content, n.TargetRole, n.CreatedAt, "
+                + "       CASE "
+                + "           WHEN n.AccountID = ? THEN n.IsRead "
+                + "           ELSE CASE WHEN nr.ReadID IS NOT NULL THEN 1 ELSE 0 END "
+                + "       END AS IsRead "
+                + "FROM Notifications n "
+                + "LEFT JOIN NotificationReads nr ON n.NotificationID = nr.NotificationID AND nr.AccountID = ? "
+                + "WHERE n.AccountID = ? "
+                + "   OR (n.AccountID IS NULL AND n.TargetRole IN (?, 'ALL')) "
+                + "ORDER BY n.CreatedAt DESC";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, accountID);
-            ps.setString(2, roleName);
+            ps.setInt(2, accountID);
+            ps.setInt(3, accountID);
+            ps.setString(4, roleName);
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     list.add(mapRow(rs));
@@ -135,15 +145,43 @@ public class NotificationDAO extends DBContext {
         return list;
     }
 
-    // 2. Đánh dấu đã đọc (Có check AccountID để bảo mật)
     public boolean markAsRead(int notificationID, int accountID) {
-        String sql = "UPDATE Notifications SET IsRead = 1 WHERE NotificationID = ? AND AccountID = ?";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        String updateSql = "UPDATE Notifications SET IsRead = 1 WHERE NotificationID = ? AND AccountID = ?";
+        try (PreparedStatement ps = connection.prepareStatement(updateSql)) {
             ps.setInt(1, notificationID);
             ps.setInt(2, accountID);
-            return ps.executeUpdate() > 0;
+            if (ps.executeUpdate() > 0) {
+                return true;
+            }
         } catch (SQLException e) {
             e.printStackTrace();
+        }
+
+        // Nếu không update được (có thể do AccountID IS NULL - thông báo chung),
+        // thì thêm bản ghi vào bảng NotificationReads để đánh dấu tài khoản này đã đọc.
+        String checkSql = "SELECT 1 FROM Notifications WHERE NotificationID = ? AND AccountID IS NULL";
+        boolean isBroadcast = false;
+        try (PreparedStatement ps = connection.prepareStatement(checkSql)) {
+            ps.setInt(1, notificationID);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    isBroadcast = true;
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        if (isBroadcast) {
+            String insertSql = "INSERT INTO NotificationReads (NotificationID, AccountID) VALUES (?, ?)";
+            try (PreparedStatement ps = connection.prepareStatement(insertSql)) {
+                ps.setInt(1, notificationID);
+                ps.setInt(2, accountID);
+                return ps.executeUpdate() > 0;
+            } catch (SQLException e) {
+                // Nếu đã tồn tại (lỗi UNIQUE), coi như thành công
+                return true;
+            }
         }
         return false;
     }
