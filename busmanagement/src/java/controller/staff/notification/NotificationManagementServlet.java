@@ -18,15 +18,7 @@ import service.NotificationService;
  * @author Administrator
  */
 public class NotificationManagementServlet extends HttpServlet {
-    private NotificationService notificationService;
 
-    @Override
-    public void init() throws ServletException {
-        notificationService = new NotificationService();
-    }
-    
-    
-   
     /** 
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code> methods.
      * @param request servlet request
@@ -62,6 +54,7 @@ public class NotificationManagementServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException {
+       NotificationService notificationService = new NotificationService();
        request.setAttribute("notifications", notificationService.getAllNotifications());
         request.getRequestDispatcher("/view/staff/notification/notification-list.jsp").forward(request, response);
     } 

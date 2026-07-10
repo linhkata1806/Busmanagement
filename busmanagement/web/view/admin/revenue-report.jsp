@@ -58,8 +58,7 @@
 
                         <div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom">
                             <div>
-                                <h2 class="fw-bold text-dark m-0">Phân tích Doanh thu</h2>
-                                <p class="text-muted small m-0 mt-1">Dữ liệu được trích xuất trực tiếp từ các giao dịch trong hệ thống.</p>
+                                <h2 class="fw-bold text-dark m-0">Báo cáo Doanh thu</h2>
                             </div>
                             <button class="btn btn-outline-primary shadow-sm"><i class="fas fa-download me-2"></i>Xuất báo cáo Excel</button>
                         </div>
@@ -78,9 +77,10 @@
                             <div class="col-md-4">
                                 <label class="form-label text-muted fw-bold fs-7">Phân loại theo Tuyến</label>
                                 <select name="routeId" class="form-select shadow-none">
-                                    <option value="ALL">Tất cả các tuyến</option>
-                                    <option value="1" ${selectedRoute == '1' ? 'selected' : ''}>Tuyến 01: Bến xe Yên Nghĩa - BX Gia Lâm</option>
-                                    <option value="2" ${selectedRoute == '2' ? 'selected' : ''}>Tuyến 02: Bác Cổ - BX Yên Nghĩa</option>
+                                    <option value="ALL" ${selectedRoute == 'ALL' || empty selectedRoute ? 'selected' : ''}>Tất cả các tuyến</option>
+                                    <c:forEach items="${routes}" var="r">
+                                        <option value="${r.routeID}" ${selectedRoute == ''.concat(r.routeID) ? 'selected' : ''}>Tuyến ${r.routeNumber}: ${r.routeName}</option>
+                                    </c:forEach>
                                 </select>
                             </div>
                             <div class="col-md-2">
@@ -105,7 +105,7 @@
                                 <h2 class="fw-bold mb-0">
                                     <fmt:formatNumber value="${not empty totalTicket ? totalTicket : 0}" pattern="#,##0" /> <span class="fs-5">VNĐ</span>
                                 </h2>
-                                <div class="mt-2 text-white-50 fs-7"><i class="fas fa-ticket-alt me-1"></i> Vé đã được sử dụng (COMPLETED)</div>
+                                <div class="mt-2 text-white-50 fs-7"><i class="fas fa-ticket-alt me-1"></i> Vé đã được sử dụng</div>
                             </div>
                         </div>
                         <div class="col-md-4">
@@ -114,7 +114,7 @@
                                 <h2 class="fw-bold mb-0">
                                     <fmt:formatNumber value="${not empty totalPass ? totalPass : 0}" pattern="#,##0" /> <span class="fs-5">VNĐ</span>
                                 </h2>
-                                <div class="mt-2 text-white-50 fs-7"><i class="fas fa-calendar-check me-1"></i> Hồ sơ hợp lệ (APPROVED)</div>
+                                <div class="mt-2 text-white-50 fs-7"><i class="fas fa-calendar-check me-1"></i> Hồ sơ hợp lệ</div>
                             </div>
                         </div>
                     </div>
@@ -240,5 +240,6 @@
                 }
             });
         </script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
     </body>
 </html>

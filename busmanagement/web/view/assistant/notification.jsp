@@ -5,7 +5,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Thông Báo Hệ Thống - Phụ Xe</title>
+    <title>Thông báo - Phụ xe</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
@@ -43,7 +43,7 @@
             <!-- Main Content Area -->
             <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 main-content">
                 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-                    <h1 class="h2 text-dark fw-bold">Thông Báo Hệ Thống</h1>
+                    <h1 class="h2 text-dark fw-bold">Thông báo</h1>
                     <span class="badge bg-primary px-2.5 py-1.5 rounded-pill">Chưa đọc: ${unreadCount}</span>
                 </div>
 

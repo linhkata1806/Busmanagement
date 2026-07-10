@@ -82,7 +82,7 @@
                 <main class="col-md-9 ms-sm-auto col-lg-10 main-content">
                     <div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom">
                         <div>
-                            <h2 class="fw-bold m-0" style="color: #5c67f2 !important;"><i class="fas fa-chart-pie me-2"></i>Tổng quan</h2>
+                            <h2 class="fw-bold text-dark m-0">Tổng quan</h2>
                             <p class="text-muted small m-0">Chào mừng quay trở lại, <span class="fw-bold text-primary">${staff.fullName}</span> (Nhân viên vận hành)</p>
                         </div>
 

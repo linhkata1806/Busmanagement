@@ -46,7 +46,7 @@
 
                 <main class="col-md-9 ms-sm-auto col-lg-10 main-content">
                     <div class="mb-4 pb-2 border-bottom">
-                        <h2 class="fw-bold m-0" style="color: #5c67f2 !important;">Chỉnh sửa thông báo</h2>
+                        <h2 class="fw-bold text-dark m-0">Chỉnh sửa thông báo</h2>
                     </div>
 
                     <div class="card border-0 shadow-sm rounded-4 bg-white p-4">
@@ -83,5 +83,6 @@
             </div>
         </div>
 
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
     </body>
 </html>

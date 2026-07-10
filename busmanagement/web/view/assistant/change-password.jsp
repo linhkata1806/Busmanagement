@@ -5,7 +5,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Đổi Mật Khẩu - Phụ Xe</title>
+    <title>Đổi mật khẩu - Phụ xe</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
@@ -38,7 +38,7 @@
             <!-- Main Content Area -->
             <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 main-content">
                 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-                    <h1 class="h2 text-dark fw-bold">Đổi Mật Khẩu</h1>
+                    <h1 class="h2 text-dark fw-bold">Đổi mật khẩu</h1>
                     <a href="${pageContext.request.contextPath}/assistant/profile" class="btn btn-outline-secondary btn-sm">
                         <i class="fas fa-arrow-left me-1"></i>Quay lại hồ sơ
                     </a>
@@ -74,7 +74,7 @@
                                     <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" required minlength="6">
                                 </div>
                                 <button type="submit" class="btn btn-primary w-100 py-2.5 shadow-sm fw-bold">
-                                    <i class="fas fa-save me-2"></i>Lưu Thay Đổi
+                                    <i class="fas fa-save me-2"></i>Lưu thay đổi
                                 </button>
                             </form>
                         </div>

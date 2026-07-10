@@ -46,7 +46,7 @@
 
                 <main class="col-md-9 ms-sm-auto col-lg-10 main-content">
                     <div class="mb-4 pb-2 border-bottom">
-                        <h2 class="fw-bold m-0" style="color: #5c67f2 !important;">Tạo thông báo mới</h2>
+                        <h2 class="fw-bold text-dark m-0">Tạo thông báo mới</h2>
                     </div>
 
                     <c:if test="${not empty msgError}">
@@ -67,7 +67,7 @@
                                 <label class="form-label small fw-bold">Loại thông báo</label>
                                 <select name="notificationType" class="form-select">
                                     <option value="SYSTEM_ALERT">SYSTEM (Hệ thống)</option>
-                                    <option value="MAINTENANCE">MAINTENANCE (Bảo trì)</option>
+                                    <option value="SYSTEM_MAINTENANCE">MAINTENANCE (Bảo trì)</option>
                                     <option value="ROUTE_DELAY">ROUTE_DELAY (Trễ tuyến)</option>
                                     <option value="ROUTE_CHANGE">ROUTE_CHANGE (Thay đổi lộ trình)</option>
                                 </select>
@@ -93,5 +93,6 @@
             </div>
         </div>
 
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
     </body>
 </html>

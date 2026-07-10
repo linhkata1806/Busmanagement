@@ -18,15 +18,7 @@ import service.NotificationService;
  * @author Administrator
  */
 public class CreateNotificationServlet extends HttpServlet {
-    private  NotificationService notificationService ;
 
-    @Override
-    public void init() throws ServletException {
-        notificationService = new NotificationService();
-    }
-    
-    
-   
     /** 
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code> methods.
      * @param request servlet request
@@ -73,6 +65,7 @@ public class CreateNotificationServlet extends HttpServlet {
             String title = request.getParameter("title");
             String content = request.getParameter("content");
 
+            NotificationService notificationService = new NotificationService();
             if (notificationService.createNotification(accountId, type, title, content)) {
                 request.getSession().setAttribute("msgSuccess", "Tạo thông báo thành công!");
                 response.sendRedirect(request.getContextPath() + "/staff/notification");

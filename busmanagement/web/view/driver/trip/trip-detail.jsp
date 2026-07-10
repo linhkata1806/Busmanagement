@@ -62,8 +62,8 @@
                     <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
                         <h1 class="h2 text-dark fw-bold">
                             <c:choose>
-                                <c:when test="${not empty trip}">Chi Tiết Chuyến Đi #${trip.tripID}</c:when>
-                                <c:otherwise>Chi Tiết Chuyến Đi</c:otherwise>
+                                <c:when test="${not empty trip}">Chi tiết chuyến đi #${trip.tripID}</c:when>
+                                <c:otherwise>Chi tiết chuyến đi</c:otherwise>
                             </c:choose>
                         </h1>
                         <a href="${pageContext.request.contextPath}/driver/trip" class="btn btn-outline-secondary btn-sm">
@@ -84,7 +84,7 @@
                             <div class="col-12 col-lg-4">
                                 <div class="card shadow-sm border-0 rounded-3 mb-4">
                                     <div class="card-header bg-white border-0 pt-4 px-4">
-                                        <h5 class="fw-bold text-dark mb-0">Thông Tin Hành Trình</h5>
+                                        <h5 class="fw-bold text-dark mb-0">Thông tin hành trình</h5>
                                     </div>
                                     <div class="card-body p-4">
                                         <div class="d-flex flex-column gap-3">
