@@ -128,7 +128,9 @@
         <div class="container">
             <c:choose>
                 <c:when test="${not empty account.avatar}">
-                    <img src="${account.avatar}" alt="Avatar" class="profile-avatar">
+                    <img src="${pageContext.request.contextPath}/${account.avatar}"
+                         alt="Avatar"
+                         class="profile-avatar">
                 </c:when>
                 <c:otherwise>
                     <img src="https://ui-avatars.com/api/?name=${account.fullName}&background=ffffff&color=0d47a1&size=120" alt="Avatar" class="profile-avatar">

@@ -22,18 +22,30 @@ public class MonthlyPassDAO extends DBContext {
 
     //=====Customer
     public int countActivePasses(int accountId) {
-        String sql = "SELECT COUNT(*) FROM MonthlyPasses "
-                + "WHERE AccountID = ? AND Status = 'APPROVED' AND EndDate >= CAST(GETDATE() AS DATE)";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+
+        String sql
+                = "SELECT COUNT(*) "
+                + "FROM MonthlyPasses "
+                + "WHERE AccountID = ? "
+                + "AND Status = 'APPROVED' "
+                + "AND StartDate <= CAST(GETDATE() AS DATE) "
+                + "AND EndDate >= CAST(GETDATE() AS DATE)";
+
+        try {
+            PreparedStatement ps = connection.prepareStatement(sql);
             ps.setInt(1, accountId);
+
             try (ResultSet rs = ps.executeQuery()) {
+
                 if (rs.next()) {
                     return rs.getInt(1);
                 }
             }
+
         } catch (Exception e) {
             e.printStackTrace();
         }
+
         return 0;
     }
 
@@ -208,6 +220,7 @@ public class MonthlyPassDAO extends DBContext {
                 + "    ON mp.PassTypeID = mpt.PassTypeID "
                 + "WHERE mp.AccountID = ? "
                 + "    AND mp.Status = 'APPROVED' "
+                + "    AND mp.StartDate <= CAST(GETDATE() AS DATE) "
                 + "    AND mp.EndDate >= CAST(GETDATE() AS DATE) "
                 + "ORDER BY mp.EndDate DESC";
 
@@ -412,7 +425,7 @@ public class MonthlyPassDAO extends DBContext {
                 + "    mp.AccountID, \n"
                 + "    a.FullName, \n"
                 + "    a.Email, \n"
-                + "    a.Phone, \n"             
+                + "    a.Phone, \n"
                 + "    mp.StartDate, \n"
                 + "    mp.EndDate, \n"
                 + "    mp.Status, \n"

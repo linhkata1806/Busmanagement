@@ -3,6 +3,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
  */
 package controller.staff.trip;
+
 import dto.TripDTO;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -29,7 +30,7 @@ public class TripManagementServlet extends HttpServlet {
     @Override
     public void init() throws ServletException {
         tripService = new TripService();
-        routeService= new RouteService();
+        routeService = new RouteService();
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
@@ -71,8 +72,16 @@ public class TripManagementServlet extends HttpServlet {
         status = status == null ? "" : status.trim();
 
         // 2. Ép kiểu RouteID (Nếu là ALL hoặc rỗng thì gán = -1 để DAO hiểu là lấy tất cả)
-        int routeID = (!routeIdStr.isEmpty() && !"ALL".equals(routeIdStr)) ? Integer.parseInt(routeIdStr) : -1;
+        int routeID = -1;
 
+        if (!routeIdStr.isEmpty() && !"ALL".equalsIgnoreCase(routeIdStr)) {
+            try {
+                routeID = Integer.parseInt(routeIdStr);
+            } catch (NumberFormatException e) {
+                routeID = -1;
+                request.setAttribute("errorMsg", "Mã tuyến không hợp lệ.");
+            }
+        }
         // 3. Gọi DUY NHẤT 1 hàm search (Gọn gàng vô cùng!)
         List<TripDTO> list = tripService.searchTrips(dateStr, routeID, plate, status, offset, limit);
         int totalRecords = tripService.countSearchTrips(dateStr, routeID, plate, status);
@@ -96,7 +105,7 @@ public class TripManagementServlet extends HttpServlet {
         }
 
         // Đổ dữ liệu tuyến xe vào Dropdown (Nhớ gọi hàm DAO/Service thực tế của nhé e yeu)
-         request.setAttribute("routes", routeService.getAllActiveRoutes());
+        request.setAttribute("routes", routeService.getAllActiveRoutes());
 
         // 4. Giữ lại filter trên giao diện và forward
         request.setAttribute("trips", list);

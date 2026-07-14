@@ -102,7 +102,7 @@ public class BuyTicketServlet extends HttpServlet {
         HttpSession session = request.getSession(false);
         Account user = (Account) session.getAttribute("USER");
         String action = request.getParameter("action");
-        String routeIdRaw = request.getParameter("routeId");
+        String routeIdRaw = request.getParameter("routeID");
         String ticketType = request.getParameter("ticketType");
         String passTypeIdRaw = request.getParameter("passTypeID");
         if (passTypeIdRaw == null || passTypeIdRaw.isEmpty()) {

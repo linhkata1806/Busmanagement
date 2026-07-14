@@ -4,11 +4,16 @@ import dal.TripDAO;
 import dal.RouteDAO;
 import dal.BusDAO;
 import dal.AccountDAO;
+import dal.BusLocationHistoryDAO;
+import dal.RouteStopDAO;
+import dto.RouteStopDTO;
 import dto.TripDTO;
 import enums.TripStatus;
+import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
+import model.BusLocationHistory;
 import model.Trip;
 
 public class TripService {
@@ -17,12 +22,16 @@ public class TripService {
     private RouteDAO routeDAO;
     private BusDAO busDAO;
     private AccountDAO accountDAO;
+    private RouteStopDAO routeStopDAO;
+    private BusLocationHistoryDAO locationDAO;
 
     public TripService() {
         tripDAO = new TripDAO();
         routeDAO = new RouteDAO();
         busDAO = new BusDAO();
         accountDAO = new AccountDAO();
+        routeStopDAO = new RouteStopDAO();
+        locationDAO = new BusLocationHistoryDAO();
     }
 
     public List<TripDTO> getAllTrips() throws Exception {
@@ -78,73 +87,177 @@ public class TripService {
     }
 
     // UPDATE TRIP
-    public void updateTrip(int tripID, int routeID, int busID, int driverID, Integer assistantID,
-            LocalDate tripDate, LocalTime startTime, LocalTime endTime,
-            int direction, String status) throws Exception {
+    public void updateTrip(
+            int tripID,
+            int routeID,
+            int busID,
+            int driverID,
+            Integer assistantID,
+            LocalDate tripDate,
+            LocalTime startTime,
+            LocalTime endTime,
+            int direction,
+            String status
+    ) throws Exception {
 
-        // Thực hiện quét toàn bộ lỗi bảo mật và trùng lịch (truyền tripID hiện tại để loại trừ kiểm tra chính nó)
-        validateTripBusinessRules(routeID, busID, driverID, assistantID, tripDate, startTime, endTime, direction, tripID);
-
+        // 1. Lấy chuyến xe gốc trước để kiểm tra trạng thái hiện tại
         Trip trip = tripDAO.getById(tripID);
+
         if (trip == null) {
-            throw new IllegalArgumentException("Chuyến xe cần cập nhật không tồn tại.");
+            throw new IllegalArgumentException(
+                    "Chuyến xe cần cập nhật không tồn tại."
+            );
         }
 
-        // 1. Dùng Try-Catch ép kiểu trạng thái mới để chống F12 
+        // 2. Dùng Try-Catch ép kiểu trạng thái mới để chống F12 gửi status rác
         TripStatus newStatus;
+
         try {
             newStatus = TripStatus.valueOf(status);
         } catch (Exception e) {
-            throw new IllegalArgumentException("Trạng thái gửi lên không hợp lệ.");
-        }
-        // 1. Nếu chuyến xe cũ đã HOÀN THÀNH (COMPLETED)
-        if (trip.getStatus() == TripStatus.COMPLETED) {
-            // Cấm tuyệt đối không cho đổi sang bất kỳ trạng thái nào khác (kể cả Admin)
-            if (newStatus != TripStatus.COMPLETED) {
-                throw new IllegalArgumentException("Thao tác bị từ chối: Chuyến xe đã HOÀN THÀNH, hồ sơ đã bị niêm phong và không thể thay đổi trạng thái!");
-            }
-            // Đã hoàn thành rồi thì cũng cấm sửa bất kỳ thông tin nào khác của chuyến xe
-            if (trip.getBusID() != busID || trip.getDriverID() != driverID || trip.getRouteID() != routeID || !trip.getTripDate().equals(tripDate)) {
-                throw new IllegalArgumentException("Thao tác bị từ chối: Không được phép chỉnh sửa thông tin của một chuyến xe đã hoàn thành.");
-            }
+            throw new IllegalArgumentException(
+                    "Trạng thái gửi lên không hợp lệ."
+            );
         }
 
-        // 2. Chuyến xe đã Hoàn thành hoặc Đã hủy
-        if (trip.getStatus() == TripStatus.COMPLETED || trip.getStatus() == TripStatus.CANCELLED) {
-            throw new IllegalArgumentException("Thao tác từ chối: Không thể chỉnh sửa chuyến xe đã Hoàn thành hoặc Đã hủy.");
+        // 3. Chuyến xe đã HOÀN THÀNH hoặc ĐÃ HỦY thì khóa hồ sơ, không cho sửa nữa
+        if (trip.getStatus() == TripStatus.COMPLETED
+                || trip.getStatus() == TripStatus.CANCELLED) {
+
+            throw new IllegalArgumentException(
+                    "Thao tác từ chối: Không thể chỉnh sửa chuyến xe đã Hoàn thành hoặc Đã hủy."
+            );
         }
 
-        // 3. Chuyến xe ĐANG CHẠY (IN_PROGRESS) 
+        // 4. Không cho chuyển thẳng từ SCHEDULED sang COMPLETED
+        // Vì COMPLETED phải đi qua IN_PROGRESS để có ActualStartTime trước
+        if (trip.getStatus() == TripStatus.SCHEDULED
+                && newStatus == TripStatus.COMPLETED) {
+
+            throw new IllegalArgumentException(
+                    "Không thể chuyển trực tiếp từ SCHEDULED sang COMPLETED. Chuyến xe phải bắt đầu trước."
+            );
+        }
+
+        // 5. Validate nghiệp vụ cơ bản: tuyến, xe, tài xế, phụ xe, thời gian, chiều chạy, trùng lịch
+        // excludeTripID = tripID để khi update không bị check trùng với chính chuyến hiện tại
+        validateTripBusinessRules(
+                routeID,
+                busID,
+                driverID,
+                assistantID,
+                tripDate,
+                startTime,
+                endTime,
+                direction,
+                tripID
+        );
+
+        // 6. Nếu chuyến xe đang chạy thì chỉ cho phép kết thúc chuyến
+        // Không cho đổi tuyến, xe, tài xế, phụ xe, ngày, giờ, chiều chạy
         if (trip.getStatus() == TripStatus.IN_PROGRESS) {
-            // Chặn đổi trạng thái lùi
-            if (newStatus == TripStatus.CANCELLED || newStatus == TripStatus.SCHEDULED) {
-                throw new IllegalArgumentException("Lỗi logic: Xe ĐANG VẬN HÀNH trên đường, không thể chuyển về trạng thái Hủy hoặc Chuẩn bị.");
+
+            // Không cho lùi trạng thái từ đang chạy về chuẩn bị hoặc hủy
+            if (newStatus == TripStatus.CANCELLED
+                    || newStatus == TripStatus.SCHEDULED) {
+
+                throw new IllegalArgumentException(
+                        "Lỗi logic: Xe ĐANG VẬN HÀNH trên đường, không thể chuyển về trạng thái Hủy hoặc Chuẩn bị."
+                );
             }
-            // Chặn(Đang chạy thì cấm đổi Xe, cấm đổi Tài xế, Tuyến đường)
+
+            // Đang chạy thì không được đổi tuyến
             if (trip.getRouteID() != routeID) {
-                throw new IllegalArgumentException("Cảnh báo: Không thể thay đổi Tuyến đường khi chuyến xe đang lăn bánh!");
+                throw new IllegalArgumentException(
+                        "Cảnh báo: Không thể thay đổi Tuyến đường khi chuyến xe đang lăn bánh!"
+                );
+            }
+
+            // Đang chạy thì không được đổi xe buýt
+            if (trip.getBusID() != busID) {
+                throw new IllegalArgumentException(
+                        "Cảnh báo: Không thể thay đổi Xe buýt khi chuyến xe đang lăn bánh!"
+                );
+            }
+
+            // Đang chạy thì không được đổi tài xế
+            if (trip.getDriverID() != driverID) {
+                throw new IllegalArgumentException(
+                        "Cảnh báo: Không thể thay đổi Tài xế khi chuyến xe đang lăn bánh!"
+                );
+            }
+
+            // Đang chạy thì không được đổi phụ xe
+            if ((trip.getAssistantID() == null && assistantID != null)
+                    || (trip.getAssistantID() != null
+                    && !trip.getAssistantID().equals(assistantID))) {
+
+                throw new IllegalArgumentException(
+                        "Cảnh báo: Không thể thay đổi Phụ xe khi chuyến xe đang lăn bánh!"
+                );
+            }
+
+            // Đang chạy thì không được đổi ngày chạy
+            if (!trip.getTripDate().equals(tripDate)) {
+                throw new IllegalArgumentException(
+                        "Cảnh báo: Không thể thay đổi Ngày chạy khi chuyến xe đang lăn bánh!"
+                );
+            }
+
+            // Đang chạy thì không được đổi giờ dự kiến
+            if (!trip.getStartTime().equals(startTime)
+                    || !trip.getEndTime().equals(endTime)) {
+
+                throw new IllegalArgumentException(
+                        "Cảnh báo: Không thể thay đổi Khung giờ khi chuyến xe đang lăn bánh!"
+                );
+            }
+
+            // Đang chạy thì không được đổi chiều chạy
+            if (trip.getDirection() != direction) {
+                throw new IllegalArgumentException(
+                        "Cảnh báo: Không thể thay đổi Chiều chạy khi chuyến xe đang lăn bánh!"
+                );
             }
         }
-        if (newStatus == TripStatus.IN_PROGRESS && trip.getStatus() != TripStatus.IN_PROGRESS) {
 
-            // Lỗi 1: Ép chạy chuyến ở tương lai hoặc quá khứ
-            // (Lưu ý: Nếu xe bạn có chạy đêm qua 00:00, hãy  lùi 4 tiếng 
+        // 7. Xác định có phải thao tác bắt đầu chuyến hay không
+        boolean isStartingTrip
+                = newStatus == TripStatus.IN_PROGRESS
+                && trip.getStatus() != TripStatus.IN_PROGRESS;
+
+        // 8. Xác định có phải thao tác kết thúc chuyến hay không
+        boolean isEndingTrip
+                = newStatus == TripStatus.COMPLETED
+                && trip.getStatus() == TripStatus.IN_PROGRESS;
+
+        // 9. Khi bắt đầu chuyến, chỉ cho phép chuyến thuộc ngày hôm nay
+        if (isStartingTrip) {
+
             LocalDate operationalToday = LocalDate.now();
+
             if (!tripDate.equals(operationalToday)) {
-                throw new IllegalArgumentException("Thao tác từ chối: Chỉ có thể kích hoạt IN_PROGRESS cho các chuyến xe thuộc ngày vận hành hôm nay.");
+                throw new IllegalArgumentException(
+                        "Thao tác từ chối: Chỉ có thể kích hoạt IN_PROGRESS cho các chuyến xe thuộc ngày vận hành hôm nay."
+                );
             }
 
-            // Lỗi 2: Tài xế đang bị kẹt ở chuyến khác
+            // Tài xế không được đang chạy chuyến khác
             if (tripDAO.isDriverCurrentlyDriving(driverID, tripID)) {
-                throw new IllegalArgumentException("Xung đột nhân sự: Tài xế này đang vận hành một chuyến xe khác chưa kết thúc!");
+                throw new IllegalArgumentException(
+                        "Xung đột nhân sự: Tài xế này đang vận hành một chuyến xe khác chưa kết thúc!"
+                );
             }
 
-            // Lỗi 3: Xe buýt đang bị kẹt ở chuyến khác
+            // Xe buýt không được đang chạy chuyến khác
             if (tripDAO.isBusCurrentlyRunning(busID, tripID)) {
-                throw new IllegalArgumentException("Xung đột thiết bị: Xe buýt này đang chạy một chuyến khác chưa về bến!");
+                throw new IllegalArgumentException(
+                        "Xung đột thiết bị: Xe buýt này đang chạy một chuyến khác chưa về bến!"
+                );
             }
         }
 
+        // 10. Set lại thông tin chuyến xe sau khi đã qua toàn bộ validate
         trip.setRouteID(routeID);
         trip.setBusID(busID);
         trip.setDriverID(driverID);
@@ -153,10 +266,103 @@ public class TripService {
         trip.setStartTime(startTime);
         trip.setEndTime(endTime);
         trip.setDirection(direction);
-        trip.setStatus(TripStatus.valueOf(status));
+
+        /*
+     * 11. Trường hợp bắt đầu chuyến:
+     * Không dùng tripDAO.update() để chuyển thẳng sang IN_PROGRESS
+     * vì IN_PROGRESS phải đồng thời set ActualStartTime.
+         */
+        if (isStartingTrip) {
+
+            // Giữ nguyên status cũ để update thông tin chuyến trước
+            TripStatus oldStatus = trip.getStatus();
+            trip.setStatus(oldStatus);
+
+            if (!tripDAO.update(trip)) {
+                throw new Exception(
+                        "Lỗi hệ thống: Không thể cập nhật thông tin chuyến xe."
+                );
+            }
+
+            // Sau đó mới chính thức bắt đầu chuyến và set ActualStartTime
+            Timestamp actualStart
+                    = new Timestamp(System.currentTimeMillis());
+
+            boolean started = tripDAO.startTripActual(
+                    tripID,
+                    actualStart
+            );
+
+            if (!started) {
+                throw new Exception(
+                        "Lỗi hệ thống: Không thể bắt đầu chuyến xe."
+                );
+            }
+
+            // Tạo GPS ban đầu theo đúng chiều chạy
+            List<RouteStopDTO> stops
+                    = routeStopDAO.getStopsByRoute(routeID);
+
+            if (stops != null && !stops.isEmpty()) {
+
+                RouteStopDTO startStop;
+
+                if (direction == 1) {
+                    // Chiều đi: lấy trạm đầu
+                    startStop = stops.get(0);
+                } else {
+                    // Chiều về: lấy trạm cuối
+                    startStop = stops.get(stops.size() - 1);
+                }
+
+                BusLocationHistory loc
+                        = new BusLocationHistory();
+
+                loc.setBusID(busID);
+                loc.setTripID(tripID);
+                loc.setLatitude(startStop.getLatitude());
+                loc.setLongitude(startStop.getLongitude());
+
+                locationDAO.insert(loc);
+            }
+
+            return;
+        }
+
+        /*
+     * 12. Trường hợp kết thúc chuyến:
+     * Không dùng tripDAO.update() đơn thuần
+     * vì COMPLETED phải đồng thời set ActualEndTime.
+         */
+        if (isEndingTrip) {
+
+            Timestamp actualEnd
+                    = new Timestamp(System.currentTimeMillis());
+
+            boolean ended = tripDAO.finishTripActual(
+                    tripID,
+                    actualEnd
+            );
+
+            if (!ended) {
+                throw new Exception(
+                        "Lỗi hệ thống: Không thể kết thúc chuyến xe."
+                );
+            }
+
+            return;
+        }
+
+        /*
+     * 13. Các trường hợp update bình thường:
+     * Ví dụ sửa thông tin chuyến SCHEDULED, hoặc giữ nguyên trạng thái.
+         */
+        trip.setStatus(newStatus);
 
         if (!tripDAO.update(trip)) {
-            throw new Exception("Lỗi hệ thống: Không thể cập nhật thông tin chuyến xe.");
+            throw new Exception(
+                    "Lỗi hệ thống: Không thể cập nhật thông tin chuyến xe."
+            );
         }
     }
 
@@ -183,13 +389,35 @@ public class TripService {
             LocalDate tripDate, LocalTime startTime, LocalTime endTime,
             int direction, Integer excludeTripID) {
 
+        if (tripDate == null) {
+            throw new IllegalArgumentException("Vui lòng chọn ngày chạy.");
+        }
+
+        if (tripDate.isBefore(LocalDate.now())) {
+            throw new IllegalArgumentException(
+                    "Không thể tạo chuyến xe cho ngày trong quá khứ."
+            );
+        }
+        if (startTime == null) {
+            throw new IllegalArgumentException("Vui lòng chọn giờ xuất phát.");
+        }
+
+        if (endTime == null) {
+            throw new IllegalArgumentException("Vui lòng chọn giờ cập bến.");
+        }
         // 1. Kiểm tra logic mốc thời gian
-        if (startTime != null && endTime != null && !startTime.isBefore(endTime)) {
+        if (!startTime.isBefore(endTime)) {
             throw new IllegalArgumentException("Khung giờ không hợp lệ: Giờ xuất phát phải nhỏ hơn giờ cập bến dự kiến.");
+        }
+        if (tripDate.equals(LocalDate.now())
+                && startTime.isBefore(LocalTime.now())) {
+            throw new IllegalArgumentException(
+                    "Không thể tạo chuyến có giờ xuất phát đã qua."
+            );
         }
 
         // 2. Test Driver != Assistant (Tránh trường hợp tự phân vai cho chính mình)
-        if (assistantID != null && driverID == assistantID.intValue()) {
+        if (assistantID != null && driverID == assistantID) {
             throw new IllegalArgumentException("Vi phạm phân bổ: Nhân sự tài xế và phụ xe không thể là cùng một người.");
         }
 
@@ -200,9 +428,11 @@ public class TripService {
 
         // 4. Test Route Inactive (Chặn bypass qua HTML)
         model.Route route = routeDAO.getRouteById(routeID);
-        // Vì RouteDAO.getRouteById đã lọc sẵn WHERE IsActive = 1 nên nếu trả về null tức là tuyến không tồn tại hoặc đã bị khóa.
-        if (route == null && !route.isIsActive()) {
-            throw new IllegalArgumentException("Yêu cầu bị từ chối: Tuyến đường này không khả dụng hoặc đã bị ngừng hoạt động (Inactive).");
+
+        if (route == null || !route.isIsActive()) {
+            throw new IllegalArgumentException(
+                    "Yêu cầu bị từ chối: Tuyến đường này không khả dụng hoặc đã bị ngừng hoạt động."
+            );
         }
 
         // 5. Test Bus Maintenance / Inactive

@@ -22,24 +22,46 @@ import java.util.logging.Logger;
 public class NotificationDAO extends DBContext {
 
     public int countUnreadNotifications(int accountId) {
-        String sql = "SELECT COUNT(*) FROM Notifications WHERE AccountID = ? AND IsRead = 0";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+
+        String sql
+                = "SELECT COUNT(*) "
+                + "FROM Notifications n "
+                + "WHERE ( "
+                + "    n.AccountID = ? "
+                + "    OR n.TargetRole = 'ALL' "
+                + "    OR n.TargetRole = 'CUSTOMER' "
+                + ") "
+                + "AND NOT EXISTS ( "
+                + "    SELECT 1 "
+                + "    FROM NotificationReads nr "
+                + "    WHERE nr.NotificationID = n.NotificationID "
+                + "    AND nr.AccountID = ? "
+                + ")";
+
+        try  {
+            PreparedStatement ps = connection.prepareStatement(sql);
+
             ps.setInt(1, accountId);
+            ps.setInt(2, accountId);
+
             try (ResultSet rs = ps.executeQuery()) {
+
                 if (rs.next()) {
                     return rs.getInt(1);
                 }
             }
+
         } catch (Exception e) {
             e.printStackTrace();
         }
+
         return 0;
     }
 
     /**
      * Đếm thông báo chưa đọc dành cho một tài khoản VÀ các thông báo broadcast
-     * gửi tới nhóm vai trò (roleName) hoặc gửi cho tất cả ('ALL').
-     * Dành cho Phụ xe: roleName = "ASSISTANT"
+     * gửi tới nhóm vai trò (roleName) hoặc gửi cho tất cả ('ALL'). Dành cho Phụ
+     * xe: roleName = "ASSISTANT"
      */
     public int countUnreadByAccountAndRole(int accountId, String roleName) {
         String sql = "SELECT COUNT(*) FROM Notifications n "
@@ -146,9 +168,10 @@ public class NotificationDAO extends DBContext {
     }
 
     /**
-     * Lấy thông báo cho Phụ xe: bao gồm thông báo đích danh (AccountID = accountID)
-     * VÀ thông báo broadcast gửi tới nhóm vai trò (roleName) hoặc gửi tất cả ('ALL').
-     * Spec Sprint 6 – Mục V: "xem thông báo được gửi đích danh HOẶC gửi hàng loạt dành cho nhóm Phụ xe".
+     * Lấy thông báo cho Phụ xe: bao gồm thông báo đích danh (AccountID =
+     * accountID) VÀ thông báo broadcast gửi tới nhóm vai trò (roleName) hoặc
+     * gửi tất cả ('ALL'). Spec Sprint 6 – Mục V: "xem thông báo được gửi đích
+     * danh HOẶC gửi hàng loạt dành cho nhóm Phụ xe".
      */
     public List<Notification> getByAccountAndRole(int accountID, String roleName, int offset, int limit) {
         List<Notification> list = new ArrayList<>();
@@ -320,7 +343,7 @@ public class NotificationDAO extends DBContext {
             n.setAccountID(0);
         } else {
             n.setAccountID(accountID);
-    }
+        }
         n.setNotificationType(NotificationType.valueOf(rs.getString("NotificationType")));
         n.setTitle(rs.getString("Title"));
         n.setContent(rs.getString("Content"));

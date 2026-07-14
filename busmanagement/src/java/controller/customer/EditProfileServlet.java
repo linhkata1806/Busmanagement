@@ -14,7 +14,9 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.http.Part;
+import java.awt.image.BufferedImage;
 import java.io.File;
+import javax.imageio.ImageIO;
 import model.Account;
 import util.Validator;
 
@@ -23,9 +25,9 @@ import util.Validator;
  * @author Administrator
  */
 @MultipartConfig(
-    fileSizeThreshold = 1024 * 1024 * 2,  // 2MB
-    maxFileSize = 1024 * 1024 * 10,       // 10MB
-    maxRequestSize = 1024 * 1024 * 50     // 50MB
+        fileSizeThreshold = 1024 * 1024 * 2, // 2MB
+        maxFileSize = 1024 * 1024 * 10, // 10MB
+        maxRequestSize = 1024 * 1024 * 50 // 50MB
 )
 public class EditProfileServlet extends HttpServlet {
 
@@ -94,42 +96,6 @@ public class EditProfileServlet extends HttpServlet {
         String fullName = fullNameRaw.trim();
         String email = emailRaw.trim();
         String phone = phoneRaw.trim();
-        
-        // Mặc định giữ nguyên ảnh đại diện cũ
-        String avatar = user.getAvatar();
-
-        // Xử lý tệp tải lên
-        try {
-            Part filePart = request.getPart("avatar");
-            if (filePart != null && filePart.getSize() > 0) {
-                // Thư mục lưu file: webapp/uploads/avatars/
-                String uploadPath = request.getServletContext().getRealPath("/") + "uploads" + File.separator + "avatars";
-                File uploadDir = new File(uploadPath);
-                if (!uploadDir.exists()) {
-                    uploadDir.mkdirs();
-                }
-
-                // Trích xuất định dạng file (.png, .jpg, ...)
-                String submittedFileName = filePart.getSubmittedFileName();
-                String fileExtension = "";
-                int dotIndex = submittedFileName.lastIndexOf('.');
-                if (dotIndex >= 0) {
-                    fileExtension = submittedFileName.substring(dotIndex);
-                }
-
-                // Đổi tên tệp để tránh trùng lặp: avatar_ID.ext
-                String newFileName = "avatar_" + user.getAccountID() + fileExtension;
-                String fileSavePath = uploadPath + File.separator + newFileName;
-
-                // Ghi file xuống server
-                filePart.write(fileSavePath);
-
-                // Đường dẫn tương đối lưu vào DB
-                avatar = "uploads/avatars/" + newFileName;
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
 
         // 2. Validate dữ liệu đầu vào (Sử dụng Validator của bạn)
         if (Validator.isBlank(fullName)) {
@@ -156,6 +122,80 @@ public class EditProfileServlet extends HttpServlet {
                 doGet(request, response);
                 return;
             }
+        }
+        // Mặc định giữ nguyên ảnh đại diện cũ
+        String avatar = user.getAvatar();
+
+        // Xử lý tệp tải lên
+        try {
+            Part filePart = request.getPart("avatar");
+
+            if (filePart != null && filePart.getSize() > 0) {
+
+                String submittedFileName = filePart.getSubmittedFileName();
+
+                if (submittedFileName == null || !submittedFileName.contains(".")) {
+                    request.setAttribute("errorMsg", "Tên file ảnh không hợp lệ.");
+                    doGet(request, response);
+                    return;
+                }
+
+                String fileExtension = submittedFileName
+                        .substring(submittedFileName.lastIndexOf("."))
+                        .toLowerCase();
+
+                if (!fileExtension.equals(".jpg")
+                        && !fileExtension.equals(".jpeg")
+                        && !fileExtension.equals(".png")) {
+
+                    request.setAttribute("errorMsg", "Chỉ chấp nhận ảnh JPG hoặc PNG.");
+                    doGet(request, response);
+                    return;
+                }
+
+                BufferedImage image = ImageIO.read(filePart.getInputStream());
+
+                if (image == null) {
+                    request.setAttribute("errorMsg", "File tải lên không phải ảnh hợp lệ.");
+                    doGet(request, response);
+                    return;
+                }
+
+                String uploadPath = request.getServletContext().getRealPath("/")
+                        + "uploads"
+                        + File.separator
+                        + "avatars";
+
+                File uploadDir = new File(uploadPath);
+
+                if (!uploadDir.exists() && !uploadDir.mkdirs()) {
+                    request.setAttribute("errorMsg", "Không thể tạo thư mục lưu ảnh.");
+                    doGet(request, response);
+                    return;
+                }
+
+                String newFileName = "avatar_"
+                        + user.getAccountID()
+                        + fileExtension;
+
+                String fileSavePath = uploadPath
+                        + File.separator
+                        + newFileName;
+
+                filePart.write(fileSavePath);
+
+                avatar = "uploads/avatars/" + newFileName;
+            }
+
+        } catch (IllegalStateException e) {
+            request.setAttribute("errorMsg", "Ảnh đại diện vượt quá dung lượng 10MB.");
+            doGet(request, response);
+            return;
+        } catch (Exception e) {
+            e.printStackTrace();
+            request.setAttribute("errorMsg", "Không thể tải ảnh đại diện lên.");
+            doGet(request, response);
+            return;
         }
 
         // 4. Gọi DAO cập nhật xuống DB

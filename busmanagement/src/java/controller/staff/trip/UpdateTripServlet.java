@@ -3,6 +3,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
  */
 package controller.staff.trip;
+
 import java.io.IOException;
 import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
@@ -42,7 +43,23 @@ public class UpdateTripServlet extends HttpServlet {
 
         try {
             // Lấy ID chuyến xe cần sửa từ URL
-            int tripID = Integer.parseInt(request.getParameter("id"));
+            String idRaw = request.getParameter("id");
+
+            if (idRaw == null || idRaw.trim().isEmpty()) {
+                request.getSession().setAttribute("msgError", "Thiếu mã chuyến xe cần sửa.");
+                response.sendRedirect(request.getContextPath() + "/staff/trip");
+                return;
+            }
+
+            int tripID;
+
+            try {
+                tripID = Integer.parseInt(idRaw);
+            } catch (NumberFormatException e) {
+                request.getSession().setAttribute("msgError", "Mã chuyến xe không hợp lệ.");
+                response.sendRedirect(request.getContextPath() + "/staff/trip");
+                return;
+            }
             Trip trip = tripService.getTripById(tripID); // Nếu TripDAO của bạn chưa có hàm getById thì bảo tớ nhé!
 
             if (trip == null) {
@@ -115,4 +132,3 @@ public class UpdateTripServlet extends HttpServlet {
         }
     }
 }
-

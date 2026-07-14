@@ -192,9 +192,19 @@ public class TicketDAO extends DBContext {
 
     //=====customer(hủy vé quá ngày)
     public void updateExpiredTickets() {
-        String sql = "UPDATE Tickets SET Status = 'EXPIRED' WHERE Status = 'UNUSED' AND CAST(PurchasedAt AS DATE) < CAST(GETDATE() AS DATE)";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+
+        String sql
+                = "UPDATE t "
+                + "SET t.Status = 'EXPIRED' "
+                + "FROM Tickets t "
+                + "JOIN Trips tr ON t.TripID = tr.TripID "
+                + "WHERE t.Status = 'UNUSED' "
+                + "AND tr.TripDate < CAST(GETDATE() AS DATE)";
+
+        try {
+            PreparedStatement ps = connection.prepareStatement(sql);
             ps.executeUpdate();
+
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -347,6 +357,7 @@ public class TicketDAO extends DBContext {
         }
         return false;
     }
+
     public boolean updateTicketStatusByTrip(int tripID, String status) {
         String sql = "UPDATE Tickets SET Status = ? WHERE TripID = ? AND Status = 'CHECKED_IN'";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -355,7 +366,7 @@ public class TicketDAO extends DBContext {
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
             e.printStackTrace();
-            
+
             return false;
         }
     }

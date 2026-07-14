@@ -31,6 +31,17 @@ public class PurchaseService {
     }
 
     public void processPurchase(Integer accountID, int routeId, String ticketType, int passTypeID, String imageProof) throws Exception {
+        if ("thang".equals(ticketType)) {
+            if (passTypeID != 1 && passTypeID != 3 && passTypeID != 4) {
+                throw new IllegalArgumentException("Loại vé tháng không hợp lệ.");
+            }
+        }
+
+        if ("lien_chuyen".equals(ticketType)) {
+            if (passTypeID != 2 && passTypeID != 3 && passTypeID != 4) {
+                throw new IllegalArgumentException("Loại vé liên tuyến không hợp lệ.");
+            }
+        }
         PurchaseDAO purchaseDAO = new PurchaseDAO();
         System.out.println("====== PROCESS PURCHASE ======");
         System.out.println("ticketType = " + ticketType);

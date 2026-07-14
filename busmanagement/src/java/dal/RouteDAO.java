@@ -45,7 +45,9 @@ public class RouteDAO extends DBContext {
     public List<Route> getAllActiveRoutes() {
         List<Route> list = new ArrayList<>();
         String sql = "SELECT * FROM Routes WHERE IsActive = 1 ORDER BY RouteNumber ASC";
-        try (PreparedStatement ps = connection.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
+        try  {
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 list.add(mapRoute(rs));
             }
@@ -54,6 +56,7 @@ public class RouteDAO extends DBContext {
         }
         return list;
     }
+
     //==== ham cho guest
     public Route getRouteById(int routeId) {
         String sql = "SELECT * FROM Routes WHERE RouteID = ?";
@@ -73,10 +76,12 @@ public class RouteDAO extends DBContext {
 
     public List<Route> searchRoutes(String keyword) {
         List<Route> list = new ArrayList<>();
-        String sql = "SELECT * FROM Routes WHERE IsActive = 1 "
+        String sql = "SELECT * FROM Routes"
+                + " WHERE IsActive = 1 "
                 + "AND (RouteNumber LIKE ? OR RouteName LIKE ? OR StartPoint LIKE ? OR EndPoint LIKE ?) "
                 + "ORDER BY RouteNumber ASC";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        try  {
+            PreparedStatement ps = connection.prepareStatement(sql);
             if (keyword == null) {
                 keyword = "";
             }
@@ -96,7 +101,7 @@ public class RouteDAO extends DBContext {
         return list;
     }
 
-        //==== ham cho guest
+    //==== ham cho guest
     public List<Route> findRoutesBetweenStops(int fromStopID, int toStopID) {
         List<Route> list = new ArrayList<>();
         String sql = "SELECT r.* FROM Routes r "
@@ -104,7 +109,8 @@ public class RouteDAO extends DBContext {
                 + "JOIN Route_Stop rs2 ON r.RouteID = rs2.RouteID "
                 + "WHERE rs1.StopID = ? AND rs2.StopID = ? "
                 + "AND rs1.StopOrder < rs2.StopOrder AND r.IsActive = 1";
-        try (PreparedStatement st = connection.prepareStatement(sql)) {
+        try  {
+            PreparedStatement st = connection.prepareStatement(sql);
             st.setInt(1, fromStopID);
             st.setInt(2, toStopID);
             try (ResultSet rs = st.executeQuery()) {
