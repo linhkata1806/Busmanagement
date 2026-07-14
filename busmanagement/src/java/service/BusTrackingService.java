@@ -25,7 +25,7 @@ public class BusTrackingService {
     public List<BusLocationDTO> getRunningBusesLocations() {
         List<BusLocationDTO> result = new ArrayList<>();
 
-        List<TripDTO> runningTrips = tripDAO.searchTrips(null, 0, null, "IN_PROGRESS");
+        List<TripDTO> runningTrips = tripDAO.getRunningTripsForTracking();
 
         for (TripDTO tripDTO : runningTrips) {
             try {
@@ -63,7 +63,7 @@ public class BusTrackingService {
                 int eta = calculateETA(latestLoc.getLatitude(), latestLoc.getLongitude(), routeID);
 
                 int capacity = 60;
-                List<Bus> foundBuses = busDAO.searchAndFilter(tripDTO.getBusPlate(), "ALL");
+                List<Bus> foundBuses = busDAO.searchAndFilter(tripDTO.getBusPlate(), "ALL", 0, 1);
                 if (foundBuses != null && !foundBuses.isEmpty()) {
                     capacity = foundBuses.get(0).getCapacity();
                 }

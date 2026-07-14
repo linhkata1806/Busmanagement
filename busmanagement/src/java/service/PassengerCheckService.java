@@ -31,7 +31,7 @@ public class PassengerCheckService {
 
         dal.BusDAO busDAO = new dal.BusDAO();
         model.Bus bus = busDAO.getBusById(trip.getBusID());
-        int currentPassengers = ticketDAO.getTicketsByTrip(tripID).size();
+        int currentPassengers = ticketDAO.countTicketsByTrip(tripID);
         if (bus != null && bus.getCapacity() > 0 && currentPassengers >= bus.getCapacity()) {
             throw new IllegalArgumentException("Xe đã đạt số lượng tối đa (" + bus.getCapacity() + " người). Không thể soát thêm!");
         }

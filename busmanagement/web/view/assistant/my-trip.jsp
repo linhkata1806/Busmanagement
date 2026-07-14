@@ -124,6 +124,9 @@
                                 </tbody>
                             </table>
                         </div>
+                        
+                        <%-- Phân trang --%>
+                        <jsp:include page="/common/pagination.jsp" />
                     </div>
                 </div>
             </main>

@@ -159,7 +159,34 @@ public class RouteDAO extends DBContext {
         return null;
     }
 
-    public List<Route> searchAndFilter(String keyword, String status) {
+    public int countSearchAndFilter(String keyword, String status) {
+        String sql = "SELECT COUNT(*) FROM Routes "
+                   + "WHERE (RouteNumber LIKE ? OR RouteName LIKE ? OR StartPoint LIKE ? OR EndPoint LIKE ?) "
+                   + "AND (?='ALL' OR IsActive=?)";
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            String kw = "%" + keyword + "%";
+            ps.setString(1, kw);
+            ps.setString(2, kw);
+            ps.setString(3, kw);
+            ps.setString(4, kw);
+
+            ps.setString(5, status);
+            int activeValue = "ACTIVE".equalsIgnoreCase(status) ? 1 : 0;
+            ps.setInt(6, activeValue);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("Lỗi countSearchAndFilter Route: " + e.getMessage());
+        }
+        return 0;
+    }
+
+    public List<Route> searchAndFilter(String keyword, String status, int offset, int limit) {
         List<Route> list = new ArrayList<>();
 
         // Format SQL dễ đọc, dễ maintain
@@ -173,7 +200,8 @@ public class RouteDAO extends DBContext {
                 + "OR EndPoint LIKE ?) "
                 + "AND "
                 + "(?='ALL' OR IsActive=?) "
-                + "ORDER BY RouteNumber ASC";
+                + "ORDER BY RouteNumber ASC "
+                + "OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             String kw = "%" + keyword + "%";
@@ -190,6 +218,9 @@ public class RouteDAO extends DBContext {
                 activeValue = 1;
             }
             ps.setInt(6, activeValue);
+            
+            ps.setInt(7, offset);
+            ps.setInt(8, limit);
 
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {

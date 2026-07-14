@@ -12,6 +12,6 @@ public class AccessDeniedServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        request.getRequestDispatcher("view/access-denied.jsp").forward(request, response);
+        request.getRequestDispatcher("view/error/access-denied.jsp").forward(request, response);
     }
 }

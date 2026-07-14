@@ -63,6 +63,24 @@ public class NotificationDAO extends DBContext {
         return 0;
     }
 
+    public int countByAccountAndRole(int accountId, String roleName) {
+        String sql = "SELECT COUNT(*) FROM Notifications n "
+                + "WHERE n.AccountID = ? "
+                + "   OR (n.AccountID IS NULL AND n.TargetRole IN (?, 'ALL'))";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, accountId);
+            ps.setString(2, roleName);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
     public boolean insert(Notification noti) {
         String sql = "INSERT INTO Notifications (AccountID, NotificationType, Title, Content, IsRead, CreatedAt) "
                 + "VALUES (?, ?, ?, ?, ?, ?)";
@@ -84,11 +102,28 @@ public class NotificationDAO extends DBContext {
         }
     }
 
-    public List<Notification> getByAccount(int accountID) {
-        List<Notification> list = new ArrayList<>();
-        String sql = "SELECT * FROM Notifications WHERE AccountID = ? ORDER BY CreatedAt DESC";
+    public int countByAccount(int accountID) {
+        String sql = "SELECT COUNT(*) FROM Notifications WHERE AccountID = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, accountID);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
+    public List<Notification> getByAccount(int accountID, int offset, int limit) {
+        List<Notification> list = new ArrayList<>();
+        String sql = "SELECT * FROM Notifications WHERE AccountID = ? ORDER BY CreatedAt DESC OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, accountID);
+            ps.setInt(2, offset);
+            ps.setInt(3, limit);
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     Notification n = new Notification();
@@ -115,7 +150,7 @@ public class NotificationDAO extends DBContext {
      * VÀ thông báo broadcast gửi tới nhóm vai trò (roleName) hoặc gửi tất cả ('ALL').
      * Spec Sprint 6 – Mục V: "xem thông báo được gửi đích danh HOẶC gửi hàng loạt dành cho nhóm Phụ xe".
      */
-    public List<Notification> getByAccountAndRole(int accountID, String roleName) {
+    public List<Notification> getByAccountAndRole(int accountID, String roleName, int offset, int limit) {
         List<Notification> list = new ArrayList<>();
         String sql = "SELECT n.NotificationID, n.AccountID, n.NotificationType, n.Title, n.Content, n.TargetRole, n.CreatedAt, "
                 + "       CASE "
@@ -126,12 +161,14 @@ public class NotificationDAO extends DBContext {
                 + "LEFT JOIN NotificationReads nr ON n.NotificationID = nr.NotificationID AND nr.AccountID = ? "
                 + "WHERE n.AccountID = ? "
                 + "   OR (n.AccountID IS NULL AND n.TargetRole IN (?, 'ALL')) "
-                + "ORDER BY n.CreatedAt DESC";
+                + "ORDER BY n.CreatedAt DESC OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, accountID);
             ps.setInt(2, accountID);
             ps.setInt(3, accountID);
             ps.setString(4, roleName);
+            ps.setInt(5, offset);
+            ps.setInt(6, limit);
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     list.add(mapRow(rs));
@@ -215,11 +252,13 @@ public class NotificationDAO extends DBContext {
     }
 
     //get all noti cho staff
-    public List<Notification> getAll() {
+    public List<Notification> getAll(int offset, int limit) {
         List<Notification> list = new ArrayList<>();
-        String sql = "select * from Notifications";
+        String sql = "select * from Notifications ORDER BY CreatedAt DESC OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
         try {
             PreparedStatement ps = connection.prepareStatement(sql);
+            ps.setInt(1, offset);
+            ps.setInt(2, limit);
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 list.add(mapRow(rs));

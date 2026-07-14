@@ -156,6 +156,9 @@
                                 <p class="mb-0">Không tìm thấy tài khoản nào khớp với điều kiện lọc.</p>
                             </div>
                         </c:if>
+                        
+                        <%-- Component Phân trang --%>
+                        <jsp:include page="/common/pagination.jsp" />
                     </div>
                 </div>
             </div>

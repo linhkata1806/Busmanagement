@@ -125,17 +125,6 @@ public class MonthlyPassService {
         return monthlyPassDAO.countByStaTus("PENDING");
     }
 
-    // 2. Lấy danh sách tất cả vé tháng (Giao diện Staff)
-    public List<MonthlyPassDTO> getAllPassesForStaff() {
-        monthlyPassDAO.updateExpiredPasses();
-        return monthlyPassDAO.getAllPasses();
-    }
-
-    // 3. Lấy danh sách vé tháng theo trạng thái lọc
-    public List<MonthlyPassDTO> getPassesByStatusForStaff(String status) {
-        monthlyPassDAO.updateExpiredPasses();
-        return monthlyPassDAO.getPassesByStatus(status);
-    }
 
     public boolean approvePass(int passID, int staffID) {
         MonthlyPass pass = monthlyPassDAO.getPassByID(passID);
@@ -186,36 +175,19 @@ public class MonthlyPassService {
     }
 
     // ham nay get va all trang tahi
-    public List<MonthlyPassDTO> getAllPassesForStaff(String searchQuery) {
-        List<MonthlyPassDTO> passList = monthlyPassDAO.getAllPasses();
-        return filterPassesBySearchQuery(passList, searchQuery);
+    public List<MonthlyPassDTO> getAllPassesForStaff(String searchQuery, int offset, int limit) {
+        monthlyPassDAO.updateExpiredPasses();
+        return monthlyPassDAO.getPassesSearchAndFilter("ALL", searchQuery, offset, limit);
     }
 
     // ham nay get ve theo 1 trang thai nhat dinh
-    public List<MonthlyPassDTO> getPassesByStatusForStaff(String status, String searchQuery) {
-        List<MonthlyPassDTO> passList = monthlyPassDAO.getPassesByStatus(status);
-        return filterPassesBySearchQuery(passList, searchQuery);
-
+    public List<MonthlyPassDTO> getPassesByStatusForStaff(String status, String searchQuery, int offset, int limit) {
+        monthlyPassDAO.updateExpiredPasses();
+        return monthlyPassDAO.getPassesSearchAndFilter(status, searchQuery, offset, limit);
     }
 
-    private List<MonthlyPassDTO> filterPassesBySearchQuery(List<MonthlyPassDTO> passList, String searchQuery) {
-        //check search query k co j 
-        if (searchQuery == null || searchQuery.isBlank()) {
-            return passList;// tra ve luon ca danh sach k phai loc
-        }
-
-        String query = searchQuery.trim().toLowerCase();
-        List<MonthlyPassDTO> filteredList = new ArrayList<>();
-
-        for (MonthlyPassDTO dto : passList) {
-            //check xem ma ve hoac ten co khop voi tu khoa tim kiem k
-            boolean matchCode = dto.getPassCode() != null && dto.getPassCode().toLowerCase().contains(query);
-            boolean matchName = dto.getFullName() != null && dto.getFullName().toLowerCase().contains(query);
-            if (matchCode || matchName) {
-                filteredList.add(dto);
-            }
-        }
-        return filteredList;
+    public int countPassesForStaff(String status, String searchQuery) {
+        return monthlyPassDAO.countPassesSearchAndFilter(status, searchQuery);
     }
 
     public String processAndSaveProof(Part filePart, String realPath) throws IllegalArgumentException, Exception {

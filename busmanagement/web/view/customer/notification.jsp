@@ -180,6 +180,11 @@
 
             </div>
         </div>
+        
+        <div class="mt-4">
+            <%-- Phân trang --%>
+            <jsp:include page="/common/pagination.jsp" />
+        </div>
     </div>
 
 
