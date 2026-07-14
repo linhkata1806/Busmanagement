@@ -40,15 +40,43 @@ public class RouteManagementServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        
+        int page = 1;
+        int limit = 10;
+        String pageStr = request.getParameter("page");
+        if (pageStr != null && !pageStr.isEmpty()) {
+            try {
+                page = Integer.parseInt(pageStr);
+                if (page < 1) page = 1;
+            } catch (NumberFormatException e) {
+                page = 1;
+            }
+        }
+        int offset = (page - 1) * limit;
+
         String keyword = request.getParameter("keyword");
         String status = request.getParameter("status");
 
-        List<Route> routes = routeService.searchAndFilter(keyword, status);
+        List<Route> routes = routeService.searchAndFilter(keyword, status, offset, limit);
+        int totalRecords = routeService.countSearchAndFilter(keyword, status);
+        int totalPages = (int) Math.ceil((double) totalRecords / limit);
+
+        StringBuilder queryString = new StringBuilder();
+        if (keyword != null && !keyword.isEmpty()) {
+            queryString.append("keyword=").append(java.net.URLEncoder.encode(keyword, "UTF-8"));
+        }
+        if (status != null && !status.isEmpty()) {
+            if (queryString.length() > 0) queryString.append("&");
+            queryString.append("status=").append(java.net.URLEncoder.encode(status, "UTF-8"));
+        }
 
         // Xử lý để JSP không bị hiển thị chuỗi "null" vào ô input
         request.setAttribute("keyword", keyword == null ? "" : keyword);
         request.setAttribute("status", status == null ? "ALL" : status);
         request.setAttribute("routes", routes);
+        request.setAttribute("currentPage", page);
+        request.setAttribute("totalPages", totalPages);
+        request.setAttribute("queryString", queryString.toString());
 
         request.getRequestDispatcher("/view/staff/route/route-management.jsp").forward(request, response);
     }

@@ -26,11 +26,15 @@ public class TripService {
     }
 
     public List<TripDTO> getAllTrips() throws Exception {
-        return tripDAO.searchTrips(null, -1, null, null);
+        return tripDAO.searchTrips(null, -1, null, null, 0, Integer.MAX_VALUE);
     }
 
-    public List<TripDTO> searchTrips(String date, int routeID, String plate, String status) {
-        return tripDAO.searchTrips(date, routeID, plate, status);
+    public int countSearchTrips(String date, int routeID, String plate, String status) {
+        return tripDAO.countSearchTrips(date, routeID, plate, status);
+    }
+
+    public List<TripDTO> searchTrips(String date, int routeID, String plate, String status, int offset, int limit) {
+        return tripDAO.searchTrips(date, routeID, plate, status, offset, limit);
     }
 
     public Trip getTripById(int tripID) {
@@ -242,12 +246,20 @@ public class TripService {
         }
     }
 
-    public List<TripDTO> getTripsByAssistant(int assistantID) {
-        return tripDAO.getTripsByAssistant(assistantID);
+    public int countTripsByAssistant(int assistantID) {
+        return tripDAO.countTripsByAssistant(assistantID);
     }
 
-    public List<TripDTO> getTripsByDriver(int driverID) {
-        return tripDAO.getTripsByDriver(driverID);
+    public List<TripDTO> getTripsByAssistant(int assistantID, int offset, int limit) {
+        return tripDAO.getTripsByAssistant(assistantID, offset, limit);
+    }
+
+    public int countTripsByDriver(int driverID) {
+        return tripDAO.countTripsByDriver(driverID);
+    }
+
+    public List<TripDTO> getTripsByDriver(int driverID, int offset, int limit) {
+        return tripDAO.getTripsByDriver(driverID, offset, limit);
     }
 
     public TripDTO getTripDTOByIDAndDriver(int tripID, int driverID) {

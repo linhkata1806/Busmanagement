@@ -29,11 +29,28 @@ public class NotificationServlet extends HttpServlet {
         Account user = (Account) session.getAttribute("USER");
         int accountId = user.getAccountID();
 
+        int page = 1;
+        int limit = 10;
+        String pageStr = request.getParameter("page");
+        if (pageStr != null && !pageStr.trim().isEmpty()) {
+            try {
+                page = Integer.parseInt(pageStr);
+            } catch (NumberFormatException e) {
+                page = 1;
+            }
+        }
+        int offset = (page - 1) * limit;
+
+        int totalNotifications = notificationService.countByAccountAndRole(accountId, ASSISTANT_ROLE);
+        int totalPages = (int) Math.ceil((double) totalNotifications / limit);
+
         // Lấy cả thông báo đích danh + broadcast cho nhóm ASSISTANT (Spec Sprint 6 – Mục V)
-        List<Notification> notiList = notificationService.getByAccountAndRole(accountId, ASSISTANT_ROLE);
+        List<Notification> notiList = notificationService.getByAccountAndRole(accountId, ASSISTANT_ROLE, offset, limit);
         int unreadCount = notificationService.countUnreadByAccountAndRole(accountId, ASSISTANT_ROLE);
 
         request.setAttribute("notiList", notiList);
+        request.setAttribute("currentPage", page);
+        request.setAttribute("totalPages", totalPages);
         request.setAttribute("unreadCount", unreadCount);
 
         request.getRequestDispatcher("/view/assistant/notification.jsp").forward(request, response);

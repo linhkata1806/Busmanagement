@@ -28,7 +28,21 @@ public class BusService {
         return busDAO.getAllActiveBuses();
     }
 
-    public List<Bus> searchAndFilter(String keyword, String status) {
+    public int countSearchAndFilter(String keyword, String status) {
+        if (keyword == null) keyword = "";
+        keyword = keyword.trim();
+
+        if (status == null || status.trim().isEmpty()) {
+            status = "ALL";
+        }
+        if (!status.equals("ALL") && !status.equals("ACTIVE")
+                && !status.equals("MAINTENANCE") && !status.equals("RETIRED")) {
+            status = "ALL";
+        }
+        return busDAO.countSearchAndFilter(keyword, status);
+    }
+
+    public List<Bus> searchAndFilter(String keyword, String status, int offset, int limit) {
         if (keyword == null) {
             keyword = "";
         }
@@ -44,8 +58,7 @@ public class BusService {
             status = "ALL";
         }
 
-        return busDAO.searchAndFilter(keyword, status);
-
+        return busDAO.searchAndFilter(keyword, status, offset, limit);
     }
 
     public void createBus(String licensePlate, String busType, int capacity) {

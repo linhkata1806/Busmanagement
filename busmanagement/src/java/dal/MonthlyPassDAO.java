@@ -368,9 +368,45 @@ public class MonthlyPassDAO extends DBContext {
         return 0;
     }
 
-    public List<MonthlyPassDTO> getAllPasses() {
+    public int countPassesSearchAndFilter(String status, String searchQuery) {
+        StringBuilder sql = new StringBuilder(
+                "SELECT COUNT(*) FROM MonthlyPasses mp "
+                + "JOIN Accounts a ON mp.AccountID = a.AccountID "
+                + "WHERE 1=1 ");
+
+        List<Object> params = new ArrayList<>();
+
+        if (status != null && !status.trim().isEmpty() && !status.equalsIgnoreCase("ALL")) {
+            sql.append("AND mp.Status = ? ");
+            params.add(status.toUpperCase());
+        }
+
+        if (searchQuery != null && !searchQuery.trim().isEmpty()) {
+            sql.append("AND (mp.PassCode LIKE ? OR a.FullName LIKE ?) ");
+            String searchPattern = "%" + searchQuery.trim() + "%";
+            params.add(searchPattern);
+            params.add(searchPattern);
+        }
+
+        try (PreparedStatement ps = connection.prepareStatement(sql.toString())) {
+            for (int i = 0; i < params.size(); i++) {
+                ps.setObject(i + 1, params.get(i));
+            }
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("Lỗi countPassesSearchAndFilter: " + e.getMessage());
+        }
+        return 0;
+    }
+
+    public List<MonthlyPassDTO> getPassesSearchAndFilter(String status, String searchQuery, int offset, int limit) {
         List<MonthlyPassDTO> list = new ArrayList<>();
-        String sql = "SELECT \n"
+        StringBuilder sql = new StringBuilder(
+                "SELECT \n"
                 + "    mp.PassID, \n"
                 + "    mp.PassCode, \n"
                 + "    mp.AccountID, \n"
@@ -387,50 +423,40 @@ public class MonthlyPassDAO extends DBContext {
                 + "FROM MonthlyPasses mp \n"
                 + "JOIN Accounts a ON mp.AccountID = a.AccountID \n"
                 + "LEFT JOIN Routes r ON mp.RouteID = r.RouteID \n"
-                + "JOIN MonthlyPassTypes mpt ON mp.PassTypeID = mpt.PassTypeID";
-        try {
-            PreparedStatement ps = connection.prepareStatement(sql);
-            ResultSet rs = ps.executeQuery();
-            while (rs.next()) {
-                list.add(mapStaffRowToDTO(rs));
-            }
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-        }
-        return list;
-    }
-
-    public List<MonthlyPassDTO> getPassesByStatus(String status) {
-        List<MonthlyPassDTO> list = new ArrayList<>();
-        String sql = "SELECT \n"
-                + "    mp.PassID, \n"
-                + "    mp.PassCode, \n"
-                + "    mp.AccountID, \n"
-                + "    a.FullName, \n"
-                + "    a.Email, \n" // <--- BỔ SUNG
-                + "    a.Phone, \n"
-                + "    mp.StartDate, \n"
-                + "    mp.EndDate, \n"
-                + "    mp.Status, \n"
-                + "    r.RouteNumber, \n"
-                + "    r.RouteName, \n"
-                + "    mpt.TypeName, \n"
-                + "    mp.ImageProof\n"
-                + "FROM MonthlyPasses mp \n"
-                + "JOIN Accounts a ON mp.AccountID = a.AccountID \n"
-                + "LEFT JOIN Routes r ON mp.RouteID = r.RouteID \n"
                 + "JOIN MonthlyPassTypes mpt ON mp.PassTypeID = mpt.PassTypeID \n"
-                + "WHERE mp.Status = ?";
-        try {
-            PreparedStatement ps = connection.prepareStatement(sql);
-            ps.setString(1, status);
-            ResultSet rs = ps.executeQuery();
+                + "WHERE 1=1 ");
 
-            while (rs.next()) {
-                list.add(mapStaffRowToDTO(rs));
+        List<Object> params = new ArrayList<>();
+
+        if (status != null && !status.trim().isEmpty() && !status.equalsIgnoreCase("ALL")) {
+            sql.append("AND mp.Status = ? ");
+            params.add(status.toUpperCase());
+        }
+
+        if (searchQuery != null && !searchQuery.trim().isEmpty()) {
+            sql.append("AND (mp.PassCode LIKE ? OR a.FullName LIKE ?) ");
+            String searchPattern = "%" + searchQuery.trim() + "%";
+            params.add(searchPattern);
+            params.add(searchPattern);
+        }
+
+        sql.append("ORDER BY mp.CreatedAt DESC OFFSET ? ROWS FETCH NEXT ? ROWS ONLY");
+
+        try (PreparedStatement ps = connection.prepareStatement(sql.toString())) {
+            int paramIndex = 1;
+            for (Object param : params) {
+                ps.setObject(paramIndex++, param);
             }
-
-        } catch (Exception e) {
+            ps.setInt(paramIndex++, offset);
+            ps.setInt(paramIndex++, limit);
+            
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    list.add(mapStaffRowToDTO(rs));
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("Lỗi getPassesSearchAndFilter: " + e.getMessage());
         }
         return list;
     }
