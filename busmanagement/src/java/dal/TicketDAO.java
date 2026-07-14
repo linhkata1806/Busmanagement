@@ -73,16 +73,33 @@ public class TicketDAO extends DBContext {
     }
 
     //==========customer(dung trong trang ve cua toi)
-    public List<TicketDTO> getTicketsByAccount(int accountID) {
+    public int countTicketsByAccount(int accountID) {
+        String sql = "SELECT COUNT(*) FROM Tickets WHERE AccountID = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, accountID);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
+    public List<TicketDTO> getTicketsByAccount(int accountID, int offset, int limit) {
         List<TicketDTO> list = new ArrayList<>();
         String sql = "SELECT t.TicketCode, t.Price, t.Status, t.PurchasedAt, "
                 + "r.RouteNumber, r.RouteName "
                 + "FROM Tickets t "
                 + "JOIN Routes r ON t.RouteID = r.RouteID "
-                + "WHERE t.AccountID = ? ORDER BY t.PurchasedAt DESC";
+                + "WHERE t.AccountID = ? ORDER BY t.PurchasedAt DESC OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, accountID);
+            ps.setInt(2, offset);
+            ps.setInt(3, limit);
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     TicketDTO dto = new TicketDTO();
@@ -122,7 +139,27 @@ public class TicketDAO extends DBContext {
     }
 
     //======customer(dung khi  vao lich su chuyen di)
-    public List<dto.TripHistoryDTO> getRecentTripsByAccount(int accountID) {
+    public int countRecentTripsByAccount(int accountID) {
+        String sql = "SELECT COUNT(*) "
+                + "FROM Tickets t "
+                + "JOIN Trips tr ON t.TripID = tr.TripID "
+                + "JOIN Routes r ON tr.RouteID = r.RouteID "
+                + "JOIN Buses b ON tr.BusID = b.BusID "
+                + "WHERE t.AccountID = ? AND t.Status = 'COMPLETED'";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, accountID);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
+    public List<dto.TripHistoryDTO> getRecentTripsByAccount(int accountID, int offset, int limit) {
         List<dto.TripHistoryDTO> list = new ArrayList<>();
         String sql = "SELECT tr.TripDate, r.RouteNumber, b.LicensePlate, r.StartPoint, r.EndPoint "
                 + "FROM Tickets t "
@@ -130,10 +167,12 @@ public class TicketDAO extends DBContext {
                 + "JOIN Routes r ON tr.RouteID = r.RouteID "
                 + "JOIN Buses b ON tr.BusID = b.BusID "
                 + "WHERE t.AccountID = ? AND t.Status = 'COMPLETED' "
-                + "ORDER BY tr.TripDate DESC";
+                + "ORDER BY tr.TripDate DESC OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, accountID);
+            ps.setInt(2, offset);
+            ps.setInt(3, limit);
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     dto.TripHistoryDTO dto = new dto.TripHistoryDTO();
@@ -243,11 +282,28 @@ public class TicketDAO extends DBContext {
         return 0;
     }
 
-    public List<Ticket> getTicketsByTrip(int tripID) {
-        List<Ticket> list = new ArrayList<>();
-        String sql = "SELECT * FROM Tickets WHERE TripID = ? ORDER BY UsedAt DESC";
+    public int countTicketsByTrip(int tripID) {
+        String sql = "SELECT COUNT(*) FROM Tickets WHERE TripID = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, tripID);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
+    public List<Ticket> getTicketsByTrip(int tripID, int offset, int limit) {
+        List<Ticket> list = new ArrayList<>();
+        String sql = "SELECT * FROM Tickets WHERE TripID = ? ORDER BY UsedAt DESC OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, tripID);
+            ps.setInt(2, offset);
+            ps.setInt(3, limit);
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     list.add(mapRowToTicket(rs));

@@ -100,7 +100,6 @@
                                             </button>
                                         </form>
                                     </div>
-                                </div>
 
                                 <div class="col-12 col-lg-7">
                                     <div class="card card-custom p-4">
@@ -143,6 +142,9 @@
                                             </table>
                                         </div>
                                     </div>
+                                    
+                                    <%-- Phân trang --%>
+                                    <jsp:include page="/common/pagination.jsp" />
                                 </div>
                             </div>
                         </c:otherwise>

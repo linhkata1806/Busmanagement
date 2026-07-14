@@ -29,33 +29,128 @@ public class BusTrackingService {
     private final BusDAO busDAO = new BusDAO();
     private final RouteStopDAO routeStopDAO = new RouteStopDAO();
 
-    public List<BusLocationDTO> getRunningBusesLocations() {
-        List<BusLocationDTO> result = new ArrayList<>();
+public List<BusLocationDTO> getRunningBusesLocations() {
+    List<BusLocationDTO> result = new ArrayList<>();
 
-        List<TripDTO> runningTrips =
-                tripDAO.searchTrips(null, 0, null, "IN_PROGRESS");
+    List<TripDTO> runningTrips = tripDAO.getRunningTripsForTracking();
 
-        if (runningTrips == null || runningTrips.isEmpty()) {
-            return result;
-        }
-
-        // Tránh query lại danh sách trạm nhiều lần nếu nhiều xe cùng route.
-        Map<Integer, List<RouteStopDTO>> routeStopsCache = new HashMap<>();
-
-        for (TripDTO tripDTO : runningTrips) {
-            try {
-                processRunningTrip(tripDTO, result, routeStopsCache);
-            } catch (Exception e) {
-                System.err.println(
-                        "Lỗi xử lý tracking cho TripID: "
-                        + tripDTO.getTripID()
-                );
-                e.printStackTrace();
-            }
-        }
-
+    if (runningTrips == null || runningTrips.isEmpty()) {
         return result;
     }
+
+    // Cache danh sách trạm theo RouteID để tránh query DB nhiều lần
+    Map<Integer, List<RouteStopDTO>> routeStopsCache = new HashMap<>();
+
+    for (TripDTO tripDTO : runningTrips) {
+        try {
+            BusLocationHistory latestLoc =
+                    locationDAO.getLatestByTrip(tripDTO.getTripID());
+
+            if (latestLoc == null) {
+                continue;
+            }
+
+            Trip tripEntity = tripDAO.getById(tripDTO.getTripID());
+
+            if (tripEntity == null) {
+                continue;
+            }
+
+            int routeID = tripEntity.getRouteID();
+
+            List<RouteStopDTO> stops = routeStopsCache.get(routeID);
+
+            if (stops == null) {
+                stops = routeStopDAO.getStopsByRoute(routeID);
+                routeStopsCache.put(routeID, stops);
+            }
+
+            if (stops != null && !stops.isEmpty()) {
+
+                RouteStopDTO endStop;
+
+                // Direction = 1: bến cuối là trạm cuối danh sách
+                // Direction = 2: bến cuối là trạm đầu danh sách
+                if (tripEntity.getDirection() == 1) {
+                    endStop = stops.get(stops.size() - 1);
+                } else {
+                    endStop = stops.get(0);
+                }
+
+                double distanceToEndStop =
+                        calculateHaversineDistance(
+                                latestLoc.getLatitude(),
+                                latestLoc.getLongitude(),
+                                endStop.getLatitude(),
+                                endStop.getLongitude()
+                        );
+
+                // Nếu xe cách bến cuối <= 150m thì tự kết thúc chuyến
+                if (distanceToEndStop <= 0.15) {
+                    tripDAO.finishTripActual(
+                            tripDTO.getTripID(),
+                            new java.sql.Timestamp(
+                                    System.currentTimeMillis()
+                            )
+                    );
+
+                    // Xe đã hoàn thành thì không trả về cho client nữa
+                    continue;
+                }
+            }
+
+            int passenger =
+                    ticketDAO.countTicketsByTripAndStatus(
+                            tripDTO.getTripID(),
+                            "CHECKED_IN"
+                    );
+
+            int eta =
+                    calculateETA(
+                            latestLoc.getLatitude(),
+                            latestLoc.getLongitude(),
+                            routeID
+                    );
+
+            int capacity = 60;
+
+            List<Bus> foundBuses =
+                    busDAO.searchAndFilter(
+                            tripDTO.getBusPlate(),
+                            "ALL",
+                            0,
+                            1
+                    );
+
+            if (foundBuses != null && !foundBuses.isEmpty()) {
+                capacity = foundBuses.get(0).getCapacity();
+            }
+
+            result.add(
+                    new BusLocationDTO(
+                            tripDTO.getTripID(),
+                            tripDTO.getRouteNumber(),
+                            tripDTO.getBusPlate(),
+                            latestLoc.getLatitude(),
+                            latestLoc.getLongitude(),
+                            passenger,
+                            capacity,
+                            eta
+                    )
+            );
+
+        } catch (Exception e) {
+            System.out.println(
+                    "Lỗi xử lý vị trí xe đang chạy TripID="
+                    + tripDTO.getTripID()
+                    + ": "
+                    + e.getMessage()
+            );
+        }
+    }
+
+    return result;
+}
 
     private void processRunningTrip(
             TripDTO tripDTO,

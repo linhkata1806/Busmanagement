@@ -261,17 +261,35 @@ public class AccountDAO extends DBContext {
     }
 
     //Code for ADMIN
+    public int countAllAccounts() {
+        String sql = "SELECT COUNT(*) FROM Accounts";
+        try (PreparedStatement ps = connection.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        } catch (Exception e) {
+            System.out.println("Lỗi tại countAllAccounts: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
     // 1. getAll() - Lấy toàn bộ danh sách tài khoản, sắp xếp mới nhất lên đầu
-    public List<Account> getAllAccounts() {
+    public List<Account> getAllAccounts(int offset, int limit) {
         List<Account> list = new ArrayList<>();
         String sql = "SELECT a.*, r.RoleName "
                 + "FROM Accounts a "
                 + "JOIN Roles r ON a.RoleID = r.RoleID "
-                + "ORDER BY a.AccountID ASC"; // Đã sửa ở đây
+                + "ORDER BY a.AccountID ASC "
+                + "OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
 
-        try (PreparedStatement ps = connection.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
-            while (rs.next()) {
-                list.add(mapAccount(rs));
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, offset);
+            ps.setInt(2, limit);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    list.add(mapAccount(rs));
+                }
             }
         } catch (Exception e) {
             System.out.println("Lỗi tại getAllAccounts: " + e.getMessage());
@@ -280,10 +298,8 @@ public class AccountDAO extends DBContext {
         return list;
     }
 
-    // 2. searchAndFilter() - Tìm kiếm đa cột theo từ khóa và lọc theo RoleName (Bắt buộc dùng JOIN Roles)
-    public List<Account> searchAndFilter(String keyword, String roleName) {
-        List<Account> list = new ArrayList<>();
-        String sql = "SELECT a.*, r.RoleName "
+    public int countSearchAndFilter(String keyword, String roleName) {
+        String sql = "SELECT COUNT(*) "
                 + "FROM Accounts a "
                 + "JOIN Roles r ON a.RoleID = r.RoleID "
                 + "WHERE (a.Username LIKE ? OR a.FullName LIKE ? OR a.Email LIKE ?) ";
@@ -292,7 +308,6 @@ public class AccountDAO extends DBContext {
         if (isFilterByRole) {
             sql += "AND r.RoleName = ? ";
         }
-        sql += "ORDER BY a.AccountID ASC"; // Đã sửa ở đây
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             String searchPattern = "%" + (keyword == null ? "" : keyword.trim()) + "%";
@@ -303,6 +318,47 @@ public class AccountDAO extends DBContext {
             if (isFilterByRole) {
                 ps.setString(4, roleName);
             }
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("Lỗi tại countSearchAndFilter: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
+    // 2. searchAndFilter() - Tìm kiếm đa cột theo từ khóa và lọc theo RoleName (Bắt buộc dùng JOIN Roles)
+    public List<Account> searchAndFilter(String keyword, String roleName, int offset, int limit) {
+        List<Account> list = new ArrayList<>();
+        String sql = "SELECT a.*, r.RoleName "
+                + "FROM Accounts a "
+                + "JOIN Roles r ON a.RoleID = r.RoleID "
+                + "WHERE (a.Username LIKE ? OR a.FullName LIKE ? OR a.Email LIKE ?) ";
+
+        boolean isFilterByRole = roleName != null && !roleName.equalsIgnoreCase("ALL") && !roleName.trim().isEmpty();
+        if (isFilterByRole) {
+            sql += "AND r.RoleName = ? ";
+        }
+        sql += "ORDER BY a.AccountID ASC "
+             + "OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            String searchPattern = "%" + (keyword == null ? "" : keyword.trim()) + "%";
+            ps.setString(1, searchPattern);
+            ps.setString(2, searchPattern);
+            ps.setString(3, searchPattern);
+
+            int paramIndex = 4;
+            if (isFilterByRole) {
+                ps.setString(paramIndex++, roleName);
+            }
+            
+            ps.setInt(paramIndex++, offset);
+            ps.setInt(paramIndex, limit);
 
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {

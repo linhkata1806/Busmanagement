@@ -23,11 +23,17 @@ public class StopService {
         this.routeStopDAO = new RouteStopDAO();
     }
 
-    public List<Stop> searchAndFilter(String keyword, String status) {
+    public int countSearchAndFilter(String keyword, String status) {
+        keyword = (keyword == null) ? "" : keyword.trim();
+        status = (status == null || status.trim().isEmpty()) ? "ALL" : status.trim().toUpperCase();
+        return stopDAO.countSearchAndFilter(keyword, status);
+    }
+
+    public List<Stop> searchAndFilter(String keyword, String status, int offset, int limit) {
         // Chuẩn hóa param trước khi đẩy xuống DAO
         keyword = (keyword == null) ? "" : keyword.trim();
         status = (status == null || status.trim().isEmpty()) ? "ALL" : status.trim().toUpperCase();
-        return stopDAO.searchAndFilter(keyword, status);
+        return stopDAO.searchAndFilter(keyword, status, offset, limit);
     }
 
     public void createStop(String stopName, String address, double lat, double lng) throws Exception {
