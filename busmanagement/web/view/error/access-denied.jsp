@@ -6,44 +6,7 @@
     <meta charset="UTF-8">
     <title>Truy cập bị từ chối - Hanoi Bus</title>
     <jsp:include page="/common/head_imports.jsp" />
-    <style>
-        :root {
-            --primary: #3b82f6;
-            --accent: #fbbc04;
-        }
-        body {
-            background-color: #f4f6f9;
-            color: #333;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        
-        /* Navbar styling matching the project */
-        .navbar {
-            background: var(--primary) !important;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-        }
-        .navbar-brand {
-            font-weight: 700;
-            font-size: 1.3rem;
-            color: white !important;
-        }
-        .navbar-brand span { color: var(--accent); }
-        .nav-link { color: rgba(255,255,255,0.9) !important; font-weight: 500; }
-        .nav-link:hover { color: white !important; }
-        .nav-link.active { color: white !important; }
-        
-        .main-content {
-            flex: 1;
-            display: flex;
-            align-items: flex-start; /* Dịch chuyển card lên phía trên */
-            justify-content: center;
-            min-height: 700px; /* Đẩy footer xuống dưới */
-            padding-top: 60px; /* Khoảng cách vừa phải giữa card và navbar */
-        }
-    </style>
+
 </head>
 <body>
     <!-- Header/Navbar chung của project -->

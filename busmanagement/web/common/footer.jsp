@@ -1,26 +1,5 @@
 <%@ page pageEncoding="UTF-8" %>
-<style>
-    /* ===== FOOTER COMMON STYLES ===== */
-    footer {
-        background-color: #1a1a2e !important;
-        color: rgba(255,255,255,0.7) !important;
-        padding: 30px 0 !important;
-        margin-top: 60px !important;
-    }
-    footer a { 
-        color: rgba(255,255,255,0.7) !important; 
-        text-decoration: none !important; 
-    }
-    footer a:hover { 
-        color: white !important; 
-    }
-    footer h6 { 
-        color: white !important; 
-    }
-    footer small, footer .text-white-50 { 
-        color: rgba(255,255,255,0.5) !important; 
-    }
-</style>
+
 <footer>
     <div class="container">
         <div class="row">
