@@ -33,7 +33,8 @@ public class FavoriteDAO extends DBContext{
     // Kiểm tra xem User đã yêu thích tuyến này chưa
     public boolean isFavorite(int accountId, int routeId) {
         String sql = "SELECT 1 FROM Favorites WHERE AccountID = ? AND RouteID = ?";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        try {
+            PreparedStatement ps = connection.prepareStatement(sql);
             ps.setInt(1, accountId);
             ps.setInt(2, routeId);
             ResultSet rs = ps.executeQuery();

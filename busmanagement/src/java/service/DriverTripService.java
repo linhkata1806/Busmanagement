@@ -1,11 +1,16 @@
 package service;
 
+import dal.BusLocationHistoryDAO;
+import dal.RouteStopDAO;
 import dal.TripDAO;
+import dto.RouteStopDTO;
 import enums.TripStatus;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
+import java.util.List;
+import model.BusLocationHistory;
 import model.Trip;
 
 public class DriverTripService {
@@ -57,7 +62,30 @@ public class DriverTripService {
         // Đủ điều kiện -> Tiến hành bắt đầu chuyến
         Timestamp actualStart = new Timestamp(System.currentTimeMillis());
         boolean isSuccess = tripDAO.startTripActual(tripID, actualStart);
+        if (isSuccess) {
 
+            RouteStopDAO stopDAO = new RouteStopDAO();
+            BusLocationHistoryDAO locationDAO = new BusLocationHistoryDAO();
+
+            List<RouteStopDTO> stops
+                    = stopDAO.getStopsByRoute(trip.getRouteID());
+
+            if (!stops.isEmpty()) {
+
+                RouteStopDTO firstStop = stops.get(0);
+
+                BusLocationHistory loc = new BusLocationHistory();
+
+                loc.setBusID(trip.getBusID());
+                loc.setTripID(tripID);
+
+                loc.setLatitude(firstStop.getLatitude());
+                loc.setLongitude(firstStop.getLongitude());
+
+                locationDAO.insert(loc);
+            }
+
+        }
         if (!isSuccess) {
             throw new Exception("Lỗi hệ thống khi cập nhật chuyến xe.");
         }

@@ -309,25 +309,25 @@
             });
 
             // AJAX Form Submission
-            const loginForm = document.getElementById('loginForm');
-            const submitBtn = document.getElementById('submitBtn');
-            const loadingSpinner = document.getElementById('loadingSpinner');
-            const alertContainer = document.getElementById('alert-container');
+                const loginForm = document.getElementById('loginForm');
+                const submitBtn = document.getElementById('submitBtn');
+                const loadingSpinner = document.getElementById('loadingSpinner');
+                const alertContainer = document.getElementById('alert-container');
 
-            loginForm.addEventListener('submit', function (e) {
-                e.preventDefault();
+                loginForm.addEventListener('submit', function (e) {
+                    e.preventDefault();
 
-                const usernameVal = document.getElementsByName('username')[0].value.trim();
-                const passwordVal = document.getElementById('password').value;
+                    const usernameVal = document.getElementsByName('username')[0].value.trim();
+                    const passwordVal = document.getElementById('password').value;
 
-                // 1. Kiểm tra rỗng
-                if (!usernameVal) {
-                    alertContainer.innerHTML = `
-                        <div class="alert alert-danger alert-dismissible fade show d-flex align-items-center mb-3" role="alert">
-                            <i class="fas fa-exclamation-circle me-2"></i>
-                            <div>Tên đăng nhập hoặc Email không được để trống.</div>
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                        </div>
+                    // 1. Kiểm tra rỗng
+                    if (!usernameVal) {
+                        alertContainer.innerHTML = `
+                            <div class="alert alert-danger alert-dismissible fade show d-flex align-items-center mb-3" role="alert">
+                                <i class="fas fa-exclamation-circle me-2"></i>
+                                <div>Tên đăng nhập hoặc Email không được để trống.</div>
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
                     `;
                     alertContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
                     return;

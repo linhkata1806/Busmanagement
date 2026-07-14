@@ -99,6 +99,7 @@ public class TripDAO extends DBContext {
         }
         return list;
     }
+
     //=====guest
     public List<TripDTO> getRunningTripsForTracking() {
         List<TripDTO> list = new ArrayList<>();
@@ -274,7 +275,13 @@ public class TripDAO extends DBContext {
     // 1. Kiểm tra trùng lịch Tài xế
     public boolean hasDriverConflict(int driverID, java.time.LocalDate date, java.time.LocalTime start, java.time.LocalTime end, Integer excludeTripID) {
         // FIX: Thêm CAST(? AS TIME) vào để bảo vệ câu lệnh SQL
-        String sql = "SELECT COUNT(*) FROM Trips WHERE DriverID = ? AND TripDate = ? AND Status != 'CANCELLED' AND StartTime < CAST(? AS TIME) AND EndTime > CAST(? AS TIME)";
+        String sql = "SELECT COUNT(*) "
+                + "FROM Trips "
+                + "WHERE DriverID = ? "
+                + "AND TripDate = ? "
+                + "AND Status IN ('SCHEDULED', 'IN_PROGRESS') "
+                + "AND StartTime < CAST(? AS TIME) "
+                + "AND EndTime > CAST(? AS TIME)";
         if (excludeTripID != null && excludeTripID > 0) {
             sql += " AND TripID != " + excludeTripID;
         }
@@ -296,7 +303,13 @@ public class TripDAO extends DBContext {
 
     // 2. Kiểm tra trùng lịch Xe buýt
     public boolean hasBusConflict(int busID, java.time.LocalDate date, java.time.LocalTime start, java.time.LocalTime end, Integer excludeTripID) {
-        String sql = "SELECT COUNT(*) FROM Trips WHERE BusID = ? AND TripDate = ? AND Status != 'CANCELLED' AND StartTime < CAST(? AS TIME) AND EndTime > CAST(? AS TIME)";
+        String sql = "SELECT COUNT(*) "
+                + "FROM Trips "
+                + "WHERE BusID = ? "
+                + "AND TripDate = ? "
+                + "AND Status IN ('SCHEDULED', 'IN_PROGRESS') "
+                + "AND StartTime < CAST(? AS TIME) "
+                + "AND EndTime > CAST(? AS TIME)";
         if (excludeTripID != null && excludeTripID > 0) {
             sql += " AND TripID != " + excludeTripID;
         }
@@ -318,7 +331,13 @@ public class TripDAO extends DBContext {
 
     // 3. Kiểm tra trùng lịch Phụ xe
     public boolean hasAssistantConflict(int assistantID, java.time.LocalDate date, java.time.LocalTime start, java.time.LocalTime end, Integer excludeTripID) {
-        String sql = "SELECT COUNT(*) FROM Trips WHERE AssistantID = ? AND TripDate = ? AND Status != 'CANCELLED' AND StartTime < CAST(? AS TIME) AND EndTime > CAST(? AS TIME)";
+        String sql = "SELECT COUNT(*) "
+                + "FROM Trips "
+                + "WHERE AssistantID = ? "
+                + "AND TripDate = ? "
+                + "AND Status IN ('SCHEDULED', 'IN_PROGRESS') "
+                + "AND StartTime < CAST(? AS TIME) "
+                + "AND EndTime > CAST(? AS TIME)";
         if (excludeTripID != null && excludeTripID > 0) {
             sql += " AND TripID != " + excludeTripID;
         }
@@ -573,14 +592,27 @@ public class TripDAO extends DBContext {
 
     // Bổ sung vào dal/TripDAO.java
     public boolean finishTripActual(int tripID, Timestamp actualEndTime) {
-        String sql = "UPDATE Trips SET Status = 'COMPLETED', ActualEndTime = ? WHERE TripID = ?";
+
+        String sql
+                = "UPDATE Trips "
+                + "SET Status = 'COMPLETED', "
+                + "ActualEndTime = ? "
+                + "WHERE TripID = ? "
+                + "AND Status = 'IN_PROGRESS'";
+
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
+
             ps.setTimestamp(1, actualEndTime);
             ps.setInt(2, tripID);
+
             return ps.executeUpdate() > 0;
+
         } catch (SQLException e) {
-            System.out.println("Lỗi finishTripActual: " + e.getMessage());
+            System.out.println(
+                    "Lỗi finishTripActual: " + e.getMessage()
+            );
         }
+
         return false;
     }
 

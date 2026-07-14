@@ -90,6 +90,33 @@ public class CreateTripServlet extends HttpServlet {
         request.setAttribute("r_direction", directionStr);
 
         try {
+            if (routeIDStr == null || routeIDStr.trim().isEmpty()) {
+                throw new IllegalArgumentException("Vui lòng chọn tuyến xe.");
+            }
+
+            if (busIDStr == null || busIDStr.trim().isEmpty()) {
+                throw new IllegalArgumentException("Vui lòng chọn xe bus.");
+            }
+
+            if (driverIDStr == null || driverIDStr.trim().isEmpty()) {
+                throw new IllegalArgumentException("Vui lòng chọn tài xế.");
+            }
+
+            if (tripDateStr == null || tripDateStr.trim().isEmpty()) {
+                throw new IllegalArgumentException("Vui lòng chọn ngày chạy.");
+            }
+
+            if (startTimeStr == null || startTimeStr.trim().isEmpty()) {
+                throw new IllegalArgumentException("Vui lòng chọn giờ xuất phát.");
+            }
+
+            if (endTimeStr == null || endTimeStr.trim().isEmpty()) {
+                throw new IllegalArgumentException("Vui lòng chọn giờ cập bến.");
+            }
+
+            if (directionStr == null || directionStr.trim().isEmpty()) {
+                throw new IllegalArgumentException("Vui lòng chọn chiều chạy.");
+            }
             // 2. Parse dữ liệu (Có thể văng NumberFormatException hoặc DateTimeParseException)
             int routeID = Integer.parseInt(routeIDStr);
             int busID = Integer.parseInt(busIDStr);

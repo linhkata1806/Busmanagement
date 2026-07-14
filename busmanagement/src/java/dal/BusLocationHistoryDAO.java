@@ -55,7 +55,8 @@ public class BusLocationHistoryDAO extends DBContext {
      */
     public BusLocationHistory getLatestByTrip(int tripID) {
         String sql = "SELECT TOP 1 * FROM BusLocationHistory WHERE TripID = ? ORDER BY RecordedAt DESC";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        try  {
+            PreparedStatement ps = connection.prepareStatement(sql);
             ps.setInt(1, tripID);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) return mapRow(rs);

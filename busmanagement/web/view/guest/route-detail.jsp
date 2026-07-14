@@ -15,7 +15,11 @@ Author     : Administrator
         <jsp:include page="/common/head_imports.jsp" />
         <!-- Leaflet CSS for Map -->
         <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-        <style>
+        <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+        <!-- 2. CSS và JS của Routing Machine (Dán ngay dưới thằng gốc) -->
+        <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.css" />
+        <script src="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.js"></script>        <style>
             :root {
                 --primary: #1a73e8;
                 --primary-dark: #1557b0;
@@ -205,7 +209,7 @@ Author     : Administrator
                             <div class="col-md">
                                 <h2 class="fw-bold m-0 d-flex align-items-center">
                                     ${route.routeName}
-                                    
+
                                     <%-- NÚT THẢ TIM ĐÃ SỬA CHUẨN --%>
                                     <i class="fa-heart ms-3 ${isFavorite ? 'fas text-danger' : 'far text-white'}" 
                                        style="cursor: pointer; font-size: 1.8rem; transition: transform 0.2s;"
@@ -313,13 +317,13 @@ Author     : Administrator
                                                class="btn btn-outline-primary btn-sm fw-bold w-50">
                                                 <i class="fas fa-route me-1"></i> Liên chuyến
                                             </a>
+                                        </div>
                                     </div>
-                                </div>
-                            </div> <!-- closes mt-3 pt-3 border-top -->
-                        </div> <!-- closes card info-card p-4 -->
-                    </div> <!-- closes col-lg-5 -->
+                                </div> <!-- closes mt-3 pt-3 border-top -->
+                            </div> <!-- closes card info-card p-4 -->
+                        </div> <!-- closes col-lg-5 -->
 
-                    <div class="col-lg-7">
+                        <div class="col-lg-7">
                             <c:if test="${not empty stops}">
                                 <div class="card info-card p-0 overflow-hidden mb-4" style="border: 1px solid #ced4da;">
                                     <div class="bg-primary text-white p-3 d-flex justify-content-between align-items-center" style="background: linear-gradient(135deg, var(--primary) 0%, #0d47a1 100%) !important;">
@@ -362,7 +366,7 @@ Author     : Administrator
                                                             <span class="badge bg-light text-primary border ms-2 small" style="font-size: 0.75rem;"><i class="fas fa-map-signs me-1"></i>+${stop.distanceFromStart} km</span>
                                                             <c:if test="${not empty stop.address}">
                                                                 <small class="text-muted d-block mt-1"><i class="fas fa-map-marker-alt me-1"></i>${stop.address}</small>
-                                                            </c:if>
+                                                                </c:if>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -397,83 +401,104 @@ Author     : Administrator
 
         <!-- ===== FOOTER ===== -->
         <jsp:include page="/common/footer.jsp" />
-        
+
         <c:if test="${not empty stops}">
             <!-- Leaflet JS -->
-            <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<!--            <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>-->
             <script>
-                // 1. Chuyển đổi trạm dừng JSP thành dữ liệu JS
-                const routeStops = [
-                    <c:forEach var="stop" items="${stops}" varStatus="status">
-                        {
-                            id: ${stop.stopID},
-                            name: "<c:out value='${stop.stopName}'/>",
-                            distance: ${stop.distanceFromStart},
-                            lat: ${stop.latitude},
-                            lng: ${stop.longitude}
-                        }<c:if test="${!status.last}">,</c:if>
-                    </c:forEach>
-                ];
+                                           // 1. Chuyển đổi trạm dừng JSP thành dữ liệu JS
+                                           const routeStops = [
+                <c:forEach var="stop" items="${stops}" varStatus="status">
+                                           {
+                                           id: ${stop.stopID},
+                                                   name: "<c:out value='${stop.stopName}'/>",
+                                                   distance: ${stop.distanceFromStart},
+                                                   lat: ${stop.latitude},
+                                                   lng: ${stop.longitude}
+                                           }<c:if test="${!status.last}">,</c:if>
+                </c:forEach>
+                                           ];
 
-                // 2. Khởi tạo Leaflet Map
-                const map = L.map('busMap').setView([routeStops[0].lat, routeStops[0].lng], 13);
-                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                    attribution: '© OpenStreetMap contributors'
-                }).addTo(map);
+                                           // 2. Khởi tạo Leaflet Map
+                                           const map = L.map('busMap').setView([routeStops[0].lat, routeStops[0].lng], 13);
+                                           L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                                               attribution: '© OpenStreetMap contributors'
+                                           }).addTo(map);
+                                            // vẽ lộ trình
+                                            const waypoints = routeStops.map(s => L.latLng(s.lat, s.lng));
 
-                // 3. Vẽ lộ trình
-                const latlngs = routeStops.map(s => [s.lat, s.lng]);
-                const polyline = L.polyline(latlngs, {color: '#1a73e8', weight: 5, opacity: 0.8}).addTo(map);
-                
-                // MẸO: Trì hoãn 300ms rồi ép map render lại + fitBounds để chắc chắn thẻ DIV đã load full chiều cao/rộng
-                setTimeout(function() {
-                    map.invalidateSize();
-                    map.fitBounds(polyline.getBounds(), {padding: [30, 30]}); 
-                }, 300);
+// Khởi tạo chỉ đường
+                                           const routingControl = L.Routing.control({
+                                               waypoints: waypoints,
+                                               routeWhileDragging: false,
+                                               addWaypoints: false,
+                                               show: false,
+                                               createMarker: function () {
+                                                   return null;
+                                               }, // Ẩn marker mặc định để xài Marker màu đỏ/xanh cậu viết bên dưới
+                                               lineOptions: {
+                                                   styles: [{color: '#1a73e8', opacity: 0.8, weight: 5}] // Chỉnh màu y hệt bản cũ
+                                               },
+                                               fitSelectedRoutes: false // Tắt tự động fit để mình tự xử lý bên dưới
+                                           }).addTo(map);
 
-                // 4. Vẽ Marker các trạm dừng
-                routeStops.forEach((stop, index) => {
-                    let fillColor = '#1a73e8'; // Bến trung gian
-                    if (index === 0) fillColor = '#2e7d32'; // Bến đi
-                    else if (index === routeStops.length - 1) fillColor = '#d32f2f'; // Bến cuối
-                    
-                    const marker = L.circleMarker([stop.lat, stop.lng], {
-                        radius: 7,
-                        fillColor: fillColor,
-                        color: '#ffffff',
-                        weight: 2,
-                        fillOpacity: 1
-                    }).addTo(map);
-                    marker.bindPopup(`<b>\${index + 1}. \${stop.name}</b><br>Lộ trình: +\${stop.distance} km`);
-                });
+// Lắng nghe sự kiện: Khi thư viện tính toán xong đường đi thì tự động Zoom vừa vặn màn hình
+                                           routingControl.on('routesfound', function (e) {
+                                               const route = e.routes[0];
+                                               const bounds = L.latLngBounds(route.coordinates);
+                                               map.fitBounds(bounds, {padding: [30, 30]});
+                                           });
 
-                // 5. Khởi tạo xe bus giả lập
-                const busIcon = L.divIcon({
-                    className: 'custom-bus-icon',
-                    html: `<div style="background-color: #fbbc04; border: 2px solid #0d47a1; border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 5px rgba(0,0,0,0.3);"><i class="fas fa-bus" style="color: #0d47a1; font-size: 13px;"></i></div>`,
-                    iconSize: [32, 32],
-                    iconAnchor: [16, 16]
-                });
+// MẸO: Trì hoãn 300ms rồi ép map render lại + để chắc chắn thẻ DIV đã load full chiều cao/rộng
+                                           setTimeout(function () {
+                                               map.invalidateSize();
+                                           }, 300);
 
-                // Object lưu trữ các marker xe buýt đang hiển thị theo TripID
-                let busMarkers = {};
+                                           // 4. Vẽ Marker các trạm dừng
+                                           routeStops.forEach((stop, index) => {
+                                               let fillColor = '#1a73e8'; // Bến trung gian
+                                               if (index === 0)
+                                                   fillColor = '#2e7d32'; // Bến đi
+                                               else if (index === routeStops.length - 1)
+                                                   fillColor = '#d32f2f'; // Bến cuối
 
-                function fetchRealBuses() {
-                    // Gọi API lấy toàn bộ vị trí xe đang chạy
-                    fetch('${pageContext.request.contextPath}/api/bus-location')
-                        .then(response => response.json())
-                        .then(data => {
-                            // Lọc ra CHỈ NHỮNG XE thuộc tuyến hiện tại (So sánh RouteNumber)
-                            const currentRouteBuses = data.filter(bus => bus.routeNumber === '${route.routeNumber}');
-                            
-                            let activeTripIDs = [];
-                            let htmlList = '';
+                                               const marker = L.circleMarker([stop.lat, stop.lng], {
+                                                   radius: 7,
+                                                   fillColor: fillColor,
+                                                   color: '#ffffff',
+                                                   weight: 2,
+                                                   fillOpacity: 1
+                                               }).addTo(map);
+                                               marker.bindPopup(`<b>\${index + 1}. \${stop.name}</b><br>Lộ trình: +\${stop.distance} km`);
+                                           });
 
-                            currentRouteBuses.forEach(bus => {
-                                activeTripIDs.push(bus.tripID);
+                                           // 5. Khởi tạo xe bus giả lập
+                                           const busIcon = L.divIcon({
+                                               className: 'custom-bus-icon',
+                                               html: `<div style="background-color: #fbbc04; border: 2px solid #0d47a1; border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 5px rgba(0,0,0,0.3);"><i class="fas fa-bus" style="color: #0d47a1; font-size: 13px;"></i></div>`,
+                                               iconSize: [32, 32],
+                                               iconAnchor: [16, 16]
+                                           });
 
-                                // Nội dung Popup khi click vào xe (Đã thêm Số lượng khách)
-                                const popupContent = `
+                                           // Object lưu trữ các marker xe buýt đang hiển thị theo TripID
+                                           let busMarkers = {};
+
+                                           function fetchRealBuses() {
+                                               // Gọi API lấy toàn bộ vị trí xe đang chạy
+                                               fetch('${pageContext.request.contextPath}/api/bus-location')
+                                                       .then(response => response.json())
+                                                       .then(data => {
+                                                           // Lọc ra CHỈ NHỮNG XE thuộc tuyến hiện tại (So sánh RouteNumber)
+                                                           const currentRouteBuses = data.filter(bus => bus.routeNumber === '${route.routeNumber}');
+
+                                                           let activeTripIDs = [];
+                                                           let htmlList = '';
+
+                                                           currentRouteBuses.forEach(bus => {
+                                                               activeTripIDs.push(bus.tripID);
+
+                                                               // Nội dung Popup khi click vào xe (Đã thêm Số lượng khách)
+                                                               const popupContent = `
                                     <div style="font-size: 14px; min-width: 160px; text-align: center;">
                                         <b style="color: #0d47a1; font-size: 16px;"><i class="fas fa-bus me-1"></i>\${bus.licensePlate}</b><br>
                                         <hr style="margin: 5px 0;">
@@ -482,19 +507,19 @@ Author     : Administrator
                                     </div>
                                 `;
 
-                                // Cập nhật vị trí Marker trên bản đồ
-                                if (busMarkers[bus.tripID]) {
-                                    // Xe đã có -> Di chuyển tới tọa độ mới
-                                    busMarkers[bus.tripID].setLatLng([bus.lat, bus.lng]);
-                                    busMarkers[bus.tripID].getPopup().setContent(popupContent);
-                                } else {
-                                    // Xe mới xuất hiện -> Tạo marker
-                                    busMarkers[bus.tripID] = L.marker([bus.lat, bus.lng], {icon: busIcon}).addTo(map);
-                                    busMarkers[bus.tripID].bindPopup(popupContent);
-                                }
+                                                               // Cập nhật vị trí Marker trên bản đồ
+                                                               if (busMarkers[bus.tripID]) {
+                                                                   // Xe đã có -> Di chuyển tới tọa độ mới
+                                                                   busMarkers[bus.tripID].setLatLng([bus.lat, bus.lng]);
+                                                                   busMarkers[bus.tripID].getPopup().setContent(popupContent);
+                                                               } else {
+                                                                   // Xe mới xuất hiện -> Tạo marker
+                                                                   busMarkers[bus.tripID] = L.marker([bus.lat, bus.lng], {icon: busIcon}).addTo(map);
+                                                                   busMarkers[bus.tripID].bindPopup(popupContent);
+                                                               }
 
-                                // Tạo HTML cho danh sách bên phải
-                                htmlList += `
+                                                               // Tạo HTML cho danh sách bên phải
+                                                               htmlList += `
                                     <div class="p-3 bg-light rounded-3 border-start border-warning border-4 d-flex justify-content-between align-items-center shadow-sm mb-3" style="cursor:pointer; transition: all 0.2s;" onclick="focusBus(\${bus.tripID})">
                                         <div>
                                             <div class="fw-bold text-dark mb-1"><i class="fas fa-bus me-2 text-primary"></i>\${bus.licensePlate}</div>
@@ -508,43 +533,43 @@ Author     : Administrator
                                         </div>
                                     </div>
                                 `;
-                            });
+                                                           });
 
-                            // Xóa các xe không còn chạy (mất tín hiệu hoặc đã kết thúc chuyến)
-                            Object.keys(busMarkers).forEach(tripID => {
-                                if (!activeTripIDs.includes(parseInt(tripID))) {
-                                    map.removeLayer(busMarkers[tripID]);
-                                    delete busMarkers[tripID];
-                                }
-                            });
+                                                           // Xóa các xe không còn chạy (mất tín hiệu hoặc đã kết thúc chuyến)
+                                                           Object.keys(busMarkers).forEach(tripID => {
+                                                               if (!activeTripIDs.includes(parseInt(tripID))) {
+                                                                   map.removeLayer(busMarkers[tripID]);
+                                                                   delete busMarkers[tripID];
+                                                               }
+                                                           });
 
-                            // Đổ dữ liệu vào danh sách (Nếu không có xe nào thì báo trống)
-                            const listContainer = document.getElementById('upcomingBusesList');
-                            if (listContainer) {
-                                listContainer.innerHTML = htmlList || `
+                                                           // Đổ dữ liệu vào danh sách (Nếu không có xe nào thì báo trống)
+                                                           const listContainer = document.getElementById('upcomingBusesList');
+                                                           if (listContainer) {
+                                                               listContainer.innerHTML = htmlList || `
                                     <div class="text-center py-4 text-muted border rounded-3 bg-light">
                                         <i class="fas fa-bus-slash fa-2x mb-2 opacity-50"></i>
                                         <p class="m-0 small">Hiện không có chuyến xe nào<br>đang chạy trên tuyến này.</p>
                                     </div>`;
-                            }
-                        })
-                        .catch(error => console.error("Lỗi fetch API xe buýt:", error));
-                }
+                                                           }
+                                                       })
+                                                       .catch(error => console.error("Lỗi fetch API xe buýt:", error));
+                                           }
 
-                // Hàm click vào danh sách thì bản đồ focus vào xe đó
-                window.focusBus = function(tripID) {
-                    if (busMarkers[tripID]) {
-                        map.setView(busMarkers[tripID].getLatLng(), 15);
-                        busMarkers[tripID].openPopup();
-                    }
-                };
+                                           // Hàm click vào danh sách thì bản đồ focus vào xe đó
+                                           window.focusBus = function (tripID) {
+                                               if (busMarkers[tripID]) {
+                                                   map.setView(busMarkers[tripID].getLatLng(), 15);
+                                                   busMarkers[tripID].openPopup();
+                                               }
+                                           };
 
-                // Chạy API ngay lập tức và cài đặt tự động làm mới mỗi 5 giây
-                fetchRealBuses();
-                setInterval(fetchRealBuses, 5000);
-                </script>
+                                           // Chạy API ngay lập tức và cài đặt tự động làm mới mỗi 5 giây
+                                           fetchRealBuses();
+                                           setInterval(fetchRealBuses, 5000);
+            </script>
         </c:if>
-        
+
         <script>
             function toggleFavorite(routeId, isLoggedIn, iconElement) {
                 console.log("Đã click tim! RouteID:", routeId, "| LoggedIn:", isLoggedIn);
@@ -557,7 +582,7 @@ Author     : Administrator
                 }
 
                 // 2. Lấy trạng thái hiện tại
-                const isCurrentlyFav = iconElement.classList.contains('fas'); 
+                const isCurrentlyFav = iconElement.classList.contains('fas');
                 const action = isCurrentlyFav ? 'remove' : 'add';
 
                 // 3. Hiệu ứng UI nhỏ
@@ -575,31 +600,32 @@ Author     : Administrator
                         'action': action
                     })
                 })
-                .then(response => {
-                    if (!response.ok) throw new Error("Lỗi mạng HTTP: " + response.status);
-                    return response.json();
-                })
-                .then(data => {
-                    console.log("Phản hồi từ server:", data);
-                    if (data.success) {
-                        // Cập nhật lại UI tim
-                        if (action === 'add') {
-                            iconElement.classList.remove('far', 'text-white');
-                            iconElement.classList.add('fas', 'text-danger');
-                            iconElement.title = 'Bỏ yêu thích';
-                        } else {
-                            iconElement.classList.remove('fas', 'text-danger');
-                            iconElement.classList.add('far', 'text-white');
-                            iconElement.title = 'Thêm vào yêu thích';
-                        }
-                    } else {
-                        alert('Thao tác không thành công: ' + (data.message || 'Lỗi không xác định'));
-                    }
-                })
-                .catch(error => {
-                    console.error('Fetch Error:', error);
-                    alert('Lỗi kết nối tới máy chủ!');
-                });
+                        .then(response => {
+                            if (!response.ok)
+                                throw new Error("Lỗi mạng HTTP: " + response.status);
+                            return response.json();
+                        })
+                        .then(data => {
+                            console.log("Phản hồi từ server:", data);
+                            if (data.success) {
+                                // Cập nhật lại UI tim
+                                if (action === 'add') {
+                                    iconElement.classList.remove('far', 'text-white');
+                                    iconElement.classList.add('fas', 'text-danger');
+                                    iconElement.title = 'Bỏ yêu thích';
+                                } else {
+                                    iconElement.classList.remove('fas', 'text-danger');
+                                    iconElement.classList.add('far', 'text-white');
+                                    iconElement.title = 'Thêm vào yêu thích';
+                                }
+                            } else {
+                                alert('Thao tác không thành công: ' + (data.message || 'Lỗi không xác định'));
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Fetch Error:', error);
+                            alert('Lỗi kết nối tới máy chủ!');
+                        });
             }
         </script>
     </body>

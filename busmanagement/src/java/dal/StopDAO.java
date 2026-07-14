@@ -22,7 +22,9 @@ public class StopDAO extends DBContext {
         List<Stop> list = new ArrayList<>();
         String sql = "SELECT * FROM Stops WHERE IsActive = 1";
 
-        try (PreparedStatement ps = connection.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
+        try  {
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 list.add(mapStop(rs));
             }
@@ -35,11 +37,12 @@ public class StopDAO extends DBContext {
     //============hàm cho guest Lấy chi tiết thông tin 1 trạm dừng dựa vào ID
     public Stop getStopById(int stopId) {
         String sql = "SELECT * FROM Stops WHERE StopID = ? AND IsActive = 1";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        try  {
+            PreparedStatement ps = connection.prepareStatement(sql);
             ps.setInt(1, stopId);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
-                    return mapStop(rs); // Gọi lại hàm mapStop có sẵn cực tiện
+                    return mapStop(rs); // Gọi lại hàm mapStop có sẵn
                 }
             }
         } catch (Exception e) {

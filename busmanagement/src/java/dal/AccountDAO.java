@@ -53,7 +53,8 @@ public class AccountDAO extends DBContext {
                 + "WHERE a.Username = ? OR a.Email = ?";
 
         // BƯỚC 2: Gọi thẳng biến 'connection' được thừa kế từ DBContext
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        try  {
+            PreparedStatement ps = connection.prepareStatement(sql);
             ps.setString(1, username);
             ps.setString(2, username);
             try (ResultSet rs = ps.executeQuery()) {

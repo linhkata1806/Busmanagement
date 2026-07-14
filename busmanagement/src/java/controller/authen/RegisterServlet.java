@@ -95,7 +95,7 @@ public class RegisterServlet extends HttpServlet {
         try {
             boolean isSuccess = AuthService.register(acc);
             if (isSuccess) {
-                // Áp dụng PRG (Post-Redirect-Get)
+               
                 HttpSession session = request.getSession();
                 session.setAttribute("success", "Đăng ký thành công, vui lòng đăng nhập!");
                 response.sendRedirect("login");

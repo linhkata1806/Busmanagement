@@ -110,7 +110,30 @@ public class TicketServlet extends HttpServlet {
                 //Gọi Service xử lý lưu file (hàm processAndSaveProof tớ vừa viết cho cậu ở trên)
                 String dbImagePath = monthlyPassService.processAndSaveProof(filePart, uploadPath);
                 //Lấy các thông số đăng ký vé từ Form
-                int passTypeID = Integer.parseInt(request.getParameter("passTypeID"));
+                String passTypeParam
+                        = request.getParameter("passTypeID");
+
+                if (passTypeParam == null
+                        || passTypeParam.trim().isEmpty()) {
+
+                    throw new IllegalArgumentException(
+                            "Loại vé tháng không hợp lệ."
+                    );
+                }
+
+                int passTypeID;
+
+                try {
+
+                    passTypeID
+                            = Integer.parseInt(passTypeParam);
+
+                } catch (NumberFormatException e) {
+
+                    throw new IllegalArgumentException(
+                            "Loại vé tháng không hợp lệ."
+                    );
+                }
                 String routeIdParam = request.getParameter("routeID");
                 if (routeIdParam != null && !routeIdParam.trim().isEmpty()) {
                     // Vé 1 tuyến
@@ -132,8 +155,7 @@ public class TicketServlet extends HttpServlet {
                 request.setAttribute("errorMsg", "Lỗi hệ thống khi tải ảnh lên.");
                 request.getRequestDispatcher("/view/customer/register-pass.jsp").forward(request, response);
             }
-        }
-        else {
+        } else {
             doGet(request, response);
         }
     }

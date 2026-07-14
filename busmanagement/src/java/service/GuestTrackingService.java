@@ -35,10 +35,10 @@ public class GuestTrackingService {
     private TicketDAO ticketDAO = new TicketDAO();
     private RouteStopDAO routeStopDAO = new RouteStopDAO();
     private RouteDAO routeDAO = new RouteDAO();
-    
+
     public List<BusTrackingDTO> getRunningBusLocations() {
         List<BusTrackingDTO> result = new ArrayList<>();
-        
+
         // 1. Tái sử dụng hàm getRunningTripsForTracking() có sẵn trong TripDAO của cậu
         List<dto.TripDTO> runningTrips = tripDAO.getRunningTripsForTracking();
 
@@ -55,10 +55,25 @@ public class GuestTrackingService {
                 if (latestLoc == null) {
                     continue;
                 }
-
-                // 3. Lấy thông tin Trip gốc từ DB để lấy các ID chuẩn phục vụ tra cứu
                 Trip tripEntity = tripDAO.getById(tripDTO.getTripID());
-                if (tripEntity == null) continue;
+
+                if (tripEntity == null) {
+                    continue;
+                }
+                if (tripEntity.getActualStartTime() != null) {
+
+                    long seconds
+                            = (System.currentTimeMillis()
+                            - latestLoc.getRecordedAt().getTime()) / 1000;
+
+                    double moveSpeed = 0.00002;
+
+                    latestLoc.setLatitude(
+                            latestLoc.getLatitude() + seconds * moveSpeed);
+
+                    latestLoc.setLongitude(
+                            latestLoc.getLongitude() + seconds * moveSpeed);
+                }
 
                 // 4. Lấy thông tin Bus từ BusDAO có sẵn của cậu
                 Bus bus = busDAO.getBusById(tripEntity.getBusID());
@@ -89,16 +104,33 @@ public class GuestTrackingService {
                         }
                     }
                     currentStopName = stops.get(closestIndex).getStopName();
-                    
+
                     // Xác định điểm dừng kế tiếp (Next Stop) theo logic tài liệu mục VII
                     int nextIndex = Math.min(closestIndex + 1, stops.size() - 1);
                     nextStopName = stops.get(nextIndex).getStopName();
-                    
+
                     // Logic Kiểm tra tới bến cuối để tự động chuyển trạng thái (Auto-Complete)
-                    if (closestIndex >= stops.size() - 1 && minDst <= 0.001) {
+                    RouteStopDTO lastStop = stops.get(stops.size() - 1);
+
+// Khoảng cách từ xe tới bến cuối (km)
+                    double distanceToLastStop = calculateHaversineDistance(
+                            latestLoc.getLatitude(),
+                            latestLoc.getLongitude(),
+                            lastStop.getLatitude(),
+                            lastStop.getLongitude()
+                    );
+
+// Nếu còn cách bến cuối <=150m thì tự kết thúc chuyến
+                    if (distanceToLastStop <= 0.15) {
+
                         ticketDAO.updateTicketStatusByTrip(tripDTO.getTripID(), "COMPLETED");
-                        tripDAO.finishTripActual(tripDTO.getTripID(), new Timestamp(System.currentTimeMillis()));
-                        continue; // Đã tới bến cuối, ẩn xe khỏi map
+
+                        tripDAO.finishTripActual(
+                                tripDTO.getTripID(),
+                                new Timestamp(System.currentTimeMillis())
+                        );
+
+                        continue;
                     }
                 }
 
@@ -128,5 +160,24 @@ public class GuestTrackingService {
             }
         }
         return result;
+    }
+
+    private double calculateHaversineDistance(double lat1, double lon1,
+            double lat2, double lon2) {
+
+        final int R = 6371; // km
+
+        double dLat = Math.toRadians(lat2 - lat1);
+        double dLon = Math.toRadians(lon2 - lon1);
+
+        double a = Math.sin(dLat / 2) * Math.sin(dLat / 2)
+                + Math.cos(Math.toRadians(lat1))
+                * Math.cos(Math.toRadians(lat2))
+                * Math.sin(dLon / 2)
+                * Math.sin(dLon / 2);
+
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+        return R * c;
     }
 }

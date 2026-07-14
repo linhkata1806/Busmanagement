@@ -14,8 +14,10 @@ import model.MonthlyPassType;
 import model.Notification;
 import enums.NotificationType;
 import jakarta.servlet.http.Part;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.UUID;
+import javax.imageio.ImageIO;
 
 public class MonthlyPassService {
 
@@ -223,6 +225,11 @@ public class MonthlyPassService {
         if (filePart == null || filePart.getSize() == 0) {
             throw new IllegalArgumentException("Vui lòng tải lên ảnh minh chứng.");
         }
+        BufferedImage image = ImageIO.read(filePart.getInputStream());
+
+        if (image == null) {
+            throw new IllegalArgumentException("File tải lên không phải ảnh hợp lệ.");
+        }
 
         // 2. Kiểm tra dung lượng (Max 5MB = 5 * 1024 * 1024 bytes)
         if (filePart.getSize() > 5 * 1024 * 1024) {
@@ -269,9 +276,9 @@ public class MonthlyPassService {
             }
             // Sao chép file từ build sang source
             java.nio.file.Files.copy(
-                new java.io.File(savePath).toPath(),
-                new java.io.File(sourcePath + File.separator + uniqueFileName).toPath(),
-                java.nio.file.StandardCopyOption.REPLACE_EXISTING
+                    new java.io.File(savePath).toPath(),
+                    new java.io.File(sourcePath + File.separator + uniqueFileName).toPath(),
+                    java.nio.file.StandardCopyOption.REPLACE_EXISTING
             );
         } catch (Exception ex) {
             System.out.println("Không thể lưu file copy vào thư mục nguồn: " + ex.getMessage());
