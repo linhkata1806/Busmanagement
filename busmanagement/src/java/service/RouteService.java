@@ -27,17 +27,7 @@ public class RouteService {
         return routeDAO.getAllActiveRoutes();
     }
 
-    public int countSearchAndFilter(String keyword, String status) {
-        if (keyword == null) keyword = "";
-        keyword = keyword.trim();
-        if (status == null || status.trim().isEmpty()) status = "ALL";
-        if (!status.equalsIgnoreCase("ALL") && !status.equalsIgnoreCase("ACTIVE") && !status.equalsIgnoreCase("INACTIVE")) {
-            status = "ALL";
-        }
-        return routeDAO.countSearchAndFilter(keyword, status);
-    }
-
-    public List<Route> searchAndFilter(String keyword, String status, int offset, int limit) {
+    public List<Route> searchAndFilter(String keyword, String status) {
         if (keyword == null) {
             keyword = "";
         }
@@ -54,7 +44,7 @@ public class RouteService {
             status = "ALL";
         }
 
-        return routeDAO.searchAndFilter(keyword, status, offset, limit);
+        return routeDAO.searchAndFilter(keyword, status);
     }
 
     public Route getRouteById(int routeID) {

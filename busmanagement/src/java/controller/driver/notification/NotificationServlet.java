@@ -30,27 +30,10 @@ public class NotificationServlet extends HttpServlet {
         Account user = (Account) session.getAttribute("USER");
         int accountId = user.getAccountID();
 
-        int page = 1;
-        int limit = 10;
-        String pageStr = request.getParameter("page");
-        if (pageStr != null && !pageStr.trim().isEmpty()) {
-            try {
-                page = Integer.parseInt(pageStr);
-            } catch (NumberFormatException e) {
-                page = 1;
-            }
-        }
-        int offset = (page - 1) * limit;
-
-        int totalNotifications = notificationService.countByAccount(accountId);
-        int totalPages = (int) Math.ceil((double) totalNotifications / limit);
-
-        List<Notification> notiList = notificationService.getByAccount(accountId, offset, limit);
+        List<Notification> notiList = notificationService.getByAccount(accountId);
         int unreadCount = notificationService.countUnreadNotifications(accountId);
 
         request.setAttribute("notiList", notiList);
-        request.setAttribute("currentPage", page);
-        request.setAttribute("totalPages", totalPages);
         request.setAttribute("unreadCount", unreadCount);
 
         request.getRequestDispatcher("/view/driver/notification/notification.jsp").forward(request, response);

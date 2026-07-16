@@ -66,37 +66,11 @@ public class BusManagementServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        
-        int page = 1;
-        int limit = 10;
-        String pageStr = request.getParameter("page");
-        if (pageStr != null && !pageStr.isEmpty()) {
-            try {
-                page = Integer.parseInt(pageStr);
-                if (page < 1) page = 1;
-            } catch (NumberFormatException e) {
-                page = 1;
-            }
-        }
-        int offset = (page - 1) * limit;
-
         String keyword = request.getParameter("keyword");
         String status = request.getParameter("status");
 
         //search+filter nha tinh yeu
-        List<Bus> buses = busService.searchAndFilter(keyword, status, offset, limit);
-        int totalRecords = busService.countSearchAndFilter(keyword, status);
-        int totalPages = (int) Math.ceil((double) totalRecords / limit);
-
-        StringBuilder queryString = new StringBuilder();
-        if (keyword != null && !keyword.isEmpty()) {
-            queryString.append("keyword=").append(java.net.URLEncoder.encode(keyword, "UTF-8"));
-        }
-        if (status != null && !status.isEmpty()) {
-            if (queryString.length() > 0) queryString.append("&");
-            queryString.append("status=").append(java.net.URLEncoder.encode(status, "UTF-8"));
-        }
-
+        List<Bus> buses = busService.searchAndFilter(keyword, status);
         // Chống hiển thị null trên ô input và dropdown
         request.setAttribute("keyword",
                 keyword == null ? "" : keyword.trim());
@@ -105,9 +79,6 @@ public class BusManagementServlet extends HttpServlet {
                 status == null ? "ALL" : status.trim().toUpperCase());
 
         request.setAttribute("buses", buses);
-        request.setAttribute("currentPage", page);
-        request.setAttribute("totalPages", totalPages);
-        request.setAttribute("queryString", queryString.toString());
 
         request.getRequestDispatcher("/view/staff/bus/bus-management.jsp")
                 .forward(request, response);

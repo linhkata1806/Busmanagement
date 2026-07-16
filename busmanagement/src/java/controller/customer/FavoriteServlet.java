@@ -71,26 +71,9 @@ public class FavoriteServlet extends HttpServlet {
         HttpSession session = request.getSession(false);
         Account user = (Account) session.getAttribute("USER");
 
-        int page = 1;
-        int limit = 10;
-        String pageStr = request.getParameter("page");
-        if (pageStr != null && !pageStr.trim().isEmpty()) {
-            try {
-                page = Integer.parseInt(pageStr);
-            } catch (NumberFormatException e) {
-                page = 1;
-            }
-        }
-        int offset = (page - 1) * limit;
-
-        int totalFavorites = favoriteService.countFavorites(user.getAccountID());
-        int totalPages = (int) Math.ceil((double) totalFavorites / limit);
-
         // Gọi Service lấy DTO
-        List<RouteDTO> favoriteRoutes = favoriteService.getFavoriteRoutes(user.getAccountID(), offset, limit);
+        List<RouteDTO> favoriteRoutes = favoriteService.getFavoriteRoutes(user.getAccountID());
         request.setAttribute("favoriteRoutes", favoriteRoutes);
-        request.setAttribute("currentPage", page);
-        request.setAttribute("totalPages", totalPages);
 
         request.getRequestDispatcher("/view/customer/favorite.jsp").forward(request, response);
     }

@@ -58,27 +58,8 @@ public class DriverPassengerCheckServlet extends HttpServlet {
                 return;
             }
 
-            int page = 1;
-            int limit = 10;
-            String pageStr = request.getParameter("page");
-            if (pageStr != null && !pageStr.trim().isEmpty()) {
-                try {
-                    page = Integer.parseInt(pageStr);
-                } catch (NumberFormatException e) {
-                    page = 1;
-                }
-            }
-            int offset = (page - 1) * limit;
-
-            int totalTickets = ticketService.countTicketsByTrip(tripID);
-            int totalPages = (int) Math.ceil((double) totalTickets / limit);
-
             // Retrieve checked-in tickets list
-            List<Ticket> checkedTickets = ticketService.getTicketsByTrip(tripID, offset, limit);
-
-            request.setAttribute("currentPage", page);
-            request.setAttribute("totalPages", totalPages);
-            request.setAttribute("queryString", "tripID=" + tripID);
+            List<Ticket> checkedTickets = ticketService.getTicketsByTrip(tripID);
 
             // Pop messages from session if any
             String successMsg = (String) session.getAttribute("successMessage");

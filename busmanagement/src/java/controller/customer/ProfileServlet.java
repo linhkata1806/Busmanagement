@@ -78,7 +78,7 @@ public class ProfileServlet extends HttpServlet {
         request.setAttribute("activeMonthlyPass", activeMonthlyPass);
 
         // 4. Lấy danh sách lịch sử chuyến đi thực tế của khách hàng
-        List<dto.TripHistoryDTO> recentTrips = ticketDAO.getRecentTripsByAccount(accountId, 0, 5);
+        List<dto.TripHistoryDTO> recentTrips = ticketDAO.getRecentTripsByAccount(accountId);
         request.setAttribute("recentTrips", recentTrips);
 
         request.getRequestDispatcher("/view/customer/profile.jsp").forward(request, response);

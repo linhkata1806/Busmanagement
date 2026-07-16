@@ -52,20 +52,12 @@ public class TicketService {
         return "TK-" + routeId + "-" + System.currentTimeMillis();
     }
     //====custome(lay danh sach ve)
-    public int countTicketsByAccount(int accountID) {
-        return ticketDAO.countTicketsByAccount(accountID);
-    }
-
-    public List<TicketDTO> getTicketsByAccount(int accountID, int offset, int limit) {
+    public List<TicketDTO> getTicketsByAccount(int accountID) {
         ticketDAO.updateExpiredTickets(); 
-        return ticketDAO.getTicketsByAccount(accountID, offset, limit);
+        return ticketDAO.getTicketsByAccount(accountID);
     }
 
-    public int countTicketsByTrip(int tripID) {
-        return ticketDAO.countTicketsByTrip(tripID);
-    }
-
-    public List<model.Ticket> getTicketsByTrip(int tripID, int offset, int limit) {
-        return ticketDAO.getTicketsByTrip(tripID, offset, limit);
+    public List<model.Ticket> getTicketsByTrip(int tripID) {
+        return ticketDAO.getTicketsByTrip(tripID);
     }
 }

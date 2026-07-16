@@ -29,136 +29,41 @@ public class BusTrackingService {
     private final BusDAO busDAO = new BusDAO();
     private final RouteStopDAO routeStopDAO = new RouteStopDAO();
 
-public List<BusLocationDTO> getRunningBusesLocations() {
-    List<BusLocationDTO> result = new ArrayList<>();
+    public List<BusLocationDTO> getRunningBusesLocations() {
+        List<BusLocationDTO> result = new ArrayList<>();
 
-    List<TripDTO> runningTrips = tripDAO.getRunningTripsForTracking();
+        List<TripDTO> runningTrips
+                = tripDAO.searchTrips(null, 0, null, "IN_PROGRESS");
 
-    if (runningTrips == null || runningTrips.isEmpty()) {
+        if (runningTrips == null || runningTrips.isEmpty()) {
+            return result;
+        }
+
+        // Tránh query lại danh sách trạm nhiều lần nếu nhiều xe cùng route.
+        Map<Integer, List<RouteStopDTO>> routeStopsCache = new HashMap<>();
+
+        for (TripDTO tripDTO : runningTrips) {
+            try {
+                processRunningTrip(tripDTO, result, routeStopsCache);
+            } catch (Exception e) {
+                System.err.println(
+                        "Lỗi xử lý tracking cho TripID: "
+                        + tripDTO.getTripID()
+                );
+                e.printStackTrace();
+            }
+        }
+
         return result;
     }
-
-    // Cache danh sách trạm theo RouteID để tránh query DB nhiều lần
-    Map<Integer, List<RouteStopDTO>> routeStopsCache = new HashMap<>();
-
-    for (TripDTO tripDTO : runningTrips) {
-        try {
-            BusLocationHistory latestLoc =
-                    locationDAO.getLatestByTrip(tripDTO.getTripID());
-
-            if (latestLoc == null) {
-                continue;
-            }
-
-            Trip tripEntity = tripDAO.getById(tripDTO.getTripID());
-
-            if (tripEntity == null) {
-                continue;
-            }
-
-            int routeID = tripEntity.getRouteID();
-
-            List<RouteStopDTO> stops = routeStopsCache.get(routeID);
-
-            if (stops == null) {
-                stops = routeStopDAO.getStopsByRoute(routeID);
-                routeStopsCache.put(routeID, stops);
-            }
-
-            if (stops != null && !stops.isEmpty()) {
-
-                RouteStopDTO endStop;
-
-                // Direction = 1: bến cuối là trạm cuối danh sách
-                // Direction = 2: bến cuối là trạm đầu danh sách
-                if (tripEntity.getDirection() == 1) {
-                    endStop = stops.get(stops.size() - 1);
-                } else {
-                    endStop = stops.get(0);
-                }
-
-                double distanceToEndStop =
-                        calculateHaversineDistance(
-                                latestLoc.getLatitude(),
-                                latestLoc.getLongitude(),
-                                endStop.getLatitude(),
-                                endStop.getLongitude()
-                        );
-
-                // Nếu xe cách bến cuối <= 150m thì tự kết thúc chuyến
-                if (distanceToEndStop <= 0.15) {
-                    tripDAO.finishTripActual(
-                            tripDTO.getTripID(),
-                            new java.sql.Timestamp(
-                                    System.currentTimeMillis()
-                            )
-                    );
-
-                    // Xe đã hoàn thành thì không trả về cho client nữa
-                    continue;
-                }
-            }
-
-            int passenger =
-                    ticketDAO.countTicketsByTripAndStatus(
-                            tripDTO.getTripID(),
-                            "CHECKED_IN"
-                    );
-
-            int eta =
-                    calculateETA(
-                            latestLoc.getLatitude(),
-                            latestLoc.getLongitude(),
-                            routeID
-                    );
-
-            int capacity = 60;
-
-            List<Bus> foundBuses =
-                    busDAO.searchAndFilter(
-                            tripDTO.getBusPlate(),
-                            "ALL",
-                            0,
-                            1
-                    );
-
-            if (foundBuses != null && !foundBuses.isEmpty()) {
-                capacity = foundBuses.get(0).getCapacity();
-            }
-
-            result.add(
-                    new BusLocationDTO(
-                            tripDTO.getTripID(),
-                            tripDTO.getRouteNumber(),
-                            tripDTO.getBusPlate(),
-                            latestLoc.getLatitude(),
-                            latestLoc.getLongitude(),
-                            passenger,
-                            capacity,
-                            eta
-                    )
-            );
-
-        } catch (Exception e) {
-            System.out.println(
-                    "Lỗi xử lý vị trí xe đang chạy TripID="
-                    + tripDTO.getTripID()
-                    + ": "
-                    + e.getMessage()
-            );
-        }
-    }
-
-    return result;
-}
 
     private void processRunningTrip(
             TripDTO tripDTO,
             List<BusLocationDTO> result,
             Map<Integer, List<RouteStopDTO>> routeStopsCache
     ) {
-        BusLocationHistory latestLoc =
-                locationDAO.getLatestByTrip(tripDTO.getTripID());
+        BusLocationHistory latestLoc
+                = locationDAO.getLatestByTrip(tripDTO.getTripID());
 
         if (latestLoc == null) {
             System.out.println(
@@ -191,10 +96,10 @@ public List<BusLocationDTO> getRunningBusesLocations() {
         double distanceTraveled = 0.0;
         double totalRouteDistance = 0.0;
         System.out.println("========== CHECK MOVE CONDITION ==========");
-System.out.println("TripID = " + tripDTO.getTripID());
-System.out.println("ActualStartTime = " + tripEntity.getActualStartTime());
-System.out.println("Stops null = " + (stops == null));
-System.out.println("Stops size = " + (stops == null ? -1 : stops.size()));
+        System.out.println("TripID = " + tripDTO.getTripID());
+        System.out.println("ActualStartTime = " + tripEntity.getActualStartTime());
+        System.out.println("Stops null = " + (stops == null));
+        System.out.println("Stops size = " + (stops == null ? -1 : stops.size()));
         if (tripEntity.getActualStartTime() != null
                 && stops != null
                 && stops.size() >= 2) {
@@ -205,11 +110,11 @@ System.out.println("Stops size = " + (stops == null ? -1 : stops.size()));
                     - tripEntity.getActualStartTime().getTime()) / 1000
             );
 
-            distanceTraveled =
-                    elapsedSeconds * SPEED_METERS_PER_SECOND;
+            distanceTraveled
+                    = elapsedSeconds * SPEED_METERS_PER_SECOND;
 
-            PositionResult positionResult =
-                    calculateSimulatedPosition(stops, distanceTraveled);
+            PositionResult positionResult
+                    = calculateSimulatedPosition(stops, distanceTraveled);
 
             displayLat = positionResult.latitude;
             displayLng = positionResult.longitude;
@@ -245,8 +150,8 @@ System.out.println("Stops size = " + (stops == null ? -1 : stops.size()));
                     lastStop.getLongitude()
             );
 
-            boolean traveledWholeRoute =
-                    totalRouteDistance > 0
+            boolean traveledWholeRoute
+                    = totalRouteDistance > 0
                     && distanceTraveled >= totalRouteDistance;
 
             if (traveledWholeRoute
@@ -307,8 +212,8 @@ System.out.println("Stops size = " + (stops == null ? -1 : stops.size()));
     /**
      * Tính vị trí mô phỏng của xe trên các đoạn nối giữa các trạm.
      *
-     * Lưu ý: đây vẫn là nội suy đường thẳng giữa các stop.
-     * Muốn marker bám đúng đường giao thông cần route shape/polyline.
+     * Lưu ý: đây vẫn là nội suy đường thẳng giữa các stop. Muốn marker bám đúng
+     * đường giao thông cần route shape/polyline.
      */
     private PositionResult calculateSimulatedPosition(
             List<RouteStopDTO> stops,
@@ -343,23 +248,23 @@ System.out.println("Stops size = " + (stops == null ? -1 : stops.size()));
                 continue;
             }
 
-            double segmentEndDistance =
-                    accumulatedDistance + distSegment;
+            double segmentEndDistance
+                    = accumulatedDistance + distSegment;
 
             if (distanceTraveledMeters <= segmentEndDistance) {
-                double remainingDistance =
-                        distanceTraveledMeters - accumulatedDistance;
+                double remainingDistance
+                        = distanceTraveledMeters - accumulatedDistance;
 
                 double ratio = remainingDistance / distSegment;
                 ratio = Math.max(0.0, Math.min(1.0, ratio));
 
-                double latitude =
-                        stop1.getLatitude()
+                double latitude
+                        = stop1.getLatitude()
                         + (stop2.getLatitude()
                         - stop1.getLatitude()) * ratio;
 
-                double longitude =
-                        stop1.getLongitude()
+                double longitude
+                        = stop1.getLongitude()
                         + (stop2.getLongitude()
                         - stop1.getLongitude()) * ratio;
 
@@ -395,8 +300,8 @@ System.out.println("Stops size = " + (stops == null ? -1 : stops.size()));
             RouteStopDTO stop1 = stops.get(i);
             RouteStopDTO stop2 = stops.get(i + 1);
 
-            double segmentDistanceMeters =
-                    calculateHaversineDistance(
+            double segmentDistanceMeters
+                    = calculateHaversineDistance(
                             stop1.getLatitude(),
                             stop1.getLongitude(),
                             stop2.getLatitude(),
@@ -459,8 +364,8 @@ System.out.println("Stops size = " + (stops == null ? -1 : stops.size()));
         double latDistance = Math.toRadians(lat2 - lat1);
         double lonDistance = Math.toRadians(lon2 - lon1);
 
-        double a =
-                Math.sin(latDistance / 2)
+        double a
+                = Math.sin(latDistance / 2)
                 * Math.sin(latDistance / 2)
                 + Math.cos(Math.toRadians(lat1))
                 * Math.cos(Math.toRadians(lat2))
@@ -488,8 +393,8 @@ System.out.println("Stops size = " + (stops == null ? -1 : stops.size()));
         ) {
             this.latitude = latitude;
             this.longitude = longitude;
-            this.totalRouteDistanceMeters =
-                    totalRouteDistanceMeters;
+            this.totalRouteDistanceMeters
+                    = totalRouteDistanceMeters;
         }
     }
 }

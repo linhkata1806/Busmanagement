@@ -209,13 +209,6 @@
                             </c:otherwise>
                         </c:choose>
                     </div>
-                    
-                    <div class="mt-4">
-                        <%-- Phân trang --%>
-                        <jsp:include page="/common/pagination.jsp">
-                            <jsp:param name="tab" value="ticket" />
-                        </jsp:include>
-                    </div>
                 </c:if>
 
                 <c:if test="${activeTab eq 'pass'}">

@@ -47,19 +47,6 @@ public class TripManagementServlet extends HttpServlet {
             HttpServletResponse response)
             throws ServletException, IOException {
 
-        int page = 1;
-        int limit = 10;
-        String pageStr = request.getParameter("page");
-        if (pageStr != null && !pageStr.isEmpty()) {
-            try {
-                page = Integer.parseInt(pageStr);
-                if (page < 1) page = 1;
-            } catch (NumberFormatException e) {
-                page = 1;
-            }
-        }
-        int offset = (page - 1) * limit;
-
         String dateStr = request.getParameter("date");
         String routeIdStr = request.getParameter("routeID");
         String plate = request.getParameter("plate");
@@ -83,36 +70,13 @@ public class TripManagementServlet extends HttpServlet {
             }
         }
         // 3. Gọi DUY NHẤT 1 hàm search (Gọn gàng vô cùng!)
-        List<TripDTO> list = tripService.searchTrips(dateStr, routeID, plate, status, offset, limit);
-        int totalRecords = tripService.countSearchTrips(dateStr, routeID, plate, status);
-        int totalPages = (int) Math.ceil((double) totalRecords / limit);
-
-        StringBuilder queryString = new StringBuilder();
-        if (dateStr != null && !dateStr.isEmpty()) {
-            queryString.append("date=").append(java.net.URLEncoder.encode(dateStr, "UTF-8"));
-        }
-        if (routeIdStr != null && !routeIdStr.isEmpty()) {
-            if (queryString.length() > 0) queryString.append("&");
-            queryString.append("routeID=").append(java.net.URLEncoder.encode(routeIdStr, "UTF-8"));
-        }
-        if (plate != null && !plate.isEmpty()) {
-            if (queryString.length() > 0) queryString.append("&");
-            queryString.append("plate=").append(java.net.URLEncoder.encode(plate, "UTF-8"));
-        }
-        if (status != null && !status.isEmpty()) {
-            if (queryString.length() > 0) queryString.append("&");
-            queryString.append("status=").append(java.net.URLEncoder.encode(status, "UTF-8"));
-        }
+        List<TripDTO> list = tripService.searchTrips(dateStr, routeID, plate, status);
 
         // Đổ dữ liệu tuyến xe vào Dropdown (Nhớ gọi hàm DAO/Service thực tế của nhé e yeu)
         request.setAttribute("routes", routeService.getAllActiveRoutes());
 
         // 4. Giữ lại filter trên giao diện và forward
         request.setAttribute("trips", list);
-        request.setAttribute("currentPage", page);
-        request.setAttribute("totalPages", totalPages);
-        request.setAttribute("queryString", queryString.toString());
-
         request.setAttribute("filterDate", dateStr);
         request.setAttribute("filterRoute", routeIdStr);
         request.setAttribute("filterPlate", plate);

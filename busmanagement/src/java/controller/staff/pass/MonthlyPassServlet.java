@@ -64,55 +64,22 @@ public class MonthlyPassServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException {
-        int page = 1;
-        int limit = 10;
-        String pageStr = request.getParameter("page");
-        if (pageStr != null && !pageStr.isEmpty()) {
-            try {
-                page = Integer.parseInt(pageStr);
-                if (page < 1) page = 1;
-            } catch (NumberFormatException e) {
-                page = 1;
-            }
-        }
-        int offset = (page - 1) * limit;
-
         String statusFilter = request.getParameter("status");
         String searchQuery = request.getParameter("search");
         
-        // Làm sạch chuỗi
-        statusFilter = statusFilter == null ? "" : statusFilter.trim();
-        searchQuery = searchQuery == null ? "" : searchQuery.trim();
-        
         List<MonthlyPassDTO> passList;
         // day xuong service khi status null 
-        if(statusFilter.isEmpty() || statusFilter.equalsIgnoreCase("ALL")){
+        if(statusFilter ==null||statusFilter.isBlank()||statusFilter.equalsIgnoreCase("ALL")){
             statusFilter="ALL";
-            passList = monthlyPassService.getAllPassesForStaff(searchQuery, offset, limit);
+            passList = monthlyPassService.getAllPassesForStaff(searchQuery);
         }else{
-            passList = monthlyPassService.getPassesByStatusForStaff(statusFilter.toUpperCase(), searchQuery, offset, limit);
-        }
-        
-        int totalRecords = monthlyPassService.countPassesForStaff(statusFilter.toUpperCase(), searchQuery);
-        int totalPages = (int) Math.ceil((double) totalRecords / limit);
-
-        StringBuilder queryString = new StringBuilder();
-        if (!statusFilter.isEmpty() && !statusFilter.equals("ALL")) {
-            queryString.append("status=").append(java.net.URLEncoder.encode(statusFilter, "UTF-8"));
-        }
-        if (!searchQuery.isEmpty()) {
-            if (queryString.length() > 0) queryString.append("&");
-            queryString.append("search=").append(java.net.URLEncoder.encode(searchQuery, "UTF-8"));
+            passList = monthlyPassService.getPassesByStatusForStaff(statusFilter.toUpperCase(),searchQuery);
         }
         
         //lay so luong badge hien thi
         int pendingCount = monthlyPassService.countPendingPasses();
         
         request.setAttribute("passList", passList);
-        request.setAttribute("currentPage", page);
-        request.setAttribute("totalPages", totalPages);
-        request.setAttribute("queryString", queryString.toString());
-        
         request.setAttribute("currentStatus", statusFilter);
         request.setAttribute("searchQuery", searchQuery);
         request.setAttribute("pendingPasses", pendingCount);

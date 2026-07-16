@@ -33,25 +33,8 @@ public class MyTripServlet extends HttpServlet {
         Account user = (Account) session.getAttribute("USER");
         int driverID = user.getAccountID();
 
-        int page = 1;
-        int limit = 10;
-        String pageStr = request.getParameter("page");
-        if (pageStr != null && !pageStr.trim().isEmpty()) {
-            try {
-                page = Integer.parseInt(pageStr);
-            } catch (NumberFormatException e) {
-                page = 1;
-            }
-        }
-        int offset = (page - 1) * limit;
-
-        int totalTrips = tripService.countTripsByDriver(driverID);
-        int totalPages = (int) Math.ceil((double) totalTrips / limit);
-
-        List<TripDTO> assignedTrips = tripService.getTripsByDriver(driverID, offset, limit);
+        List<TripDTO> assignedTrips = tripService.getTripsByDriver(driverID);
         request.setAttribute("assignedTrips", assignedTrips);
-        request.setAttribute("currentPage", page);
-        request.setAttribute("totalPages", totalPages);
 
         // Fetch unread notification count for sidebar
         int unreadCount = notificationService.countUnreadNotifications(driverID);

@@ -32,25 +32,8 @@ public class TripHistoryServlet extends HttpServlet {
         Account user = (Account) session.getAttribute("USER");
         int accountId = user.getAccountID();
 
-        int page = 1;
-        int limit = 10;
-        String pageStr = request.getParameter("page");
-        if (pageStr != null && !pageStr.trim().isEmpty()) {
-            try {
-                page = Integer.parseInt(pageStr);
-            } catch (NumberFormatException e) {
-                page = 1;
-            }
-        }
-        int offset = (page - 1) * limit;
-
-        int totalTrips = ticketDAO.countRecentTripsByAccount(accountId);
-        int totalPages = (int) Math.ceil((double) totalTrips / limit);
-
-        List<TripHistoryDTO> trips = ticketDAO.getRecentTripsByAccount(accountId, offset, limit);
+        List<TripHistoryDTO> trips = ticketDAO.getRecentTripsByAccount(accountId);
         request.setAttribute("trips", trips);
-        request.setAttribute("currentPage", page);
-        request.setAttribute("totalPages", totalPages);
 
         request.getRequestDispatcher("/view/customer/trip-history.jsp").forward(request, response);
     }

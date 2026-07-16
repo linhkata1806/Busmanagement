@@ -71,7 +71,7 @@ public class FavoriteDAO extends DBContext{
         return false;
     }
 
-    public List<RouteDTO> getFavoriteRoutes(int accountId, int offset, int limit) {
+    public List<RouteDTO> getFavoriteRoutes(int accountId) {
         List<RouteDTO> list = new ArrayList<>();
         
         // JOIN bảng Routes với bảng Favorites
@@ -79,12 +79,10 @@ public class FavoriteDAO extends DBContext{
                    + "FROM Routes r "
                    + "JOIN Favorites f ON r.RouteID = f.RouteID "
                    + "WHERE f.AccountID = ? "
-                   + "ORDER BY f.CreatedAt DESC OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
+                   + "ORDER BY f.CreatedAt DESC";
                    
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, accountId);
-            ps.setInt(2, offset);
-            ps.setInt(3, limit);
             
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {

@@ -34,53 +34,8 @@ public class TripDAO extends DBContext {
         return 0;
     }
 
-    public int countSearchTrips(String date, int routeID, String plate, String status) {
-        StringBuilder sql = new StringBuilder(
-                "SELECT COUNT(*) "
-                + "FROM Trips t "
-                + "JOIN Routes r ON t.RouteID = r.RouteID "
-                + "JOIN Buses b ON t.BusID = b.BusID "
-                + "JOIN Accounts ad ON t.DriverID = ad.AccountID "
-                + "LEFT JOIN Accounts aa ON t.AssistantID = aa.AccountID "
-                + "WHERE 1=1 "
-        );
-
-        List<Object> params = new ArrayList<>();
-
-        if (date != null && !date.isEmpty()) {
-            sql.append("AND t.TripDate = ? ");
-            params.add(date);
-        }
-        if (routeID > 0) {
-            sql.append("AND t.RouteID = ? ");
-            params.add(routeID);
-        }
-        if (plate != null && !plate.trim().isEmpty()) {
-            sql.append("AND b.LicensePlate LIKE ? ");
-            params.add("%" + plate.trim() + "%");
-        }
-        if (status != null && !status.trim().isEmpty() && !"ALL".equals(status)) {
-            sql.append("AND t.Status = ? ");
-            params.add(status);
-        }
-
-        try (PreparedStatement ps = connection.prepareStatement(sql.toString())) {
-            for (int i = 0; i < params.size(); i++) {
-                ps.setObject(i + 1, params.get(i));
-            }
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    return rs.getInt(1);
-                }
-            }
-        } catch (Exception e) {
-            System.out.println("Lỗi countSearchTrips: " + e.getMessage());
-        }
-        return 0;
-    }
-
     // HÀM TÌM KIẾM ĐỘNG (Gộp tất cả các bộ lọc vào làm 1)
-    public List<TripDTO> searchTrips(String date, int routeID, String plate, String status, int offset, int limit) {
+    public List<TripDTO> searchTrips(String date, int routeID, String plate, String status) {
         // Tự động hủy các chuyến đi đã quá hạn nhưng chưa chạy
         try {
             String updateSql = "UPDATE Trips SET Status = 'CANCELLED' WHERE Status = 'SCHEDULED' AND CAST(TripDate AS DATE) < CAST(GETDATE() AS DATE)";
@@ -126,18 +81,14 @@ public class TripDAO extends DBContext {
             params.add(status);
         }
 
-        sql.append("ORDER BY t.TripDate DESC, t.StartTime ASC OFFSET ? ROWS FETCH NEXT ? ROWS ONLY");
+        sql.append("ORDER BY t.TripDate DESC, t.StartTime ASC");
 
         // 4. Thực thi câu lệnh
         try (PreparedStatement ps = connection.prepareStatement(sql.toString())) {
             // Đổ tham số vào các dấu ? tương ứng
-            int paramIndex = 1;
-            for (Object param : params) {
-                ps.setObject(paramIndex++, param);
+            for (int i = 0; i < params.size(); i++) {
+                ps.setObject(i + 1, params.get(i));
             }
-            ps.setInt(paramIndex++, offset);
-            ps.setInt(paramIndex++, limit);
-
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) { // Đã fix lỗi while(true) của bạn
                     list.add(mapRowtoDTO(rs));
@@ -433,22 +384,7 @@ public class TripDAO extends DBContext {
         return false;
     }
 
-    public int countTripsByAssistant(int assistantID) {
-        String sql = "SELECT COUNT(*) FROM Trips WHERE AssistantID = ?";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setInt(1, assistantID);
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    return rs.getInt(1);
-                }
-            }
-        } catch (Exception e) {
-            System.out.println("Lỗi countTripsByAssistant: " + e.getMessage());
-        }
-        return 0;
-    }
-
-    public List<TripDTO> getTripsByAssistant(int assistantID, int offset, int limit) {
+    public List<TripDTO> getTripsByAssistant(int assistantID) {
         // Tự động hủy các chuyến đi đã quá hạn nhưng chưa chạy
         try {
             String updateSql = "UPDATE Trips SET Status = 'CANCELLED' WHERE Status = 'SCHEDULED' AND CAST(TripDate AS DATE) < CAST(GETDATE() AS DATE)";
@@ -468,11 +404,9 @@ public class TripDAO extends DBContext {
                 + "JOIN Accounts ad ON t.DriverID = ad.AccountID "
                 + "LEFT JOIN Accounts aa ON t.AssistantID = aa.AccountID "
                 + "WHERE t.AssistantID = ? "
-                + "ORDER BY t.TripDate DESC, t.StartTime ASC OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
+                + "ORDER BY t.TripDate DESC, t.StartTime ASC";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, assistantID);
-            ps.setInt(2, offset);
-            ps.setInt(3, limit);
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     try {
@@ -584,22 +518,7 @@ public class TripDAO extends DBContext {
     // ==========================================
     // DRIVER MODULE METHODS
     // ==========================================
-    public int countTripsByDriver(int driverID) {
-        String sql = "SELECT COUNT(*) FROM Trips WHERE DriverID = ?";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setInt(1, driverID);
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    return rs.getInt(1);
-                }
-            }
-        } catch (Exception e) {
-            System.out.println("Lỗi countTripsByDriver: " + e.getMessage());
-        }
-        return 0;
-    }
-
-    public List<TripDTO> getTripsByDriver(int driverID, int offset, int limit) {
+    public List<TripDTO> getTripsByDriver(int driverID) {
         List<TripDTO> list = new ArrayList<>();
         String sql = "SELECT t.TripID, r.RouteNumber, r.RouteName, b.LicensePlate AS BusPlate, "
                 + "ad.FullName AS DriverName, aa.FullName AS AssistantName, "
@@ -611,11 +530,9 @@ public class TripDAO extends DBContext {
                 + "JOIN Accounts ad ON t.DriverID = ad.AccountID "
                 + "LEFT JOIN Accounts aa ON t.AssistantID = aa.AccountID "
                 + "WHERE t.DriverID = ? "
-                + "ORDER BY t.TripDate DESC, t.StartTime ASC OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
+                + "ORDER BY t.TripDate DESC, t.StartTime ASC";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, driverID);
-            ps.setInt(2, offset);
-            ps.setInt(3, limit);
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     try {

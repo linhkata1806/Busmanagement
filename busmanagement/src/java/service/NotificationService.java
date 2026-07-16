@@ -65,8 +65,8 @@ public class NotificationService {
     }
 
     // Lấy toàn bộ danh sách thông báo (Dùng cho giao diện Staff)
-    public List<Notification> getAllNotifications(int offset, int limit) {
-        return notificationDAO.getAll(offset, limit);
+    public List<Notification> getAllNotifications() {
+        return notificationDAO.getAll();
     }
 
     public boolean updateNotification(int notificationId, String title, String content) {
@@ -81,12 +81,8 @@ public class NotificationService {
         return notificationDAO.delete(notificationId);
     }
 
-    public int countByAccount(int accountID) {
-        return notificationDAO.countByAccount(accountID);
-    }
-
-    public List<Notification> getByAccount(int accountID, int offset, int limit) {
-        return notificationDAO.getByAccount(accountID, offset, limit);
+    public List<Notification> getByAccount(int accountID) {
+        return notificationDAO.getByAccount(accountID);
     }
 
     public boolean markAsRead(int notificationID, int accountID) {
@@ -101,16 +97,12 @@ public class NotificationService {
         return notificationDAO.countUnreadNotifications(accountID);
     }
 
-    public int countByAccountAndRole(int accountId, String roleName) {
-        return notificationDAO.countByAccountAndRole(accountId, roleName);
-    }
-
     /**
      * Dành cho Phụ xe: lấy thông báo đích danh + broadcast cho nhóm roleName.
      * Ví dụ: roleName = "ASSISTANT"
      */
-    public List<Notification> getByAccountAndRole(int accountID, String roleName, int offset, int limit) {
-        return notificationDAO.getByAccountAndRole(accountID, roleName, offset, limit);
+    public List<Notification> getByAccountAndRole(int accountID, String roleName) {
+        return notificationDAO.getByAccountAndRole(accountID, roleName);
     }
 
     /**

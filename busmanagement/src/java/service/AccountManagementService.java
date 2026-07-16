@@ -31,20 +31,12 @@ public class AccountManagementService {
     // ==========================================================
     // 2. CÁC NGHIỆP VỤ CHÍNH
     // ==========================================================
-    public int countAllAccounts() {
-        return accountDAO.countAllAccounts();
+    public List<Account> getAllAccounts() {
+        return accountDAO.getAllAccounts();
     }
 
-    public List<Account> getAllAccounts(int offset, int limit) {
-        return accountDAO.getAllAccounts(offset, limit);
-    }
-
-    public int countSearchAndFilter(String keyword, String roleName) {
-        return accountDAO.countSearchAndFilter(keyword, roleName);
-    }
-
-    public List<Account> searchAndFilter(String keyword, String roleName, int offset, int limit) {
-        return accountDAO.searchAndFilter(keyword, roleName, offset, limit);
+    public List<Account> searchAndFilter(String keyword, String roleName) {
+        return accountDAO.searchAndFilter(keyword, roleName);
     }
 
     public boolean createAccount(Account newAccount, String roleName) throws Exception {

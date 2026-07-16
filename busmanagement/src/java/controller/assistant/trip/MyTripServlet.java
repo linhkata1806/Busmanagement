@@ -26,25 +26,8 @@ public class MyTripServlet extends HttpServlet {
         Account user = (Account) session.getAttribute("USER");
         int assistantID = user.getAccountID();
 
-        int page = 1;
-        int limit = 10;
-        String pageStr = request.getParameter("page");
-        if (pageStr != null && !pageStr.trim().isEmpty()) {
-            try {
-                page = Integer.parseInt(pageStr);
-            } catch (NumberFormatException e) {
-                page = 1;
-            }
-        }
-        int offset = (page - 1) * limit;
-
-        int totalTrips = tripService.countTripsByAssistant(assistantID);
-        int totalPages = (int) Math.ceil((double) totalTrips / limit);
-
-        List<TripDTO> assignedTrips = tripService.getTripsByAssistant(assistantID, offset, limit);
+        List<TripDTO> assignedTrips = tripService.getTripsByAssistant(assistantID);
         request.setAttribute("assignedTrips", assignedTrips);
-        request.setAttribute("currentPage", page);
-        request.setAttribute("totalPages", totalPages);
 
         request.getRequestDispatcher("/view/assistant/my-trip.jsp").forward(request, response);
     }

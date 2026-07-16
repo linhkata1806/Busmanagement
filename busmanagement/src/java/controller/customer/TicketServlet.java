@@ -69,40 +69,8 @@ public class TicketServlet extends HttpServlet {
         if (tab == null) {
             tab = "ticket";
         }
-        int page = 1;
-        int limit = 10;
-        String pageStr = request.getParameter("page");
-        if (pageStr != null && !pageStr.trim().isEmpty()) {
-            try {
-                page = Integer.parseInt(pageStr);
-            } catch (NumberFormatException e) {
-                page = 1;
-            }
-        }
-        int offset = (page - 1) * limit;
-
         //service lay du lieu tu DTO
-        List<TicketDTO> ticketList;
-        if ("ticket".equals(tab)) {
-            int totalTickets = ticketService.countTicketsByAccount(accountID);
-            int totalPages = (int) Math.ceil((double) totalTickets / limit);
-            ticketList = ticketService.getTicketsByAccount(accountID, offset, limit);
-            request.setAttribute("currentPage", page);
-            request.setAttribute("totalPages", totalPages);
-        } else {
-            // For other tabs we might not paginate or we just get all for now to avoid breaking. 
-            // In fact, ticketDAO.getTicketsByAccount no longer exists without offset/limit!
-            // Wait, we need a method without offset/limit if we don't want to break other places?
-            // Actually, we can just paginate it always or pass offset 0 limit max if not in ticket tab.
-            // Let's just paginate it always or it only shows the first 10 on other tabs.
-            // Let's just do it cleanly:
-            int totalTickets = ticketService.countTicketsByAccount(accountID);
-            int totalPages = (int) Math.ceil((double) totalTickets / limit);
-            ticketList = ticketService.getTicketsByAccount(accountID, offset, limit);
-            request.setAttribute("currentPage", page);
-            request.setAttribute("totalPages", totalPages);
-        }
-        
+        List<TicketDTO> ticketList = ticketService.getTicketsByAccount(accountID);
         List<MonthlyPassDTO> routePassList = monthlyPassService.getRoutePasses(accountID);
         List<MonthlyPassDTO> allRoutePassList = monthlyPassService.getAllRoutePasses(accountID);
 

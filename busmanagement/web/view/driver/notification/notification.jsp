@@ -80,11 +80,6 @@
                             </c:otherwise>
                         </c:choose>
                     </div>
-                    
-                    <div class="mt-4">
-                        <%-- Phân trang --%>
-                        <jsp:include page="/common/pagination.jsp" />
-                    </div>
                 </main>
             </div>
         </div>

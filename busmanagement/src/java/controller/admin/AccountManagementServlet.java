@@ -35,58 +35,26 @@ public class AccountManagementServlet extends HttpServlet {
 
         request.setCharacterEncoding("UTF-8");
 
-        // Phân trang
-        int page = 1;
-        int limit = 10;
-        String pageStr = request.getParameter("page");
-        if (pageStr != null && !pageStr.isEmpty()) {
-            try {
-                page = Integer.parseInt(pageStr);
-                if (page < 1) page = 1;
-            } catch (NumberFormatException e) {
-                page = 1;
-            }
-        }
-        int offset = (page - 1) * limit;
-
         String keyword = request.getParameter("search");
         String role = request.getParameter("role");
 
         List<Account> accountList;
-        int totalRecords = 0;
-        StringBuilder queryString = new StringBuilder();
 
         if ((keyword != null && !keyword.isEmpty()) || (role != null && !role.isEmpty())) {
             // Nếu không lọc role cụ thể, ngầm định là ALL
             if (role == null || role.isEmpty()) {
                 role = "ALL";
             }
-            accountList = accountService.searchAndFilter(keyword, role, offset, limit);
-            totalRecords = accountService.countSearchAndFilter(keyword, role);
+            accountList = accountService.searchAndFilter(keyword, role);
 
             // Giữ lại từ khóa trên ô tìm kiếm
             request.setAttribute("searchKeyword", keyword);
             request.setAttribute("selectedRole", role);
-            
-            // Xây dựng query string để giữ tham số khi chuyển trang
-            if (keyword != null && !keyword.isEmpty()) {
-                queryString.append("search=").append(java.net.URLEncoder.encode(keyword, "UTF-8"));
-            }
-            if (role != null && !role.isEmpty()) {
-                if (queryString.length() > 0) queryString.append("&");
-                queryString.append("role=").append(java.net.URLEncoder.encode(role, "UTF-8"));
-            }
         } else {
-            accountList = accountService.getAllAccounts(offset, limit);
-            totalRecords = accountService.countAllAccounts();
+            accountList = accountService.getAllAccounts();
         }
 
-        int totalPages = (int) Math.ceil((double) totalRecords / limit);
-
         request.setAttribute("accountList", accountList);
-        request.setAttribute("currentPage", page);
-        request.setAttribute("totalPages", totalPages);
-        request.setAttribute("queryString", queryString.toString());
         request.getRequestDispatcher("/view/admin/account-management.jsp").forward(request, response);
     }
 

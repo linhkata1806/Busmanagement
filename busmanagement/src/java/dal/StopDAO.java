@@ -89,33 +89,8 @@ public class StopDAO extends DBContext {
         return list;
     }
 
-    public int countSearchAndFilter(String keyword, String status) {
-        StringBuilder sql = new StringBuilder("SELECT COUNT(*) FROM Stops WHERE (StopName LIKE ? OR Address LIKE ?) ");
-
-        if ("ACTIVE".equalsIgnoreCase(status)) {
-            sql.append("AND IsActive = 1 ");
-        } else if ("INACTIVE".equalsIgnoreCase(status)) {
-            sql.append("AND IsActive = 0 ");
-        }
-
-        try (PreparedStatement ps = connection.prepareStatement(sql.toString())) {
-            String searchPattern = "%" + keyword + "%";
-            ps.setString(1, searchPattern);
-            ps.setString(2, searchPattern);
-
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    return rs.getInt(1);
-                }
-            }
-        } catch (Exception e) {
-            System.out.println("Lỗi countSearchAndFilter Stop: " + e.getMessage());
-        }
-        return 0;
-    }
-
 // 1. TÌM KIẾM VÀ LỌC ĐIỂM DỪNG (Xử lý chuỗi ALL/ACTIVE/INACTIVE sang BIT)
-    public List<Stop> searchAndFilter(String keyword, String status, int offset, int limit) {
+    public List<Stop> searchAndFilter(String keyword, String status) {
         List<Stop> list = new ArrayList<>();
         StringBuilder sql = new StringBuilder("SELECT * FROM Stops WHERE (StopName LIKE ? OR Address LIKE ?) ");
 
@@ -125,14 +100,12 @@ public class StopDAO extends DBContext {
         } else if ("INACTIVE".equalsIgnoreCase(status)) {
             sql.append("AND IsActive = 0 ");
         }
-        sql.append("ORDER BY StopName ASC OFFSET ? ROWS FETCH NEXT ? ROWS ONLY");
+        sql.append("ORDER BY StopName ASC");
 
         try (PreparedStatement ps = connection.prepareStatement(sql.toString())) {
             String searchPattern = "%" + keyword + "%";
             ps.setString(1, searchPattern);
             ps.setString(2, searchPattern);
-            ps.setInt(3, offset);
-            ps.setInt(4, limit);
 
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {

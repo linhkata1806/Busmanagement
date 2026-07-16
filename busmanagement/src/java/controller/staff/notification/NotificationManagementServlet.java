@@ -54,28 +54,8 @@ public class NotificationManagementServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException {
-        int page = 1;
-        int limit = 10;
-        String pageStr = request.getParameter("page");
-        if (pageStr != null && !pageStr.isEmpty()) {
-            try {
-                page = Integer.parseInt(pageStr);
-                if (page < 1) page = 1;
-            } catch (NumberFormatException e) {
-                page = 1;
-            }
-        }
-        int offset = (page - 1) * limit;
-
-        NotificationService notificationService = new NotificationService();
-        int totalRecords = notificationService.countNotifications();
-        int totalPages = (int) Math.ceil((double) totalRecords / limit);
-
-        request.setAttribute("notifications", notificationService.getAllNotifications(offset, limit));
-        request.setAttribute("currentPage", page);
-        request.setAttribute("totalPages", totalPages);
-        request.setAttribute("queryString", "");
-        
+       NotificationService notificationService = new NotificationService();
+       request.setAttribute("notifications", notificationService.getAllNotifications());
         request.getRequestDispatcher("/view/staff/notification/notification-list.jsp").forward(request, response);
     } 
 

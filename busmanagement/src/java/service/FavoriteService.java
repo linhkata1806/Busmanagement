@@ -31,11 +31,7 @@ public class FavoriteService {
         return favoriteDAO.removeFavorite(accountId, routeId);
     }
 
-    public int countFavorites(int accountId) {
-        return favoriteDAO.countFavorites(accountId);
-    }
-
-    public List<RouteDTO> getFavoriteRoutes(int accountId, int offset, int limit) {
-        return favoriteDAO.getFavoriteRoutes(accountId, offset, limit);
+    public List<RouteDTO> getFavoriteRoutes(int accountId) {
+        return favoriteDAO.getFavoriteRoutes(accountId);
     }
 }
