@@ -79,6 +79,11 @@ public class RouteService {
         if (distance <= 0) {
             throw new IllegalArgumentException("Tổng chiều dài tuyến đường phải lớn hơn 0 km.");
         }
+        if (operatingHours == null || operatingHours.trim().isEmpty()) {
+            throw new IllegalArgumentException(
+                    "Khung giờ hoạt động không được để trống."
+            );
+        }
 
         Route route = new Route();
         route.setRouteNumber(routeNumber.trim());
@@ -115,11 +120,11 @@ public class RouteService {
         if (startPoint.trim().equalsIgnoreCase(endPoint.trim())) {
             throw new IllegalArgumentException("Vi phạm hành trình: Điểm đầu và Điểm cuối không được trùng nhau.");
         }
-        
+
         if (estimatedDuration <= 0) {
             throw new IllegalArgumentException("Thời gian dự kiến phải > 0 phút.");
         }
-        
+
         if (ticketPrice <= 0) {
             throw new IllegalArgumentException("Giá vé bắt buộc phải lớn hơn 0 VNĐ.");
         }
@@ -142,22 +147,29 @@ public class RouteService {
             throw new Exception("Lỗi Database: Không thể cập nhật thông tin tuyến xe.");
         }
     }
+
     // HÀM XÓA TUYẾN XE (TỰ ĐỘNG SOFT/HARD DELETE THEO LOGIC)
     public void deleteRoute(int routeID) throws Exception {
         // 1. Kiểm tra tuyến xe có tồn tại không
         if (!routeDAO.existsById(routeID)) {
             throw new IllegalArgumentException("Tuyến xe không tồn tại.");
         }
-        
+
         // 2. Kiểm tra lịch sử vận hành chuyến xe (Trip)
         if (tripDAO.existsByRouteId(routeID)) {
-            // Tự động chuyển trạng thái thành Ngừng hoạt động (INACTIVE) để giữ toàn vẹn dữ liệu lịch sử
-            routeDAO.updateStatus(routeID, false);
-            
-            // Ném lỗi IllegalArgumentException để thông báo trực tiếp cho nhân viên trên giao diện
-            throw new IllegalArgumentException("Tuyến đã có lịch sử vận hành nên hệ thống chỉ chuyển về trạng thái Ngừng hoạt động.");
+            boolean updated = routeDAO.updateStatus(routeID, false);
+
+            if (!updated) {
+                throw new Exception(
+                        "Không thể chuyển tuyến về trạng thái Ngừng hoạt động."
+                );
+            }
+
+            throw new IllegalArgumentException(
+                    "Tuyến đã có lịch sử vận hành nên hệ thống chỉ chuyển về trạng thái Ngừng hoạt động."
+            );
         }
-        
+
         // 3. Đủ điều kiện an toàn -> Tiến hành xóa cứng (Hard Delete) khỏi Database
         if (!routeDAO.delete(routeID)) {
             throw new Exception("Lỗi hệ thống cơ sở dữ liệu: Không thể hoàn tác lệnh xóa tuyến xe.");

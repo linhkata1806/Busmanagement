@@ -181,34 +181,55 @@ public class DashboardDAO extends DBContext {
     }
 
     //Hàm doanh thu
-    public List<Map<String, Object>> getRevenueByRouteAndType(Date fromDate, Date toDate) {
-        List<Map<String, Object>> list = new ArrayList<>();
-        // SỬA ĐỔI: Sử dụng CAST(... AS DATE) để đồng bộ kiểu dữ liệu ngày thuần túy với Java
-        String sql = "SELECT r.RouteNumber, "
-                + "ISNULL(SUM(t.Price), 0) as TicketRev, "
-                + "ISNULL(SUM(p.Price), 0) as PassRev "
-                + "FROM Routes r "
-                + "LEFT JOIN Tickets t ON r.RouteID = t.RouteID AND t.Status = 'COMPLETED' AND CAST(t.PurchasedAt AS DATE) BETWEEN ? AND ? "
-                + "LEFT JOIN MonthlyPasses p ON r.RouteID = p.RouteID AND p.Status = 'APPROVED' AND CAST(p.ApprovedAt AS DATE) BETWEEN ? AND ? "
-                + "GROUP BY r.RouteNumber";
+    public List<Map<String, Object>> getRevenueByRouteAndType(
+        Date fromDate,
+        Date toDate
+) {
+    List<Map<String, Object>> list = new ArrayList<>();
 
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setDate(1, fromDate);
-            ps.setDate(2, toDate);
-            ps.setDate(3, fromDate);
-            ps.setDate(4, toDate);
-            try (ResultSet rs = ps.executeQuery()) {
-                while (rs.next()) {
-                    Map<String, Object> map = new HashMap<>();
-                    map.put("route", rs.getString("RouteNumber"));
-                    map.put("ticket", rs.getDouble("TicketRev"));
-                    map.put("pass", rs.getDouble("PassRev"));
-                    list.add(map);
-                }
+    String sql
+            = "SELECT r.RouteNumber, "
+            + "       ISNULL(t.TicketRev, 0) AS TicketRev, "
+            + "       ISNULL(p.PassRev, 0) AS PassRev "
+            + "FROM Routes r "
+            + "LEFT JOIN ( "
+            + "    SELECT RouteID, SUM(Price) AS TicketRev "
+            + "    FROM Tickets "
+            + "    WHERE Status = 'COMPLETED' "
+            + "      AND CAST(PurchasedAt AS DATE) BETWEEN ? AND ? "
+            + "    GROUP BY RouteID "
+            + ") t ON r.RouteID = t.RouteID "
+            + "LEFT JOIN ( "
+            + "    SELECT RouteID, SUM(Price) AS PassRev "
+            + "    FROM MonthlyPasses "
+            + "    WHERE Status = 'APPROVED' "
+            + "      AND CAST(ApprovedAt AS DATE) BETWEEN ? AND ? "
+            + "    GROUP BY RouteID "
+            + ") p ON r.RouteID = p.RouteID "
+            + "ORDER BY r.RouteNumber ASC";
+
+    try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        ps.setDate(1, fromDate);
+        ps.setDate(2, toDate);
+        ps.setDate(3, fromDate);
+        ps.setDate(4, toDate);
+
+        try (ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                Map<String, Object> map = new HashMap<>();
+
+                map.put("route", rs.getString("RouteNumber"));
+                map.put("ticket", rs.getDouble("TicketRev"));
+                map.put("pass", rs.getDouble("PassRev"));
+
+                list.add(map);
             }
-        } catch (Exception e) {
-            e.printStackTrace();
         }
-        return list;
+
+    } catch (Exception e) {
+        e.printStackTrace();
     }
+
+    return list;
+}
 }

@@ -62,6 +62,17 @@ public class TripService {
     // CREATE TRIP
     public void createTrip(int routeID, int busID, int driverID, Integer assistantID,
             LocalDate tripDate, LocalTime startTime, LocalTime endTime, int direction) throws Exception {
+        if (tripDate.isBefore(LocalDate.now())) {
+            throw new IllegalArgumentException(
+                    "Không thể tạo chuyến xe cho ngày trong quá khứ."
+            );
+        }
+        if (tripDate.equals(LocalDate.now())
+                && startTime.isBefore(LocalTime.now())) {
+            throw new IllegalArgumentException(
+                    "Không thể tạo chuyến có giờ xuất phát đã qua."
+            );
+        }
 
         // Thực hiện quét toàn bộ lỗi bảo mật và trùng lịch (excludeTripID = null khi tạo mới)
         validateTripBusinessRules(routeID, busID, driverID, assistantID, tripDate, startTime, endTime, direction, null);
@@ -169,29 +180,11 @@ public class TripService {
                 );
             }
 
-            // Đang chạy thì không được đổi xe buýt
-            if (trip.getBusID() != busID) {
-                throw new IllegalArgumentException(
-                        "Cảnh báo: Không thể thay đổi Xe buýt khi chuyến xe đang lăn bánh!"
-                );
-            }
+            
 
-            // Đang chạy thì không được đổi tài xế
-            if (trip.getDriverID() != driverID) {
-                throw new IllegalArgumentException(
-                        "Cảnh báo: Không thể thay đổi Tài xế khi chuyến xe đang lăn bánh!"
-                );
-            }
+            
 
-            // Đang chạy thì không được đổi phụ xe
-            if ((trip.getAssistantID() == null && assistantID != null)
-                    || (trip.getAssistantID() != null
-                    && !trip.getAssistantID().equals(assistantID))) {
-
-                throw new IllegalArgumentException(
-                        "Cảnh báo: Không thể thay đổi Phụ xe khi chuyến xe đang lăn bánh!"
-                );
-            }
+          
 
             // Đang chạy thì không được đổi ngày chạy
             if (!trip.getTripDate().equals(tripDate)) {
@@ -389,11 +382,6 @@ public class TripService {
             throw new IllegalArgumentException("Vui lòng chọn ngày chạy.");
         }
 
-        if (tripDate.isBefore(LocalDate.now())) {
-            throw new IllegalArgumentException(
-                    "Không thể tạo chuyến xe cho ngày trong quá khứ."
-            );
-        }
         if (startTime == null) {
             throw new IllegalArgumentException("Vui lòng chọn giờ xuất phát.");
         }
@@ -404,12 +392,6 @@ public class TripService {
         // 1. Kiểm tra logic mốc thời gian
         if (!startTime.isBefore(endTime)) {
             throw new IllegalArgumentException("Khung giờ không hợp lệ: Giờ xuất phát phải nhỏ hơn giờ cập bến dự kiến.");
-        }
-        if (tripDate.equals(LocalDate.now())
-                && startTime.isBefore(LocalTime.now())) {
-            throw new IllegalArgumentException(
-                    "Không thể tạo chuyến có giờ xuất phát đã qua."
-            );
         }
 
         // 2. Test Driver != Assistant (Tránh trường hợp tự phân vai cho chính mình)

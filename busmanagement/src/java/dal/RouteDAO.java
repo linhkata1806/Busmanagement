@@ -168,7 +168,7 @@ public class RouteDAO extends DBContext {
     public List<Route> searchAndFilter(String keyword, String status) {
         List<Route> list = new ArrayList<>();
 
-        // Format SQL dễ đọc, dễ maintain
+
         String sql
                 = "SELECT * "
                 + "FROM Routes "
@@ -190,7 +190,7 @@ public class RouteDAO extends DBContext {
 
             ps.setString(5, status);
 
-            // Xử lý điều kiện rõ ràng, tường minh
+            
             int activeValue = 0;
             if ("ACTIVE".equalsIgnoreCase(status)) {
                 activeValue = 1;
