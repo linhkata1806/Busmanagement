@@ -76,11 +76,36 @@ public class TripManagementServlet extends HttpServlet {
         request.setAttribute("routes", routeService.getAllActiveRoutes());
 
         // 4. Giữ lại filter trên giao diện và forward
-        request.setAttribute("trips", list);
         request.setAttribute("filterDate", dateStr);
         request.setAttribute("filterRoute", routeIdStr);
         request.setAttribute("filterPlate", plate);
         request.setAttribute("filterStatus", status);
+
+        StringBuilder qs = new StringBuilder();
+        if (dateStr != null && !dateStr.isEmpty()) qs.append("date=").append(dateStr).append("&");
+        if (routeIdStr != null && !routeIdStr.isEmpty()) qs.append("routeID=").append(routeIdStr).append("&");
+        if (plate != null && !plate.isEmpty()) qs.append("plate=").append(plate).append("&");
+        if (status != null && !status.isEmpty()) qs.append("status=").append(status).append("&");
+        if (qs.length() > 0) {
+            qs.deleteCharAt(qs.length() - 1);
+            request.setAttribute("queryString", qs.toString());
+        }
+
+        int page = 1;
+        String pageStr = request.getParameter("page");
+        if (pageStr != null && !pageStr.isEmpty()) {
+            try {
+                page = Integer.parseInt(pageStr);
+            } catch (Exception e) {}
+        }
+        util.Page<TripDTO> pageInfo = new util.Page<>(list, page, list.size(), 10);
+        int start = (page - 1) * 10;
+        int end = Math.min(start + 10, list.size());
+        List<TripDTO> pagedList = list.isEmpty() ? list : list.subList(start, end);
+
+        request.setAttribute("trips", pagedList);
+        request.setAttribute("currentPage", pageInfo.getCurrentPage());
+        request.setAttribute("totalPages", pageInfo.getTotalPages());
 
         request.getRequestDispatcher("/view/staff/trip/trip-management.jsp").forward(request, response);
     }

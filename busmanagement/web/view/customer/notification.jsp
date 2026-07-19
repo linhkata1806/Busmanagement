@@ -106,8 +106,8 @@
             </a>
         </div>
 
-        <div class="card border-0 shadow-sm rounded-3 overflow-hidden">
-            <div class="list-group list-group-flush" id="notiContainer">
+        <div class="card border-0 shadow-sm rounded-3 overflow-hidden d-flex flex-column h-100">
+            <div class="list-group list-group-flush flex-grow-1" id="notiContainer">
                 
                 <c:choose>
                     <c:when test="${empty notiList}">
@@ -179,6 +179,7 @@
                 </c:choose>
 
             </div>
+            <%@ include file="../../common/pagination.jsp" %>
         </div>
     </div>
 

@@ -118,58 +118,61 @@
                     <!-- BẢNG DỮ LIỆU -->
                     <div class="card border-0 shadow-sm rounded-4 bg-white">
                         <div class="card-body p-0">
-                            <div class="table-responsive">
-                                <table class="table table-hover table-striped mb-0 align-middle">
-                                    <thead class="table-dark">
-                                        <tr>
-                                            <th>ID</th>
-                                            <th>Tên điểm dừng</th>
-                                            <th>Địa chỉ</th>
-                                            <th>Tọa độ (Lat, Lng)</th>
-                                            <th>Trạng thái</th>
-                                            <th class="text-center">Thao tác</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <c:forEach items="${listStops}" var="stop">
+                            <div class="table-responsive d-flex flex-column h-100" style="min-height: 500px;">
+                                <div class="flex-grow-1">
+                                    <table class="table table-hover table-striped mb-0 align-middle" style="min-width: 900px;">
+                                        <thead class="table-dark">
                                             <tr>
-                                                <td class="fw-bold">${stop.stopID}</td>
-                                                <td>${stop.stopName}</td>
-                                                <td>${stop.address}</td>
-                                                <td><small class="text-muted"><i class="fas fa-location-crosshairs me-1"></i>${stop.latitude}, ${stop.longitude}</small></td>
-                                                <td>
-                                                    <c:choose>
-                                                        <c:when test="${stop.isActive}">
-                                                            <span class="badge bg-success">Hoạt động</span>
-                                                        </c:when>
-                                                        <c:otherwise>
-                                                            <span class="badge bg-secondary">Ngừng hoạt động</span>
-                                                        </c:otherwise>
-                                                    </c:choose>
-                                                </td>
-                                                <td class="text-center">
-                                                    <!-- Nút Sửa -->
-                                                    <a href="${pageContext.request.contextPath}/staff/stop/update?id=${stop.stopID}" class="btn btn-sm btn-outline-primary" title="Chỉnh sửa">
-                                                        <i class="fas fa-edit"></i>
-                                                    </a>
-
-                                                    <!-- Nút Xóa (Dùng form ẩn Method POST) -->
-                                                    <form action="${pageContext.request.contextPath}/staff/stop/delete" method="POST" class="d-inline" onsubmit="return confirm('Bạn có chắc chắn muốn xóa điểm dừng này không?');">
-                                                        <input type="hidden" name="id" value="${stop.stopID}">
-                                                        <button type="submit" class="btn btn-sm btn-outline-danger" title="Xóa">
-                                                            <i class="fas fa-trash-alt"></i>
-                                                        </button>
-                                                    </form>
-                                                </td>
+                                                <th>ID</th>
+                                                <th>Tên điểm dừng</th>
+                                                <th>Địa chỉ</th>
+                                                <th>Tọa độ (Lat, Lng)</th>
+                                                <th>Trạng thái</th>
+                                                <th class="text-center">Thao tác</th>
                                             </tr>
-                                        </c:forEach>
-                                        <c:if test="${empty listStops}">
-                                            <tr>
-                                                <td colspan="6" class="text-center text-muted py-4">Không tìm thấy điểm dừng nào phù hợp.</td>
-                                            </tr>
-                                        </c:if>
-                                    </tbody>
-                                </table>
+                                        </thead>
+                                        <tbody>
+                                            <c:forEach items="${listStops}" var="stop">
+                                                <tr>
+                                                    <td class="fw-bold">${stop.stopID}</td>
+                                                    <td>${stop.stopName}</td>
+                                                    <td>${stop.address}</td>
+                                                    <td><small class="text-muted"><i class="fas fa-location-crosshairs me-1"></i>${stop.latitude}, ${stop.longitude}</small></td>
+                                                    <td>
+                                                        <c:choose>
+                                                            <c:when test="${stop.isActive}">
+                                                                <span class="badge bg-success">Hoạt động</span>
+                                                            </c:when>
+                                                            <c:otherwise>
+                                                                <span class="badge bg-secondary">Ngừng hoạt động</span>
+                                                            </c:otherwise>
+                                                        </c:choose>
+                                                    </td>
+                                                    <td class="text-center">
+                                                        <!-- Nút Sửa -->
+                                                        <a href="${pageContext.request.contextPath}/staff/stop/update?id=${stop.stopID}" class="btn btn-sm btn-outline-primary" title="Chỉnh sửa">
+                                                            <i class="fas fa-edit"></i>
+                                                        </a>
+    
+                                                        <!-- Nút Xóa (Dùng form ẩn Method POST) -->
+                                                        <form action="${pageContext.request.contextPath}/staff/stop/delete" method="POST" class="d-inline" onsubmit="return confirm('Bạn có chắc chắn muốn xóa điểm dừng này không?');">
+                                                            <input type="hidden" name="id" value="${stop.stopID}">
+                                                            <button type="submit" class="btn btn-sm btn-outline-danger" title="Xóa">
+                                                                <i class="fas fa-trash-alt"></i>
+                                                            </button>
+                                                        </form>
+                                                    </td>
+                                                </tr>
+                                            </c:forEach>
+                                            <c:if test="${empty listStops}">
+                                                <tr>
+                                                    <td colspan="6" class="text-center text-muted py-4">Không tìm thấy điểm dừng nào phù hợp.</td>
+                                                </tr>
+                                            </c:if>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <%@ include file="../../../common/pagination.jsp" %>
                             </div>
                         </div>
                     </div>

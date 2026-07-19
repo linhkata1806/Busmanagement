@@ -39,9 +39,22 @@ public class RouteListServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        List<Route> routes = routeDAO.getAllActiveRoutes();
+        List<model.Route> allRoutes = routeDAO.getAllActiveRoutes();
+        int page = 1;
+        String pageStr = request.getParameter("page");
+        if (pageStr != null && !pageStr.isEmpty()) {
+            try {
+                page = Integer.parseInt(pageStr);
+            } catch (Exception e) {}
+        }
+        util.Page<model.Route> pageInfo = new util.Page<>(allRoutes, page, allRoutes.size(), 10);
+        int start = (page - 1) * 10;
+        int end = Math.min(start + 10, allRoutes.size());
+        List<model.Route> pagedRoutes = allRoutes.isEmpty() ? allRoutes : allRoutes.subList(start, end);
 
-        request.setAttribute("routes", routes);
+        request.setAttribute("routes", pagedRoutes);
+        request.setAttribute("currentPage", pageInfo.getCurrentPage());
+        request.setAttribute("totalPages", pageInfo.getTotalPages());
 
         request.getRequestDispatcher("view/guest/route-list.jsp")
                 .forward(request, response);

@@ -35,45 +35,48 @@
         </a>
     </div>
 
-    <div class="row g-3" id="favoriteList">
-        <c:choose>
-            <c:when test="${empty favoriteRoutes}">
-                <div class="col-12 text-center py-5 text-muted bg-white rounded-3 shadow-sm" id="emptyState">
-                    <i class="far fa-heart fa-3x mb-3 text-black-50"></i>
-                    <p class="m-0">Bạn chưa có tuyến xe yêu thích nào.</p>
-                </div>
-            </c:when>
-            
-            <c:otherwise>
-                <c:forEach var="route" items="${favoriteRoutes}">
-                    <div class="col-md-6 col-lg-4 route-card" id="route-card-${route.routeID}">
-                        <div class="card h-100 border-0 shadow-sm rounded-3">
-                            <div class="card-body">
-                                <div class="d-flex align-items-center mb-3">
-                                    <span class="badge bg-warning text-dark fs-6 me-2">Tuyến ${route.routeNumber}</span>
-                                </div>
-                                <h5 class="fw-bold text-dark">${route.routeName}</h5>
-                                <p class="text-muted small mb-3">
-                                    <i class="fas fa-clock me-1"></i> ${route.operatingHours}
-                                </p>
-                                <hr class="opacity-25">
-                                <div class="d-flex justify-content-between">
-                                    <a href="${pageContext.request.contextPath}/route-detail?id=${route.routeID}" 
-                                       class="btn btn-sm btn-outline-primary fw-bold">
-                                        <i class="fas fa-info-circle me-1"></i> Xem chi tiết
-                                    </a>
-                                    
-                                    <button class="btn btn-sm btn-light text-danger fw-bold border" 
-                                            onclick="removeFav(${route.routeID})">
-                                        <i class="fas fa-heart-broken me-1"></i> Bỏ yêu thích
-                                    </button>
+    <div class="d-flex flex-column min-vh-100">
+        <div class="row g-3 flex-grow-1" id="favoriteList">
+            <c:choose>
+                <c:when test="${empty favoriteRoutes}">
+                    <div class="col-12 text-center py-5 text-muted bg-white rounded-3 shadow-sm" id="emptyState">
+                        <i class="far fa-heart fa-3x mb-3 text-black-50"></i>
+                        <p class="m-0">Bạn chưa có tuyến xe yêu thích nào.</p>
+                    </div>
+                </c:when>
+                
+                <c:otherwise>
+                    <c:forEach var="route" items="${favoriteRoutes}">
+                        <div class="col-md-6 col-lg-4 route-card" id="route-card-${route.routeID}">
+                            <div class="card h-100 border-0 shadow-sm rounded-3">
+                                <div class="card-body">
+                                    <div class="d-flex align-items-center mb-3">
+                                        <span class="badge bg-warning text-dark fs-6 me-2">Tuyến ${route.routeNumber}</span>
+                                    </div>
+                                    <h5 class="fw-bold text-dark">${route.routeName}</h5>
+                                    <p class="text-muted small mb-3">
+                                        <i class="fas fa-clock me-1"></i> ${route.operatingHours}
+                                    </p>
+                                    <hr class="opacity-25">
+                                    <div class="d-flex justify-content-between">
+                                        <a href="${pageContext.request.contextPath}/route-detail?id=${route.routeID}" 
+                                           class="btn btn-sm btn-outline-primary fw-bold">
+                                            <i class="fas fa-info-circle me-1"></i> Xem chi tiết
+                                        </a>
+                                        
+                                        <button class="btn btn-sm btn-light text-danger fw-bold border" 
+                                                onclick="removeFav(${route.routeID})">
+                                            <i class="fas fa-heart-broken me-1"></i> Bỏ yêu thích
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                </c:forEach>
-            </c:otherwise>
-        </c:choose>
+                    </c:forEach>
+                </c:otherwise>
+            </c:choose>
+        </div>
+        <%@ include file="../../common/pagination.jsp" %>
     </div>
 </div>
 

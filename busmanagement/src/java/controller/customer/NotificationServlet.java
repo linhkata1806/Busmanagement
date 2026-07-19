@@ -71,11 +71,25 @@ public class NotificationServlet extends HttpServlet {
         Account user = (Account) session.getAttribute("USER");
         int accountId = user.getAccountID();
 
-        List<Notification> notiList = notificationService.getByAccount(accountId);
+        List<Notification> allNotis = notificationService.getByAccount(accountId);
         int unreadCount = notificationService.countUnreadNotifications(accountId);
+        
+        int page = 1;
+        String pageStr = request.getParameter("page");
+        if (pageStr != null && !pageStr.isEmpty()) {
+            try {
+                page = Integer.parseInt(pageStr);
+            } catch (Exception e) {}
+        }
+        util.Page<Notification> pageInfo = new util.Page<>(allNotis, page, allNotis.size(), 10);
+        int start = (page - 1) * 10;
+        int end = Math.min(start + 10, allNotis.size());
+        List<Notification> pagedNotis = allNotis.isEmpty() ? allNotis : allNotis.subList(start, end);
 
-        request.setAttribute("notiList", notiList);
+        request.setAttribute("notiList", pagedNotis);
         request.setAttribute("unreadCount", unreadCount);
+        request.setAttribute("currentPage", pageInfo.getCurrentPage());
+        request.setAttribute("totalPages", pageInfo.getTotalPages());
 
         request.getRequestDispatcher("/view/customer/notification.jsp").forward(request, response);
     }

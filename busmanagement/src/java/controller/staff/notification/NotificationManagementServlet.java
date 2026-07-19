@@ -12,6 +12,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import service.NotificationService;
+import java.util.List;
 
 /**
  *
@@ -55,8 +56,26 @@ public class NotificationManagementServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException {
        NotificationService notificationService = new NotificationService();
-       request.setAttribute("notifications", notificationService.getAllNotifications());
-        request.getRequestDispatcher("/view/staff/notification/notification-list.jsp").forward(request, response);
+       List<model.Notification> allNotifications = notificationService.getAllNotifications();
+       
+       int page = 1;
+       String pageStr = request.getParameter("page");
+       if (pageStr != null && !pageStr.isEmpty()) {
+           try {
+               page = Integer.parseInt(pageStr);
+           } catch (Exception e) {}
+       }
+       
+       util.Page<model.Notification> pageInfo = new util.Page<>(allNotifications, page, allNotifications.size(), 10);
+       int start = (page - 1) * 10;
+       int end = Math.min(start + 10, allNotifications.size());
+       List<model.Notification> pagedList = allNotifications.isEmpty() ? allNotifications : allNotifications.subList(start, end);
+       
+       request.setAttribute("notifications", pagedList);
+       request.setAttribute("currentPage", pageInfo.getCurrentPage());
+       request.setAttribute("totalPages", pageInfo.getTotalPages());
+       
+       request.getRequestDispatcher("/view/staff/notification/notification-list.jsp").forward(request, response);
     } 
 
     /** 
