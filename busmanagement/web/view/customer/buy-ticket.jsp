@@ -206,8 +206,8 @@
                                 </div>
 
                                 <div class="mb-3">
-                                    <label class="form-label fw-bold text-secondary small">MÃ HSSV / SỐ CCCD</label>
-                                    <input type="text" name="cardNumber" class="form-control rounded-3" placeholder="Nhập 12 số CCCD định danh..." pattern="[0-9]{12}" maxlength="12" title="Số CCCD phải gồm đúng 12 chữ số" required>
+                                    <label class="form-label fw-bold text-secondary small">SỐ ĐIỆN THOẠI DI ĐỘNG</label>
+                                    <input type="text" name="phoneNumber" value="${USER.phone}" class="form-control rounded-3" placeholder="Nhập số điện thoại..." pattern="(0[3|5|7|8|9])+([0-9]{8})" maxlength="10" title="Số điện thoại phải gồm 10 số hợp lệ tại Việt Nam" required>
                                 </div>
 
                                 <!-- ĐÃ SỬA: Khối Upload Ảnh Chuẩn -->
@@ -254,16 +254,28 @@
                             function toggleProofUpload() {
                                 const select = document.getElementById('passTypeSelect');
                                 const uploadLabel = document.getElementById('proofUploadLabel');
-                                if (!select || !uploadLabel)
-                                    return;
+                                const uploadSection = document.getElementById('proofUploadSection');
+                                const imageInput = document.getElementById('imageProofFile');
+                                const previewContainer = document.getElementById('previewContainer');
+                                if (!select || !uploadSection) return;
 
                                 const val = select.value;
-                                if (val === "1" || val === "2") {
-                                    uploadLabel.textContent = "TẢI ẢNH THẺ HSSV (BẮT BUỘC ĐỂ HƯỞNG ƯU ĐÃI)";
-                                } else if (val === "3") {
-                                    uploadLabel.textContent = "TẢI ẢNH CCCD (BẮT BUỘC ĐỂ HƯỞNG ƯU ĐÃI)";
+                                if (val === "4") {
+                                    uploadSection.classList.add('d-none');
+                                    if (imageInput) imageInput.removeAttribute('required');
+                                    if (previewContainer) previewContainer.classList.add('d-none');
                                 } else {
-                                    uploadLabel.textContent = "TẢI ẢNH CHÂN DUNG HOẶC CCCD (BẮT BUỘC ĐỂ XÁC THỰC NGƯỜI DÙNG)";
+                                    uploadSection.classList.remove('d-none');
+                                    if (imageInput) imageInput.setAttribute('required', 'true');
+                                    if (uploadLabel) {
+                                        if (val === "1" || val === "2") {
+                                            uploadLabel.textContent = "TẢI ẢNH THẺ HSSV (BẮT BUỘC ĐỂ HƯỞNG ƯU ĐÃI)";
+                                        } else if (val === "3") {
+                                            uploadLabel.textContent = "TẢI ẢNH CCCD (BẮT BUỘC ĐỂ HƯỞNG ƯU ĐÃI)";
+                                        } else {
+                                            uploadLabel.textContent = "TẢI ẢNH CHÂN DUNG HOẶC CCCD (BẮT BUỘC ĐỂ XÁC THỰC NGƯỜI DÙNG)";
+                                        }
+                                    }
                                 }
                             }
 

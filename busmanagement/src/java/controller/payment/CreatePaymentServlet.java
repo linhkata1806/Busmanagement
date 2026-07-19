@@ -88,12 +88,21 @@ public class CreatePaymentServlet extends HttpServlet {
         System.out.println("passTypeID request = " + passTypeIDStr);
         int passTypeID = (passTypeIDStr != null && !passTypeIDStr.isEmpty()) ? Integer.parseInt(passTypeIDStr) : 0;
 
+        String phoneNumber = request.getParameter("phoneNumber");
+        if (phoneNumber != null && !phoneNumber.trim().isEmpty() && accountID != null) {
+            dal.AccountDAO accountDAO = new dal.AccountDAO();
+            accountDAO.updatePhone(accountID, phoneNumber.trim());
+            if (user != null) {
+                user.setPhone(phoneNumber.trim()); // update session object
+            }
+        }
+
         String imageProofPath = null;
 
         // Chỉ vé tháng / liên tuyến mới cần ảnh minh chứng. Vé lượt không có
         // input file này trong form nên không được gọi getPart/processAndSaveProof
         // cho loại vé đó (nếu không sẽ luôn bị lỗi "Vui lòng tải lên ảnh minh chứng").
-        if ("thang".equals(ticketType) || "lien_chuyen".equals(ticketType)) {
+        if (("thang".equals(ticketType) || "lien_chuyen".equals(ticketType)) && passTypeID != 4) {
             Part filePart = request.getPart("imageProof");
             String uploadPath = request.getServletContext().getRealPath("")
                     + File.separator + "uploads"
