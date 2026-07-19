@@ -56,6 +56,7 @@ public class RouteManagementServlet extends HttpServlet {
 
         // Xử lý để JSP không bị hiển thị chuỗi "null" vào ô input
 
+
         request.setAttribute("keyword", keyword == null ? "" : keyword);
         request.setAttribute("status", status == null ? "ALL" : status);
         
@@ -82,6 +83,7 @@ public class RouteManagementServlet extends HttpServlet {
         request.setAttribute("routes", pagedList);
         request.setAttribute("currentPage", pageInfo.getCurrentPage());
         request.setAttribute("totalPages", pageInfo.getTotalPages());
+
 
 
         request.getRequestDispatcher("/view/staff/route/route-management.jsp").forward(request, response);
