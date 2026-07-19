@@ -37,7 +37,7 @@ public class MyTripServlet extends HttpServlet {
         request.setAttribute("assignedTrips", assignedTrips);
 
         // Fetch unread notification count for sidebar
-        int unreadCount = notificationService.countUnreadNotifications(driverID);
+        int unreadCount = notificationService.countUnreadByAccountAndRole(driverID, "DRIVER");
         request.setAttribute("unreadCount", unreadCount);
 
         request.getRequestDispatcher("/view/driver/trip/my-trip.jsp").forward(request, response);

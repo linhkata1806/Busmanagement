@@ -33,7 +33,7 @@ public class ChangePasswordServlet extends HttpServlet {
         int accountId = user.getAccountID();
 
         // Fetch unread notification count for sidebar
-        int unreadCount = notificationService.countUnreadNotifications(accountId);
+        int unreadCount = notificationService.countUnreadByAccountAndRole(accountId, "DRIVER");
         request.setAttribute("unreadCount", unreadCount);
 
         request.getRequestDispatcher("/view/driver/change-password.jsp").forward(request, response);

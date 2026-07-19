@@ -90,7 +90,7 @@ public class TripDetailServlet extends HttpServlet {
     // Hàm helper để tránh lặp lại code set Sidebar count và forward
     private void forwardToView(HttpServletRequest request, HttpServletResponse response, int driverID) throws ServletException, IOException {
         try {
-            int unreadCount = notificationService.countUnreadNotifications(driverID);
+            int unreadCount = notificationService.countUnreadByAccountAndRole(driverID, "DRIVER");
             request.setAttribute("unreadCount", unreadCount);
         } catch (Exception e) {
             // Fail-safe cho notification

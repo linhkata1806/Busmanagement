@@ -71,7 +71,7 @@ public class NotificationServlet extends HttpServlet {
         Account user = (Account) session.getAttribute("USER");
         int accountId = user.getAccountID();
 
-        List<Notification> allNotis = notificationService.getByAccount(accountId);
+        List<Notification> allNotis = notificationService.getByAccountAndRole(accountId, "CUSTOMER");
         int unreadCount = notificationService.countUnreadNotifications(accountId);
         
         int page = 1;

@@ -52,7 +52,7 @@
                         <c:choose>
                             <c:when test="${not empty notiList}">
                                 <c:forEach var="n" items="${notiList}">
-                                    <div class="noti-card p-4 ${n.isRead() ? '' : 'unread'}">
+                                    <div class="noti-card p-4 ${n.isRead ? '' : 'unread'}">
                                         <div class="d-flex justify-content-between align-items-start mb-2">
                                             <div>
                                                 <span class="badge bg-secondary mb-2">${n.notificationType}</span>
@@ -61,7 +61,7 @@
                                             <small class="text-secondary fw-semibold">${n.createdAt}</small>
                                         </div>
                                         <p class="text-secondary mb-3">${n.content}</p>
-                                        <c:if test="${not n.isRead()}">
+                                        <c:if test="${not n.isRead}">
                                             <form action="${pageContext.request.contextPath}/driver/notification" method="POST">
                                                 <input type="hidden" name="notificationID" value="${n.notificationID}">
                                                 <button type="submit" class="btn btn-sm btn-outline-primary">

@@ -16,8 +16,8 @@
     <jsp:include page="/common/head_imports.jsp" />
     <style>
         :root {
-            --primary: #0d47a1;
-            --primary-light: #1565c0;
+            --primary: #1a73e8;
+            --primary-dark: #1557b0;
             --accent: #fbbc04;
             --bg-light: #f4f6f9;
         }
@@ -72,19 +72,27 @@
             justify-content: center;
             font-size: 1.1rem;
         }
-
+        /* ===== FOOTER ===== */
         footer {
             background: #1a1a2e;
             color: rgba(255,255,255,0.7);
             padding: 30px 0;
             margin-top: 60px;
         }
-        footer a {
-            color: rgba(255,255,255,0.7);
-            text-decoration: none;
-        }
-        footer a:hover {
+        footer a { color: rgba(255,255,255,0.7); text-decoration: none; }
+        footer a:hover { color: white; }
+
+        /* PAGE HEADER */
+        .page-header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            padding: 20px 0;
             color: white;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+        .page-header h3 {
+            font-size: 1.45rem;
+            letter-spacing: -0.3px;
         }
     </style>
 </head>
@@ -93,18 +101,28 @@
     <!-- ===== HEADER NAVIGATION ===== -->
     <jsp:include page="/common/navbar.jsp" />
 
-    <div class="container my-5" style="max-width: 850px; min-height: 700px;">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h4 class="fw-bold text-dark m-0">
-                <i class="fas fa-bell text-warning me-2"></i>Trung tâm thông báo
-                <c:if test="${unreadCount > 0}">
-                    <span class="badge bg-danger rounded-pill fs-6 ms-2" id="unreadBadge">${unreadCount} mới</span>
-                </c:if>
-            </h4>
-            <a href="${pageContext.request.contextPath}/customer/profile" class="btn btn-light rounded-pill px-4 fw-bold text-dark shadow-sm">
-                <i class="fas fa-arrow-left me-2"></i>Quay lại
-            </a>
+    <div class="page-header">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-6 text-center text-md-start mb-3 mb-md-0">
+                    <h3 class="fw-bold m-0">
+                        <i class="fas fa-bell text-warning me-2"></i>Trung tâm thông báo
+                        <c:if test="${unreadCount > 0}">
+                            <span class="badge bg-danger rounded-pill fs-6 ms-2" id="unreadBadge">${unreadCount} mới</span>
+                        </c:if>
+                    </h3>
+                </div>
+                <div class="col-md-6 text-center text-md-end">
+                    <a href="${pageContext.request.contextPath}/customer/profile" class="btn btn-light rounded-pill px-4 fw-bold text-dark shadow-sm">
+                        <i class="fas fa-arrow-left me-2"></i>Quay lại
+                    </a>
+                </div>
+            </div>
         </div>
+    </div>
+
+    <div class="container my-5 flex-grow-1" style="max-width: 850px; min-height: 700px;">
+
 
         <div class="card border-0 shadow-sm rounded-3 overflow-hidden d-flex flex-column h-100">
             <div class="list-group list-group-flush flex-grow-1" id="notiContainer">
@@ -185,7 +203,6 @@
 
 
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
     <script>
         function executeAction(notiId, action) {
             if (action === 'delete' && !confirm("Bạn có chắc muốn xóa vĩnh viễn thông báo này?")) {

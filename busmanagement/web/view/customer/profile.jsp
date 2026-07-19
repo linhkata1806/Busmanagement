@@ -12,8 +12,8 @@
 
     <style>
         :root {
-            --primary: #0d47a1;
-            --primary-light: #1565c0;
+            --primary: #1a73e8;
+            --primary-dark: #1557b0;
             --accent: #fbbc04;
             --bg-light: #f4f6f9;
         }
@@ -37,7 +37,7 @@
 
         /* ===== HERO BANNER ===== */
         .hero {
-            background: var(--primary);
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
             padding: 40px 0 100px;
             color: white;
             text-align: center;
@@ -245,7 +245,7 @@
                         <h5 class="fw-bold text-dark mb-0"><i class="fas fa-user-shield me-2 text-primary"></i>Thông tin tài khoản</h5>
                         <div class="d-flex gap-2">
                             <a href="${pageContext.request.contextPath}/customer/changePassword" class="btn btn-sm btn-outline-secondary"><i class="fas fa-key me-1"></i> Đổi mật khẩu</a>
-                            <a href="${pageContext.request.contextPath}/customer/editProfile" class="btn btn-sm btn-primary" style="background-color: var(--primary-light);"><i class="fas fa-edit me-1"></i> Sửa thông tin</a>
+                            <a href="${pageContext.request.contextPath}/customer/editProfile" class="btn btn-sm btn-primary" style="background-color: var(--primary);"><i class="fas fa-edit me-1"></i> Sửa thông tin</a>
                         </div>
                     </div>
                     <div class="table-responsive">

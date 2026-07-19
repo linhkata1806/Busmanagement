@@ -220,6 +220,14 @@ public class AuthFilter implements Filter {
             } catch (Exception e) {
                 System.out.println("Error setting unreadCount in AuthFilter for Assistant: " + e.getMessage());
             }
+        } else if ("DRIVER".equals(role)) {
+            try {
+                service.NotificationService notiService = new service.NotificationService();
+                int unreadCount = notiService.countUnreadByAccountAndRole(user.getAccountID(), "DRIVER");
+                req.setAttribute("unreadCount", unreadCount);
+            } catch (Exception e) {
+                System.out.println("Error setting unreadCount in AuthFilter for Driver: " + e.getMessage());
+            }
         } else if ("CUSTOMER".equals(role)) {
             try {
                 service.NotificationService notiService = new service.NotificationService();

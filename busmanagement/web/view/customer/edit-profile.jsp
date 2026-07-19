@@ -17,8 +17,8 @@
 
     <style>
         :root {
-            --primary: #0d47a1;
-            --primary-light: #1565c0;
+            --primary: #1a73e8;
+            --primary-dark: #1557b0;
             --accent: #fbbc04;
             --bg-light: #f4f6f9;
         }
@@ -42,7 +42,7 @@
 
         /* ===== HERO BANNER ===== */
         .hero { 
-            background: var(--primary); 
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%); 
             padding: 40px 0 100px; 
             color: white; 
             text-align: center; 
