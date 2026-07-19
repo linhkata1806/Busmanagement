@@ -198,6 +198,18 @@ public class AccountDAO extends DBContext {
         return false;
     }
 
+    public boolean updatePhone(int accountID, String phone) {
+        String sql = "UPDATE Accounts SET Phone = ?, UpdatedAt = GETDATE() WHERE AccountID = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, phone);
+            ps.setInt(2, accountID);
+            return ps.executeUpdate() > 0;
+        } catch (Exception e) {
+            System.out.println("Lỗi tại updatePhone: " + e.getMessage());
+        }
+        return false;
+    }
+
     public Account getAccountById(int accountID) {
         // Đã ghép lệnh JOIN để lấy được cả RoleName
         String sql = "SELECT a.*, r.RoleName "
