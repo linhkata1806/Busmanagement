@@ -140,47 +140,50 @@
     <c:choose>
         <%-- TRƯỜNG HỢP CÓ DỮ LIỆU --%>
         <c:when test="${not empty routes}">
-            <div class="table-container table-responsive">
-                <table class="table custom-table">
-                    <thead>
-                        <tr>
-                            <th scope="col" style="width: 12%">Số tuyến</th>
-                            <th scope="col" style="width: 25%">Tên tuyến</th>
-                            <th scope="col" style="width: 28%">Lộ trình điểm đầu &rarr; cuối</th>
-                            <th scope="col" style="width: 15%"><i class="far fa-clock me-1"></i>Giờ chạy</th>
-                            <th scope="col" style="width: 10%"><i class="fas fa-tag me-1"></i>Giá vé</th>
-                            <th scope="col" class="text-center" style="width: 10%">Hành động</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <c:forEach var="r" items="${routes}">
+            <div class="table-container table-responsive d-flex flex-column h-100">
+                <div class="flex-grow-1">
+                    <table class="table custom-table" style="min-width: 900px;">
+                        <thead>
                             <tr>
-                                <td>
-                                    <span class="route-number-badge">Tuyến ${r.routeNumber}</span>
-                                </td>
-                                <td>
-                                    <span class="fw-bold text-dark">${r.routeName}</span>
-                                </td>
-                                <td>
-                                    <small class="text-muted d-block">
-                                        <strong>${r.startPoint}</strong> <i class="fas fa-long-arrow-alt-right mx-1 text-secondary"></i> <strong>${r.endPoint}</strong>
-                                    </small>
-                                </td>
-                                <td><small class="fw-medium">${r.operatingHours}</small></td>
-                                <td>
-                                    <span class="fw-bold text-success">
-                                        <fmt:formatNumber value="${r.ticketPrice}" pattern="#,###"/>đ
-                                    </span>
-                                </td>
-                                <td class="text-center">
-                                    <a href="route-detail?id=${r.routeID}" class="btn-detail">
-                                        Xem <i class="fas fa-chevron-right ms-1" style="font-size: 0.8rem;"></i>
-                                    </a>
-                                </td>
+                                <th scope="col" style="width: 12%">Số tuyến</th>
+                                <th scope="col" style="width: 25%">Tên tuyến</th>
+                                <th scope="col" style="width: 28%">Lộ trình điểm đầu &rarr; cuối</th>
+                                <th scope="col" style="width: 15%"><i class="far fa-clock me-1"></i>Giờ chạy</th>
+                                <th scope="col" style="width: 10%"><i class="fas fa-tag me-1"></i>Giá vé</th>
+                                <th scope="col" class="text-center" style="width: 10%">Hành động</th>
                             </tr>
-                        </c:forEach>
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            <c:forEach var="r" items="${routes}">
+                                <tr>
+                                    <td>
+                                        <span class="route-number-badge">Tuyến ${r.routeNumber}</span>
+                                    </td>
+                                    <td>
+                                        <span class="fw-bold text-dark">${r.routeName}</span>
+                                    </td>
+                                    <td>
+                                        <small class="text-muted d-block">
+                                            <strong>${r.startPoint}</strong> <i class="fas fa-long-arrow-alt-right mx-1 text-secondary"></i> <strong>${r.endPoint}</strong>
+                                        </small>
+                                    </td>
+                                    <td><small class="fw-medium">${r.operatingHours}</small></td>
+                                    <td>
+                                        <span class="fw-bold text-success">
+                                            <fmt:formatNumber value="${r.ticketPrice}" pattern="#,###"/>đ
+                                        </span>
+                                    </td>
+                                    <td class="text-center">
+                                        <a href="route-detail?id=${r.routeID}" class="btn-detail">
+                                            Xem <i class="fas fa-chevron-right ms-1" style="font-size: 0.8rem;"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                            </c:forEach>
+                        </tbody>
+                    </table>
+                </div>
+                <%@ include file="../../common/pagination.jsp" %>
             </div>
         </c:when>
         

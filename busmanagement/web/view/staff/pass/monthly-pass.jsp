@@ -137,87 +137,90 @@
 
                     <div class="card border-0 shadow-sm rounded-4 bg-white">
                         <div class="card-body p-0">
-                            <div class="table-responsive">
-                                <table class="table table-hover table-striped align-middle mb-0">
-                                    <thead class="table-dark">
-                                        <tr>
-                                            <th class="ps-4 py-3">Mã vé</th>
-                                            <th class="py-3">Khách hàng</th>
-                                            <th class="py-3">Loại tuyến xe</th>
-                                            <th class="py-3">Thời gian hạn dùng</th>
-                                            <th class="py-3">Trạng thái</th>
-                                            <th class="text-center pe-4 py-3">Hành động xử lý</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <c:choose>
-                                            <c:when test="${empty passList}">
-                                                <tr>
-                                                    <td colspan="6" class="text-center py-5 text-muted">
-                                                        <div class="py-4">
-                                                            <i class="fas fa-folder-open fa-3x mb-3 text-black-50 d-block"></i>
-                                                            <span class="fw-semibold d-block fs-6">Không tìm thấy hồ sơ nào!</span>
-                                                            <small class="text-secondary">Hệ thống trống hoặc bộ lọc tìm kiếm của bạn không có kết quả phù hợp.</small>
-                                                        </div>
-                                                    </td>
-                                                </tr>
-                                            </c:when>
-                                            <c:otherwise>
-                                                <c:forEach var="p" items="${passList}">
+                            <div class="table-responsive d-flex flex-column h-100" style="min-height: 500px;">
+                                <div class="flex-grow-1">
+                                    <table class="table table-hover table-striped align-middle mb-0" style="min-width: 900px;">
+                                        <thead class="table-dark">
+                                            <tr>
+                                                <th class="ps-4 py-3">Mã vé</th>
+                                                <th class="py-3">Khách hàng</th>
+                                                <th class="py-3">Loại tuyến xe</th>
+                                                <th class="py-3">Thời gian hạn dùng</th>
+                                                <th class="py-3">Trạng thái</th>
+                                                <th class="text-center pe-4 py-3">Hành động xử lý</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <c:choose>
+                                                <c:when test="${empty passList}">
                                                     <tr>
-                                                        <td class="ps-4 fw-bold text-primary">#${p.passCode}</td>
-
-                                                        <td>
-                                                            <div class="fw-semibold text-dark">${p.fullName}</div>
-                                                            <small class="text-muted text-xs">Mã TK: ${p.accountID}</small>
-                                                        </td>
-
-                                                        <td>
-                                                            <span class="badge bg-light text-dark border px-2 py-1 mb-1 d-inline-block fw-medium">${p.typeName}</span>
-                                                            <div class="small text-secondary">
-                                                                <c:choose>
-                                                                    <c:when test="${empty p.routeNumber}">
-                                                                        <i class="fas fa-globe text-success me-1" style="font-size: 0.75rem;"></i>Liên tuyến toàn mạng lưới
-                                                                    </c:when>
-                                                                    <c:otherwise>
-                                                                        <i class="fas fa-map-marker-alt text-primary me-1" style="font-size: 0.75rem;"></i>Tuyến đơn: Số ${p.routeNumber}
-                                                                    </c:otherwise>
-                                                                </c:choose>
+                                                        <td colspan="6" class="text-center py-5 text-muted">
+                                                            <div class="py-4">
+                                                                <i class="fas fa-folder-open fa-3x mb-3 text-black-50 d-block"></i>
+                                                                <span class="fw-semibold d-block fs-6">Không tìm thấy hồ sơ nào!</span>
+                                                                <small class="text-secondary">Hệ thống trống hoặc bộ lọc tìm kiếm của bạn không có kết quả phù hợp.</small>
                                                             </div>
                                                         </td>
-
-                                                        <td class="small text-secondary">
-                                                            <div>Từ: <span class="text-dark fw-medium">${p.startDate}</span></div>
-                                                            <div>Đến: <span class="text-dark fw-medium">${p.endDate}</span></div>
-                                                        </td>
-
-                                                        <td>
-                                                            <c:choose>
-                                                                <c:when test="${p.status eq 'PENDING'}">
-                                                                    <span class="badge bg-warning text-dark px-2 py-1.5"><i class="fas fa-clock me-1"></i>Chờ duyệt</span>
-                                                                </c:when>
-                                                                <c:when test="${p.status eq 'APPROVED'}">
-                                                                    <span class="badge bg-success px-2 py-1.5"><i class="fas fa-check-circle me-1"></i>Đã duyệt</span>
-                                                                </c:when>
-                                                                <c:otherwise>
-                                                                    <span class="badge bg-danger px-2 py-1.5"><i class="fas fa-times-circle me-1"></i>Bị từ chối</span>
-                                                                </c:otherwise>
-                                                            </c:choose>
-                                                        </td>
-
-                                                        <!-- ĐÃ SỬA: Gom lại thành 1 nút duy nhất -->
-                                                        <td class="text-center pe-4">
-                                                            <button type="button" class="btn btn-outline-primary btn-sm px-3" title="Xem chi tiết hồ sơ"
-                                                                    onclick="showDetailModal('${p.passID}', '${p.passCode}', '${p.fullName}', '${p.email}', '${p.phone}', '${pageContext.request.contextPath}/${p.imageProof}', '${p.status}')">
-                                                                <i class="fas fa-eye me-1"></i> View Detail
-                                                            </button>
-                                                        </td>
                                                     </tr>
-                                                </c:forEach>
-                                            </c:otherwise>
-                                        </c:choose>
-                                    </tbody>
-                                </table>
+                                                </c:when>
+                                                <c:otherwise>
+                                                    <c:forEach var="p" items="${passList}">
+                                                        <tr>
+                                                            <td class="ps-4 fw-bold text-primary">#${p.passCode}</td>
+    
+                                                            <td>
+                                                                <div class="fw-semibold text-dark">${p.fullName}</div>
+                                                                <small class="text-muted text-xs">Mã TK: ${p.accountID}</small>
+                                                            </td>
+    
+                                                            <td>
+                                                                <span class="badge bg-light text-dark border px-2 py-1 mb-1 d-inline-block fw-medium">${p.typeName}</span>
+                                                                <div class="small text-secondary">
+                                                                    <c:choose>
+                                                                        <c:when test="${empty p.routeNumber}">
+                                                                            <i class="fas fa-globe text-success me-1" style="font-size: 0.75rem;"></i>Liên tuyến toàn mạng lưới
+                                                                        </c:when>
+                                                                        <c:otherwise>
+                                                                            <i class="fas fa-map-marker-alt text-primary me-1" style="font-size: 0.75rem;"></i>Tuyến đơn: Số ${p.routeNumber}
+                                                                        </c:otherwise>
+                                                                    </c:choose>
+                                                                </div>
+                                                            </td>
+    
+                                                            <td class="small text-secondary">
+                                                                <div>Từ: <span class="text-dark fw-medium">${p.startDate}</span></div>
+                                                                <div>Đến: <span class="text-dark fw-medium">${p.endDate}</span></div>
+                                                            </td>
+    
+                                                            <td>
+                                                                <c:choose>
+                                                                    <c:when test="${p.status eq 'PENDING'}">
+                                                                        <span class="badge bg-warning text-dark px-2 py-1.5"><i class="fas fa-clock me-1"></i>Chờ duyệt</span>
+                                                                    </c:when>
+                                                                    <c:when test="${p.status eq 'APPROVED'}">
+                                                                        <span class="badge bg-success px-2 py-1.5"><i class="fas fa-check-circle me-1"></i>Đã duyệt</span>
+                                                                    </c:when>
+                                                                    <c:otherwise>
+                                                                        <span class="badge bg-danger px-2 py-1.5"><i class="fas fa-times-circle me-1"></i>Bị từ chối</span>
+                                                                    </c:otherwise>
+                                                                </c:choose>
+                                                            </td>
+    
+                                                            <!-- ĐÃ SỬA: Gom lại thành 1 nút duy nhất -->
+                                                            <td class="text-center pe-4">
+                                                                <button type="button" class="btn btn-outline-primary btn-sm px-3" title="Xem chi tiết hồ sơ"
+                                                                        onclick="showDetailModal('${p.passID}', '${p.passCode}', '${p.fullName}', '${p.email}', '${p.phone}', '${pageContext.request.contextPath}/${p.imageProof}', '${p.status}')">
+                                                                    <i class="fas fa-eye me-1"></i> View Detail
+                                                                </button>
+                                                            </td>
+                                                        </tr>
+                                                    </c:forEach>
+                                                </c:otherwise>
+                                            </c:choose>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <%@ include file="../../../common/pagination.jsp" %>
                             </div>
                         </div>
                     </div>

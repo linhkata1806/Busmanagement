@@ -120,76 +120,79 @@
 
                     <div class="card border-0 shadow-sm rounded-4 bg-white overflow-hidden">
                         <div class="card-body p-0">
-                            <div class="table-responsive">
-                                <table class="table table-hover table-striped align-middle mb-0">
-                                    <thead class="table-dark">
-                                        <tr>
-                                            <th class="ps-4">ID</th>
-                                            <th>Biển số xe</th>
-                                            <th>Loại phương tiện</th>
-                                            <th>Sức chứa</th>
-                                            <th class="text-center">Trạng thái</th>
-                                            <th class="text-center">Thao tác</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <c:choose>
-                                            <c:when test="${empty buses}">
-                                                <tr>
-                                                    <td colspan="6" class="text-center py-5 text-muted">
-                                                        <i class="fas fa-bus fa-3x mb-3 d-block text-black-50"></i>
-                                                        <h6 class="fw-bold">Không tìm thấy phương tiện</h6>
-                                                        <p class="small m-0">Không có xe buýt nào khớp với điều kiện tìm kiếm.</p>
-                                                    </td>
-                                                </tr>
-                                            </c:when>
-                                            <c:otherwise>
-                                                <c:forEach var="b" items="${buses}">
+                            <div class="table-responsive d-flex flex-column h-100" style="min-height: 500px;">
+                                <div class="flex-grow-1">
+                                    <table class="table table-hover table-striped align-middle mb-0" style="min-width: 900px;">
+                                        <thead class="table-dark">
+                                            <tr>
+                                                <th class="ps-4">ID</th>
+                                                <th>Biển số xe</th>
+                                                <th>Loại phương tiện</th>
+                                                <th>Sức chứa</th>
+                                                <th class="text-center">Trạng thái</th>
+                                                <th class="text-center">Thao tác</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <c:choose>
+                                                <c:when test="${empty buses}">
                                                     <tr>
-                                                        <td class="ps-4 text-secondary fw-semibold">#${b.busID}</td>
-                                                        <td>
-                                                            <a href="${pageContext.request.contextPath}/staff/bus/update?id=${b.busID}" class="text-decoration-none">
-                                                                <span class="badge bg-primary fs-6 px-3 py-2 shadow-sm" style="cursor: pointer;">${b.licensePlate}</span>
-                                                            </a>
-                                                        </td>
-                                                        <td class="fw-bold text-dark">
-                                                            <a href="${pageContext.request.contextPath}/staff/bus/update?id=${b.busID}" class="text-decoration-none text-dark hover-primary">
-                                                                ${b.busType}
-                                                            </a>
-                                                        </td>
-                                                        <td><i class="fas fa-users text-secondary me-2"></i>${b.capacity} chỗ</td>
-                                                        <td class="text-center">
-                                                            <c:choose>
-                                                                <c:when test="${b.status eq 'ACTIVE'}">
-                                                                    <span class="badge bg-success bg-opacity-10 text-success border border-success px-2 py-1"><i class="fas fa-check-circle me-1"></i>ACTIVE</span>
-                                                                </c:when>
-                                                                <c:when test="${b.status eq 'MAINTENANCE'}">
-                                                                    <span class="badge bg-warning bg-opacity-10 text-warning border border-warning px-2 py-1"><i class="fas fa-tools me-1"></i>MAINTENANCE</span>
-                                                                </c:when>
-                                                                <c:otherwise>
-                                                                    <span class="badge bg-secondary bg-opacity-10 text-secondary border border-secondary px-2 py-1"><i class="fas fa-ban me-1"></i>RETIRED</span>
-                                                                </c:otherwise>
-                                                            </c:choose>
-                                                        </td>
-                                                        <td class="text-center">
-                                                            <div class="d-inline-flex gap-2">
-                                                                <a href="${pageContext.request.contextPath}/staff/bus/update?id=${b.busID}" class="btn btn-sm btn-outline-primary shadow-sm" title="Hồ sơ chi tiết">
-                                                                    <i class="fas fa-edit"></i>
-                                                                </a>
-                                                                <form action="${pageContext.request.contextPath}/staff/bus/delete" method="POST" class="m-0" onsubmit="return confirm('CẢNH BÁO: Xác nhận xóa/ngừng sử dụng xe ${b.licensePlate}?')">
-                                                                    <input type="hidden" name="id" value="${b.busID}">
-                                                                    <button type="submit" class="btn btn-sm btn-outline-danger shadow-sm" title="Xóa xe">
-                                                                        <i class="fas fa-trash-alt"></i>
-                                                                    </button>
-                                                                </form>
-                                                            </div>
+                                                        <td colspan="6" class="text-center py-5 text-muted">
+                                                            <i class="fas fa-bus fa-3x mb-3 d-block text-black-50"></i>
+                                                            <h6 class="fw-bold">Không tìm thấy phương tiện</h6>
+                                                            <p class="small m-0">Không có xe buýt nào khớp với điều kiện tìm kiếm.</p>
                                                         </td>
                                                     </tr>
-                                                </c:forEach>
-                                            </c:otherwise>
-                                        </c:choose>
-                                    </tbody>
-                                </table>
+                                                </c:when>
+                                                <c:otherwise>
+                                                    <c:forEach var="b" items="${buses}">
+                                                        <tr>
+                                                            <td class="ps-4 text-secondary fw-semibold">#${b.busID}</td>
+                                                            <td>
+                                                                <a href="${pageContext.request.contextPath}/staff/bus/update?id=${b.busID}" class="text-decoration-none">
+                                                                    <span class="badge bg-primary fs-6 px-3 py-2 shadow-sm" style="cursor: pointer;">${b.licensePlate}</span>
+                                                                </a>
+                                                            </td>
+                                                            <td class="fw-bold text-dark">
+                                                                <a href="${pageContext.request.contextPath}/staff/bus/update?id=${b.busID}" class="text-decoration-none text-dark hover-primary">
+                                                                    ${b.busType}
+                                                                </a>
+                                                            </td>
+                                                            <td><i class="fas fa-users text-secondary me-2"></i>${b.capacity} chỗ</td>
+                                                            <td class="text-center">
+                                                                <c:choose>
+                                                                    <c:when test="${b.status eq 'ACTIVE'}">
+                                                                        <span class="badge bg-success bg-opacity-10 text-success border border-success px-2 py-1"><i class="fas fa-check-circle me-1"></i>ACTIVE</span>
+                                                                    </c:when>
+                                                                    <c:when test="${b.status eq 'MAINTENANCE'}">
+                                                                        <span class="badge bg-warning bg-opacity-10 text-warning border border-warning px-2 py-1"><i class="fas fa-tools me-1"></i>MAINTENANCE</span>
+                                                                    </c:when>
+                                                                    <c:otherwise>
+                                                                        <span class="badge bg-secondary bg-opacity-10 text-secondary border border-secondary px-2 py-1"><i class="fas fa-ban me-1"></i>RETIRED</span>
+                                                                    </c:otherwise>
+                                                                </c:choose>
+                                                            </td>
+                                                            <td class="text-center">
+                                                                <div class="d-inline-flex gap-2">
+                                                                    <a href="${pageContext.request.contextPath}/staff/bus/update?id=${b.busID}" class="btn btn-sm btn-outline-primary shadow-sm" title="Hồ sơ chi tiết">
+                                                                        <i class="fas fa-edit"></i>
+                                                                    </a>
+                                                                    <form action="${pageContext.request.contextPath}/staff/bus/delete" method="POST" class="m-0" onsubmit="return confirm('CẢNH BÁO: Xác nhận xóa/ngừng sử dụng xe ${b.licensePlate}?')">
+                                                                        <input type="hidden" name="id" value="${b.busID}">
+                                                                        <button type="submit" class="btn btn-sm btn-outline-danger shadow-sm" title="Xóa xe">
+                                                                            <i class="fas fa-trash-alt"></i>
+                                                                        </button>
+                                                                    </form>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                    </c:forEach>
+                                                </c:otherwise>
+                                            </c:choose>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <%@ include file="../../../common/pagination.jsp" %>
                             </div>
                         </div>
                     </div>

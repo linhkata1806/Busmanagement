@@ -96,72 +96,75 @@
                     <!-- BẢNG DANH SÁCH TUYẾN XE -->
                     <div class="card border-0 shadow-sm rounded-4 bg-white">
                         <div class="card-body p-0">
-                            <div class="table-responsive">
-                                <table class="table table-hover table-striped mb-0 align-middle">
-                                    <thead class="table-dark">
-                                        <tr>
-                                            <th>ID</th>
-                                            <th>Mã tuyến</th>
-                                            <th>Tên tuyến (Lộ trình)</th>
-                                            <th>Thời gian HĐ</th>
-                                            <th>Trạng thái</th>
-                                            <th class="text-center">Thao tác</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <c:forEach items="${routes}" var="route">
+                            <div class="table-responsive d-flex flex-column h-100" style="min-height: 500px;">
+                                <div class="flex-grow-1">
+                                    <table class="table table-hover table-striped mb-0 align-middle" style="min-width: 900px;">
+                                        <thead class="table-dark">
                                             <tr>
-                                                <td class="fw-bold">${route.routeID}</td>
-                                                <td><span class="badge bg-secondary">${route.routeNumber}</span></td>
-                                                <td class="fw-bold text-primary">${route.routeName}</td>
-
-                                                <!-- ĐÃ SỬA THÀNH operatingHours CHO KHỚP VỚI MODEL ROUTE -->
-                                                <td><small class="text-muted"><i class="far fa-clock me-1"></i>${route.operatingHours}</small></td>
-
-                                                <td>
-                                                    <c:choose>
-                                                        <c:when test="${route.isActive}">
-                                                            <span class="badge bg-success">Hoạt động</span>
-                                                        </c:when>
-                                                        <c:otherwise>
-                                                            <span class="badge bg-danger">Ngừng HĐ</span>
-                                                        </c:otherwise>
-                                                    </c:choose>
-                                                </td>
-                                                <td class="text-center">
-
-                                                    <!-- NÚT QUẢN LÝ TRẠM (CHUYỂN SANG ROUTE STOP) -->
-                                                    <a href="${pageContext.request.contextPath}/staff/route-stop?routeId=${route.routeID}" 
-                                                       class="btn btn-sm btn-info text-white me-1" title="Quản lý trạm dừng">
-                                                        <i class="fas fa-map-signs"></i> Quản lý trạm
-                                                    </a>
-
-                                                    <!-- Nút Sửa -->
-                                                    <a href="${pageContext.request.contextPath}/staff/route/update?id=${route.routeID}" 
-                                                       class="btn btn-sm btn-outline-primary me-1" title="Chỉnh sửa tuyến">
-                                                        <i class="fas fa-edit"></i>
-                                                    </a>
-
-                                                    <!-- Nút Xóa (Dùng form ẩn Method POST) -->
-                                                    <form action="${pageContext.request.contextPath}/staff/route/delete" method="POST" class="d-inline" 
-                                                          onsubmit="return confirm('Bạn có chắc chắn muốn xóa tuyến xe này không?');">
-                                                        <input type="hidden" name="id" value="${route.routeID}">
-                                                        <button type="submit" class="btn btn-sm btn-outline-danger" title="Xóa tuyến">
-                                                            <i class="fas fa-trash-alt"></i>
-                                                        </button>
-                                                    </form>
-
-                                                </td>
+                                                <th>ID</th>
+                                                <th>Mã tuyến</th>
+                                                <th>Tên tuyến (Lộ trình)</th>
+                                                <th>Thời gian HĐ</th>
+                                                <th>Trạng thái</th>
+                                                <th class="text-center">Thao tác</th>
                                             </tr>
-                                        </c:forEach>
-
-                                        <c:if test="${empty routes}">
-                                            <tr>
-                                                <td colspan="6" class="text-center text-muted py-4">Không tìm thấy tuyến xe nào phù hợp.</td>
-                                            </tr>
-                                        </c:if>
-                                    </tbody>
-                                </table>
+                                        </thead>
+                                        <tbody>
+                                            <c:forEach items="${routes}" var="route">
+                                                <tr>
+                                                    <td class="fw-bold">${route.routeID}</td>
+                                                    <td><span class="badge bg-secondary">${route.routeNumber}</span></td>
+                                                    <td class="fw-bold text-primary">${route.routeName}</td>
+    
+                                                    <!-- ĐÃ SỬA THÀNH operatingHours CHO KHỚP VỚI MODEL ROUTE -->
+                                                    <td><small class="text-muted"><i class="far fa-clock me-1"></i>${route.operatingHours}</small></td>
+    
+                                                    <td>
+                                                        <c:choose>
+                                                            <c:when test="${route.isActive}">
+                                                                <span class="badge bg-success">Hoạt động</span>
+                                                            </c:when>
+                                                            <c:otherwise>
+                                                                <span class="badge bg-danger">Ngừng HĐ</span>
+                                                            </c:otherwise>
+                                                        </c:choose>
+                                                    </td>
+                                                    <td class="text-center">
+    
+                                                        <!-- NÚT QUẢN LÝ TRẠM (CHUYỂN SANG ROUTE STOP) -->
+                                                        <a href="${pageContext.request.contextPath}/staff/route-stop?routeId=${route.routeID}" 
+                                                           class="btn btn-sm btn-info text-white me-1" title="Quản lý trạm dừng">
+                                                            <i class="fas fa-map-signs"></i> Quản lý trạm
+                                                        </a>
+    
+                                                        <!-- Nút Sửa -->
+                                                        <a href="${pageContext.request.contextPath}/staff/route/update?id=${route.routeID}" 
+                                                           class="btn btn-sm btn-outline-primary me-1" title="Chỉnh sửa tuyến">
+                                                            <i class="fas fa-edit"></i>
+                                                        </a>
+    
+                                                        <!-- Nút Xóa (Dùng form ẩn Method POST) -->
+                                                        <form action="${pageContext.request.contextPath}/staff/route/delete" method="POST" class="d-inline" 
+                                                              onsubmit="return confirm('Bạn có chắc chắn muốn xóa tuyến xe này không?');">
+                                                            <input type="hidden" name="id" value="${route.routeID}">
+                                                            <button type="submit" class="btn btn-sm btn-outline-danger" title="Xóa tuyến">
+                                                                <i class="fas fa-trash-alt"></i>
+                                                            </button>
+                                                        </form>
+    
+                                                    </td>
+                                                </tr>
+                                            </c:forEach>
+    
+                                            <c:if test="${empty routes}">
+                                                <tr>
+                                                    <td colspan="6" class="text-center text-muted py-4">Không tìm thấy tuyến xe nào phù hợp.</td>
+                                                </tr>
+                                            </c:if>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <%@ include file="../../../common/pagination.jsp" %>
                             </div>
                         </div>
                     </div>

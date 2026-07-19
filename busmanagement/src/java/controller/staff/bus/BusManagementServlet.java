@@ -78,7 +78,29 @@ public class BusManagementServlet extends HttpServlet {
         request.setAttribute("status",
                 status == null ? "ALL" : status.trim().toUpperCase());
 
-        request.setAttribute("buses", buses);
+        StringBuilder qs = new StringBuilder();
+        if (keyword != null && !keyword.isEmpty()) qs.append("keyword=").append(keyword).append("&");
+        if (status != null && !status.isEmpty()) qs.append("status=").append(status).append("&");
+        if (qs.length() > 0) {
+            qs.deleteCharAt(qs.length() - 1);
+            request.setAttribute("queryString", qs.toString());
+        }
+
+        int page = 1;
+        String pageStr = request.getParameter("page");
+        if (pageStr != null && !pageStr.isEmpty()) {
+            try {
+                page = Integer.parseInt(pageStr);
+            } catch (Exception e) {}
+        }
+        util.Page<Bus> pageInfo = new util.Page<>(buses, page, buses.size(), 10);
+        int start = (page - 1) * 10;
+        int end = Math.min(start + 10, buses.size());
+        List<Bus> pagedList = buses.isEmpty() ? buses : buses.subList(start, end);
+
+        request.setAttribute("buses", pagedList);
+        request.setAttribute("currentPage", pageInfo.getCurrentPage());
+        request.setAttribute("totalPages", pageInfo.getTotalPages());
 
         request.getRequestDispatcher("/view/staff/bus/bus-management.jsp")
                 .forward(request, response);

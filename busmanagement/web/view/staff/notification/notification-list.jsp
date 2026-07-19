@@ -82,69 +82,72 @@
 
                     <div class="card border-0 shadow-sm rounded-4 bg-white">
                         <div class="card-body p-0">
-                            <div class="table-responsive">
-                                <table class="table table-hover table-striped align-middle mb-0">
-                                    <thead class="table-dark">
-                                        <tr>
-                                            <th class="ps-4">ID</th>
-                                            <th>Người nhận</th>
-                                            <th>Loại</th>
-                                            <th>Tiêu đề</th>
-                                            <th>Nội dung</th>
-                                            <th>Ngày tạo</th>
-                                            <th class="text-center">Hành động</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <c:choose>
-                                            <c:when test="${empty notifications}">
-                                                <tr>
-                                                    <td colspan="7" class="text-center py-5 text-muted">
-                                                        <i class="fas fa-bullhorn fa-2x mb-2 d-block text-black-50"></i>
-                                                        Chưa có thông báo nào được phát hành.
-                                                    </td>
-                                                </tr>
-                                            </c:when>
-                                            <c:otherwise>
-                                                <c:forEach var="n" items="${notifications}">
+                            <div class="table-responsive d-flex flex-column h-100" style="min-height: 500px;">
+                                <div class="flex-grow-1">
+                                    <table class="table table-hover table-striped align-middle mb-0" style="min-width: 900px;">
+                                        <thead class="table-dark">
+                                            <tr>
+                                                <th class="ps-4">ID</th>
+                                                <th>Người nhận</th>
+                                                <th>Loại</th>
+                                                <th>Tiêu đề</th>
+                                                <th>Nội dung</th>
+                                                <th>Ngày tạo</th>
+                                                <th class="text-center">Hành động</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <c:choose>
+                                                <c:when test="${empty notifications}">
                                                     <tr>
-                                                        <td class="ps-4 text-secondary">#${n.notificationID}</td>
-                                                        <td><span class="badge bg-dark">Mã TK: ${n.accountID}</span></td>
-                                                        <td>
-                                                             <c:choose>
-                                                                 <c:when test="${n.notificationType.name() eq 'SYSTEM_ALERT' || n.notificationType.name() eq 'SYSTEM_MAINTENANCE'}">
-                                                                     <span class="badge bg-primary">${n.notificationType}</span>
-                                                                 </c:when>
-                                                                 <c:when test="${n.notificationType.name() eq 'ROUTE_DELAY'}">
-                                                                     <span class="badge bg-danger">${n.notificationType}</span>
-                                                                 </c:when>
-                                                                 <c:otherwise>
-                                                                     <span class="badge bg-secondary">${n.notificationType}</span>
-                                                                 </c:otherwise>
-                                                             </c:choose>
-                                                        </td>
-                                                        <td class="fw-semibold text-dark">${n.title}</td>
-                                                        <td class="text-muted small text-truncate" style="max-width: 200px;">${n.content}</td>
-                                                        <td class="small text-secondary">${n.createdAt}</td>
-                                                        <td class="text-center">
-                                                            <div class="d-inline-flex gap-2">
-                                                                <a href="${pageContext.request.contextPath}/staff/notification/edit?id=${n.notificationID}" class="btn btn-sm btn-outline-primary px-2.5">
-                                                                    <i class="fas fa-edit me-1"></i>Sửa
-                                                                </a>
-                                                                <form action="${pageContext.request.contextPath}/staff/notification/delete" method="POST" class="m-0" onsubmit="return confirm('Bạn chắc chắn muốn XÓA thông báo này?')">
-                                                                    <input type="hidden" name="id" value="${n.notificationID}">
-                                                                    <button type="submit" class="btn btn-sm btn-outline-danger px-2.5">
-                                                                        <i class="fas fa-trash-alt me-1"></i>Xóa
-                                                                    </button>
-                                                                </form>
-                                                            </div>
+                                                        <td colspan="7" class="text-center py-5 text-muted">
+                                                            <i class="fas fa-bullhorn fa-2x mb-2 d-block text-black-50"></i>
+                                                            Chưa có thông báo nào được phát hành.
                                                         </td>
                                                     </tr>
-                                                </c:forEach>
-                                            </c:otherwise>
-                                        </c:choose>
-                                    </tbody>
-                                </table>
+                                                </c:when>
+                                                <c:otherwise>
+                                                    <c:forEach var="n" items="${notifications}">
+                                                        <tr>
+                                                            <td class="ps-4 text-secondary">#${n.notificationID}</td>
+                                                            <td><span class="badge bg-dark">Mã TK: ${n.accountID}</span></td>
+                                                            <td>
+                                                                 <c:choose>
+                                                                     <c:when test="${n.notificationType.name() eq 'SYSTEM_ALERT' || n.notificationType.name() eq 'SYSTEM_MAINTENANCE'}">
+                                                                         <span class="badge bg-primary">${n.notificationType}</span>
+                                                                     </c:when>
+                                                                     <c:when test="${n.notificationType.name() eq 'ROUTE_DELAY'}">
+                                                                         <span class="badge bg-danger">${n.notificationType}</span>
+                                                                     </c:when>
+                                                                     <c:otherwise>
+                                                                         <span class="badge bg-secondary">${n.notificationType}</span>
+                                                                     </c:otherwise>
+                                                                 </c:choose>
+                                                            </td>
+                                                            <td class="fw-semibold text-dark">${n.title}</td>
+                                                            <td class="text-muted small text-truncate" style="max-width: 200px;">${n.content}</td>
+                                                            <td class="small text-secondary">${n.createdAt}</td>
+                                                            <td class="text-center">
+                                                                <div class="d-inline-flex gap-2">
+                                                                    <a href="${pageContext.request.contextPath}/staff/notification/edit?id=${n.notificationID}" class="btn btn-sm btn-outline-primary px-2.5">
+                                                                        <i class="fas fa-edit me-1"></i>Sửa
+                                                                    </a>
+                                                                    <form action="${pageContext.request.contextPath}/staff/notification/delete" method="POST" class="m-0" onsubmit="return confirm('Bạn chắc chắn muốn XÓA thông báo này?')">
+                                                                        <input type="hidden" name="id" value="${n.notificationID}">
+                                                                        <button type="submit" class="btn btn-sm btn-outline-danger px-2.5">
+                                                                            <i class="fas fa-trash-alt me-1"></i>Xóa
+                                                                        </button>
+                                                                    </form>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                    </c:forEach>
+                                                </c:otherwise>
+                                            </c:choose>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <%@ include file="../../../common/pagination.jsp" %>
                             </div>
                         </div>
                     </div>

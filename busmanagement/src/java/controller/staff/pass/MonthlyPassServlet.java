@@ -79,10 +79,33 @@ public class MonthlyPassServlet extends HttpServlet {
         //lay so luong badge hien thi
         int pendingCount = monthlyPassService.countPendingPasses();
         
-        request.setAttribute("passList", passList);
         request.setAttribute("currentStatus", statusFilter);
         request.setAttribute("searchQuery", searchQuery);
         request.setAttribute("pendingPasses", pendingCount);
+
+        StringBuilder qs = new StringBuilder();
+        if (statusFilter != null && !statusFilter.isEmpty()) qs.append("status=").append(statusFilter).append("&");
+        if (searchQuery != null && !searchQuery.isEmpty()) qs.append("search=").append(searchQuery).append("&");
+        if (qs.length() > 0) {
+            qs.deleteCharAt(qs.length() - 1);
+            request.setAttribute("queryString", qs.toString());
+        }
+
+        int page = 1;
+        String pageStr = request.getParameter("page");
+        if (pageStr != null && !pageStr.isEmpty()) {
+            try {
+                page = Integer.parseInt(pageStr);
+            } catch (Exception e) {}
+        }
+        util.Page<MonthlyPassDTO> pageInfo = new util.Page<>(passList, page, passList.size(), 10);
+        int start = (page - 1) * 10;
+        int end = Math.min(start + 10, passList.size());
+        List<MonthlyPassDTO> pagedList = passList.isEmpty() ? passList : passList.subList(start, end);
+
+        request.setAttribute("passList", pagedList);
+        request.setAttribute("currentPage", pageInfo.getCurrentPage());
+        request.setAttribute("totalPages", pageInfo.getTotalPages());
 
         request.getRequestDispatcher("/view/staff/pass/monthly-pass.jsp").forward(request, response);
     } 

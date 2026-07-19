@@ -30,8 +30,8 @@ public class NotificationServlet extends HttpServlet {
         Account user = (Account) session.getAttribute("USER");
         int accountId = user.getAccountID();
 
-        List<Notification> notiList = notificationService.getByAccount(accountId);
-        int unreadCount = notificationService.countUnreadNotifications(accountId);
+        List<Notification> notiList = notificationService.getByAccountAndRole(accountId, "DRIVER");
+        int unreadCount = notificationService.countUnreadByAccountAndRole(accountId, "DRIVER");
 
         request.setAttribute("notiList", notiList);
         request.setAttribute("unreadCount", unreadCount);

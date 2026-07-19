@@ -51,7 +51,7 @@ public class DriverDashboardService {
         stats.put("todaysTrips", todaysTrips);
 
         // 3. Đếm số thông báo chưa đọc
-        int pendingNotifications = notificationDAO.countUnreadNotifications(driverID);
+        int pendingNotifications = notificationDAO.countUnreadByAccountAndRole(driverID, "DRIVER");
         stats.put("pendingNotifications", pendingNotifications);
 
         return stats;

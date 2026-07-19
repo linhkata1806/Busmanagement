@@ -29,12 +29,33 @@ public class StopManagementServlet extends HttpServlet {
         // 2. Gọi Service để lấy dữ liệu
         List<Stop> listStops = stopService.searchAndFilter(keyword, status);
 
-        // 3. Đẩy dữ liệu ra view
-        request.setAttribute("listStops", listStops);
-        
         // Giữ lại trạng thái tìm kiếm trên giao diện
         request.setAttribute("search", keyword);
         request.setAttribute("status", status);
+
+        StringBuilder qs = new StringBuilder();
+        if (keyword != null && !keyword.isEmpty()) qs.append("search=").append(keyword).append("&");
+        if (status != null && !status.isEmpty()) qs.append("status=").append(status).append("&");
+        if (qs.length() > 0) {
+            qs.deleteCharAt(qs.length() - 1);
+            request.setAttribute("queryString", qs.toString());
+        }
+
+        int page = 1;
+        String pageStr = request.getParameter("page");
+        if (pageStr != null && !pageStr.isEmpty()) {
+            try {
+                page = Integer.parseInt(pageStr);
+            } catch (Exception e) {}
+        }
+        util.Page<Stop> pageInfo = new util.Page<>(listStops, page, listStops.size(), 10);
+        int start = (page - 1) * 10;
+        int end = Math.min(start + 10, listStops.size());
+        List<Stop> pagedList = listStops.isEmpty() ? listStops : listStops.subList(start, end);
+
+        request.setAttribute("listStops", pagedList);
+        request.setAttribute("currentPage", pageInfo.getCurrentPage());
+        request.setAttribute("totalPages", pageInfo.getTotalPages());
 
         // 4. Chuyển hướng sang trang JSP
         request.getRequestDispatcher("/view/staff/stop/stop-management.jsp").forward(request, response);

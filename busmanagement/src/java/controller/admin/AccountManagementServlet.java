@@ -50,11 +50,34 @@ public class AccountManagementServlet extends HttpServlet {
             // Giữ lại từ khóa trên ô tìm kiếm
             request.setAttribute("searchKeyword", keyword);
             request.setAttribute("selectedRole", role);
+            
+            StringBuilder qs = new StringBuilder();
+            if (keyword != null && !keyword.isEmpty()) qs.append("search=").append(keyword).append("&");
+            if (role != null && !role.isEmpty()) qs.append("role=").append(role).append("&");
+            if (qs.length() > 0) {
+                qs.deleteCharAt(qs.length() - 1);
+                request.setAttribute("queryString", qs.toString());
+            }
         } else {
             accountList = accountService.getAllAccounts();
         }
 
-        request.setAttribute("accountList", accountList);
+        int page = 1;
+        String pageStr = request.getParameter("page");
+        if (pageStr != null && !pageStr.isEmpty()) {
+            try {
+                page = Integer.parseInt(pageStr);
+            } catch (Exception e) {}
+        }
+        util.Page<Account> pageInfo = new util.Page<>(accountList, page, accountList.size(), 10);
+        int start = (page - 1) * 10;
+        int end = Math.min(start + 10, accountList.size());
+        List<Account> pagedList = accountList.isEmpty() ? accountList : accountList.subList(start, end);
+
+        request.setAttribute("accountList", pagedList);
+        request.setAttribute("currentPage", pageInfo.getCurrentPage());
+        request.setAttribute("totalPages", pageInfo.getTotalPages());
+        
         request.getRequestDispatcher("/view/admin/account-management.jsp").forward(request, response);
     }
 

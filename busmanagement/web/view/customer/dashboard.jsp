@@ -19,8 +19,8 @@
 
     <style>
         :root {
-            --primary: #0d47a1; /* Màu xanh đậm chuẩn giống hình */
-            --primary-light: #1565c0;
+            --primary: #1a73e8; /* Màu xanh đậm chuẩn giống hình */
+            --primary-dark: #1557b0;
             --accent: #fbbc04;
             --bg-light: #f4f6f9;
         }
@@ -49,7 +49,7 @@
 
         /* ===== HERO / BANNER XANH ĐẬM ===== */
         .hero {
-            background: var(--primary);
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
             padding: 40px 0 100px; /* Padding dưới dài ra để chứa thẻ overlap */
             color: white;
             text-align: center;

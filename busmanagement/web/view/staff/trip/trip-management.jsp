@@ -136,97 +136,100 @@
 
                     <div class="card border-0 shadow-sm rounded-4 bg-white">
                         <div class="card-body p-0">
-                            <div class="table-responsive">
-                                <table class="table table-hover table-striped align-middle mb-0">
-                                    <thead class="table-dark">
-                                        <tr>
-                                            <th class="ps-4">Mã Chuyến</th>
-                                            <th>Thông tin Tuyến</th>
-                                            <th>Phương tiện</th>
-                                            <th>Nhân sự phụ trách</th>
-                                            <th>Lịch trình</th>
-                                            <th class="text-center">Chiều chạy</th>
-                                            <th class="text-center">Trạng thái</th>
-                                            <th class="text-center">Thao tác</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <c:choose>
-                                            <c:when test="${empty trips}">
-                                                <tr>
-                                                    <td colspan="8" class="text-center py-5 text-muted">
-                                                        <i class="fas fa-folder-open fa-3x mb-3 d-block text-black-50"></i>
-                                                        <h6 class="fw-bold">Không tìm thấy dữ liệu</h6>
-                                                        <p class="small m-0">Không có chuyến xe nào khớp với điều kiện tìm kiếm của bạn.</p>
-                                                    </td>
-                                                </tr>
-                                            </c:when>
-                                            <c:otherwise>
-                                                <c:forEach var="t" items="${trips}">
+                            <div class="table-responsive d-flex flex-column h-100" style="min-height: 500px;">
+                                <div class="flex-grow-1">
+                                    <table class="table table-hover table-striped align-middle mb-0" style="min-width: 900px;">
+                                        <thead class="table-dark">
+                                            <tr>
+                                                <th class="ps-4">Mã Chuyến</th>
+                                                <th>Thông tin Tuyến</th>
+                                                <th>Phương tiện</th>
+                                                <th>Nhân sự phụ trách</th>
+                                                <th>Lịch trình</th>
+                                                <th class="text-center">Chiều chạy</th>
+                                                <th class="text-center">Trạng thái</th>
+                                                <th class="text-center">Thao tác</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <c:choose>
+                                                <c:when test="${empty trips}">
                                                     <tr>
-                                                        <td class="ps-4 fw-bold text-primary">#${t.tripID}</td>
-                                                        <td>
-                                                            <span class="badge bg-light text-dark border px-2 py-1 fw-bold mb-1 d-inline-block">Tuyến ${t.routeNumber}</span>
-                                                            <div class="small text-muted text-truncate" style="max-width: 180px;" title="${t.routeName}">${t.routeName}</div>
-                                                        </td>
-                                                        <td class="fw-bold text-dark">
-                                                            <i class="fas fa-bus text-secondary me-1"></i>${t.busPlate}
-                                                        </td>
-                                                        <td>
-                                                            <div class="fw-semibold"><i class="fas fa-steering-wheel text-primary me-2"></i>${t.driverName}</div>
-                                                            <div class="small text-secondary mt-1">
-                                                                <i class="fas fa-user-friends me-1"></i>
-                                                                <c:choose>
-                                                                    <c:when test="${empty t.assistantName}"><i>Không có phụ xe</i></c:when>
-                                                                    <c:otherwise>${t.assistantName}</c:otherwise>
-                                                                </c:choose>
-                                                            </div>
-                                                        </td>
-                                                        <td class="small">
-                                                            <div class="fw-bold text-dark mb-1"><i class="far fa-calendar-alt me-1"></i>${t.tripDate}</div>
-                                                            <div class="text-muted fw-semibold"><i class="far fa-clock me-1"></i>${t.startTime} <i class="fas fa-long-arrow-alt-right mx-1"></i> ${t.endTime}</div>
-                                                            <c:if test="${not empty t.actualStartTime}">
-                                                                <div class="text-success fw-semibold mt-1" style="font-size: 0.8rem;"><i class="fas fa-play me-1"></i>Thực tế chạy: ${t.actualStartTime}</div>
-                                                            </c:if>
-                                                            <c:if test="${not empty t.actualEndTime}">
-                                                                <div class="text-secondary fw-semibold mt-1" style="font-size: 0.8rem;"><i class="fas fa-flag-checkered me-1"></i>Kết thúc: ${t.actualEndTime}</div>
-                                                            </c:if>
-                                                        </td>
-                                                        <td class="text-center">
-                                                            <c:choose>
-                                                                <c:when test="${t.direction == 1}"><span class="badge text-success bg-success bg-opacity-10 px-2 py-1"><i class="fas fa-arrow-right me-1"></i>Lượt đi</span></c:when>
-                                                                <c:otherwise><span class="badge text-warning bg-warning bg-opacity-10 px-2 py-1"><i class="fas fa-arrow-left me-1"></i>Lượt về</span></c:otherwise>
-                                                            </c:choose>
-                                                        </td>
-                                                        <td class="text-center">
-                                                            <c:choose>
-                                                                <c:when test="${t.status eq 'SCHEDULED'}"><span class="badge bg-primary px-2 py-1">SCHEDULED</span></c:when>
-                                                                <c:when test="${t.status eq 'IN_PROGRESS'}"><span class="badge bg-warning text-dark px-2 py-1">IN_PROGRESS</span></c:when>
-                                                                <c:when test="${t.status eq 'COMPLETED'}"><span class="badge bg-secondary px-2 py-1">COMPLETED</span></c:when>
-                                                                <c:otherwise><span class="badge bg-danger px-2 py-1">CANCELLED</span></c:otherwise>
-                                                            </c:choose>
-                                                        </td>
-                                                        <td class="text-center">
-                                                            <div class="d-inline-flex gap-2">
-                                                                <a href="${pageContext.request.contextPath}/staff/trip/update?id=${t.tripID}" class="btn btn-sm btn-outline-primary shadow-sm" title="Sửa lịch trình">
-                                                                    <i class="fas fa-edit"></i>
-                                                                </a>
-                                                                <c:if test="${t.status eq 'SCHEDULED'}">
-                                                                    <form action="${pageContext.request.contextPath}/staff/trip/delete" method="POST" class="m-0" onsubmit="return confirm('CẢNH BÁO: Xác nhận XÓA chuyến xe #${t.tripID} ra khỏi hệ thống?')">
-                                                                        <input type="hidden" name="id" value="${t.tripID}">
-                                                                        <button type="submit" class="btn btn-sm btn-outline-danger shadow-sm" title="Xóa chuyến">
-                                                                            <i class="fas fa-trash-alt"></i>
-                                                                        </button>
-                                                                    </form>
-                                                                </c:if>
-                                                            </div>
+                                                        <td colspan="8" class="text-center py-5 text-muted">
+                                                            <i class="fas fa-folder-open fa-3x mb-3 d-block text-black-50"></i>
+                                                            <h6 class="fw-bold">Không tìm thấy dữ liệu</h6>
+                                                            <p class="small m-0">Không có chuyến xe nào khớp với điều kiện tìm kiếm của bạn.</p>
                                                         </td>
                                                     </tr>
-                                                </c:forEach>
-                                            </c:otherwise>
-                                        </c:choose>
-                                    </tbody>
-                                </table>
+                                                </c:when>
+                                                <c:otherwise>
+                                                    <c:forEach var="t" items="${trips}">
+                                                        <tr>
+                                                            <td class="ps-4 fw-bold text-primary">#${t.tripID}</td>
+                                                            <td>
+                                                                <span class="badge bg-light text-dark border px-2 py-1 fw-bold mb-1 d-inline-block">Tuyến ${t.routeNumber}</span>
+                                                                <div class="small text-muted text-truncate" style="max-width: 180px;" title="${t.routeName}">${t.routeName}</div>
+                                                            </td>
+                                                            <td class="fw-bold text-dark">
+                                                                <i class="fas fa-bus text-secondary me-1"></i>${t.busPlate}
+                                                            </td>
+                                                            <td>
+                                                                <div class="fw-semibold"><i class="fas fa-steering-wheel text-primary me-2"></i>${t.driverName}</div>
+                                                                <div class="small text-secondary mt-1">
+                                                                    <i class="fas fa-user-friends me-1"></i>
+                                                                    <c:choose>
+                                                                        <c:when test="${empty t.assistantName}"><i>Không có phụ xe</i></c:when>
+                                                                        <c:otherwise>${t.assistantName}</c:otherwise>
+                                                                    </c:choose>
+                                                                </div>
+                                                            </td>
+                                                            <td class="small">
+                                                                <div class="fw-bold text-dark mb-1"><i class="far fa-calendar-alt me-1"></i>${t.tripDate}</div>
+                                                                <div class="text-muted fw-semibold"><i class="far fa-clock me-1"></i>${t.startTime} <i class="fas fa-long-arrow-alt-right mx-1"></i> ${t.endTime}</div>
+                                                                <c:if test="${not empty t.actualStartTime}">
+                                                                    <div class="text-success fw-semibold mt-1" style="font-size: 0.8rem;"><i class="fas fa-play me-1"></i>Thực tế chạy: ${t.actualStartTime}</div>
+                                                                </c:if>
+                                                                <c:if test="${not empty t.actualEndTime}">
+                                                                    <div class="text-secondary fw-semibold mt-1" style="font-size: 0.8rem;"><i class="fas fa-flag-checkered me-1"></i>Kết thúc: ${t.actualEndTime}</div>
+                                                                </c:if>
+                                                            </td>
+                                                            <td class="text-center">
+                                                                <c:choose>
+                                                                    <c:when test="${t.direction == 1}"><span class="badge text-success bg-success bg-opacity-10 px-2 py-1"><i class="fas fa-arrow-right me-1"></i>Lượt đi</span></c:when>
+                                                                    <c:otherwise><span class="badge text-warning bg-warning bg-opacity-10 px-2 py-1"><i class="fas fa-arrow-left me-1"></i>Lượt về</span></c:otherwise>
+                                                                </c:choose>
+                                                            </td>
+                                                            <td class="text-center">
+                                                                <c:choose>
+                                                                    <c:when test="${t.status eq 'SCHEDULED'}"><span class="badge bg-primary px-2 py-1">SCHEDULED</span></c:when>
+                                                                    <c:when test="${t.status eq 'IN_PROGRESS'}"><span class="badge bg-warning text-dark px-2 py-1">IN_PROGRESS</span></c:when>
+                                                                    <c:when test="${t.status eq 'COMPLETED'}"><span class="badge bg-secondary px-2 py-1">COMPLETED</span></c:when>
+                                                                    <c:otherwise><span class="badge bg-danger px-2 py-1">CANCELLED</span></c:otherwise>
+                                                                </c:choose>
+                                                            </td>
+                                                            <td class="text-center">
+                                                                <div class="d-inline-flex gap-2">
+                                                                    <a href="${pageContext.request.contextPath}/staff/trip/update?id=${t.tripID}" class="btn btn-sm btn-outline-primary shadow-sm" title="Sửa lịch trình">
+                                                                        <i class="fas fa-edit"></i>
+                                                                    </a>
+                                                                    <c:if test="${t.status eq 'SCHEDULED'}">
+                                                                        <form action="${pageContext.request.contextPath}/staff/trip/delete" method="POST" class="m-0" onsubmit="return confirm('CẢNH BÁO: Xác nhận XÓA chuyến xe #${t.tripID} ra khỏi hệ thống?')">
+                                                                            <input type="hidden" name="id" value="${t.tripID}">
+                                                                            <button type="submit" class="btn btn-sm btn-outline-danger shadow-sm" title="Xóa chuyến">
+                                                                                <i class="fas fa-trash-alt"></i>
+                                                                            </button>
+                                                                        </form>
+                                                                    </c:if>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                    </c:forEach>
+                                                </c:otherwise>
+                                            </c:choose>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <%@ include file="../../../common/pagination.jsp" %>
                             </div>
                         </div>
                     </div>

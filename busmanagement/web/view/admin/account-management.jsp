@@ -86,76 +86,79 @@
 
             <div class="card border-0 shadow-sm rounded-4 bg-white">
                 <div class="card-body p-0">
-                    <div class="table-responsive">
-                        <table class="table table-hover table-striped align-middle mb-0">
-                            <thead class="table-dark">
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Username</th>
-                                    <th>Họ tên</th>
-                                    <th>Email</th>
-                                    <th>Quyền</th>
-                                    <th>Trạng thái</th>
-                                    <th class="text-center">Thao tác</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <c:forEach items="${accountList}" var="a">
+                    <div class="table-responsive d-flex flex-column h-100" style="min-height: 500px;">
+                        <div class="flex-grow-1">
+                            <table class="table table-hover table-striped align-middle mb-0" style="min-width: 900px;">
+                                <thead class="table-dark">
                                     <tr>
-                                        <td>${a.accountID}</td>
-                                        <td class="fw-bold">${a.username}</td>
-                                        <td>${a.fullName}</td>
-                                        <td>${a.email}</td>
-                                        <td><span class="badge bg-info text-dark">${a.roleName}</span></td>
-                                        <td>
-                                            <c:choose>
-                                                <c:when test="${a.active}">
-                                                    <span class="badge bg-success">Hoạt động</span>
-                                                </c:when>
-                                                <c:otherwise>
-                                                    <span class="badge bg-danger">Đã khóa</span>
-                                                </c:otherwise>
-                                            </c:choose>
-                                        </td>
-                                        <td class="text-center">
-                                            <a href="${pageContext.request.contextPath}/admin/account/update?id=${a.accountID}" class="btn btn-sm btn-outline-primary" title="Sửa thông tin">
-                                                <i class="fas fa-edit"></i>
-                                            </a>
-                                            
-                                            <form action="${pageContext.request.contextPath}/admin/accounts" method="POST" class="d-inline">
-                                                <input type="hidden" name="id" value="${a.accountID}">
+                                        <th>ID</th>
+                                        <th>Username</th>
+                                        <th>Họ tên</th>
+                                        <th>Email</th>
+                                        <th>Quyền</th>
+                                        <th>Trạng thái</th>
+                                        <th class="text-center">Thao tác</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <c:forEach items="${accountList}" var="a">
+                                        <tr>
+                                            <td>${a.accountID}</td>
+                                            <td class="fw-bold">${a.username}</td>
+                                            <td>${a.fullName}</td>
+                                            <td>${a.email}</td>
+                                            <td><span class="badge bg-info text-dark">${a.roleName}</span></td>
+                                            <td>
                                                 <c:choose>
                                                     <c:when test="${a.active}">
-                                                        <button name="action" value="lock" class="btn btn-sm btn-outline-danger" title="Khóa tài khoản" onclick="return confirm('Bạn có chắc chắn muốn KHÓA tài khoản ${a.username}?')">
-                                                            <i class="fas fa-lock"></i>
-                                                        </button>
+                                                        <span class="badge bg-success">Hoạt động</span>
                                                     </c:when>
                                                     <c:otherwise>
-                                                        <button name="action" value="unlock" class="btn btn-sm btn-outline-success" title="Mở khóa tài khoản">
-                                                            <i class="fas fa-unlock"></i>
-                                                        </button>
+                                                        <span class="badge bg-danger">Đã khóa</span>
                                                     </c:otherwise>
                                                 </c:choose>
-                                            </form>
-        
-                                            <form action="${pageContext.request.contextPath}/admin/account/reset-password" method="POST" class="d-inline" onsubmit="return confirm('Reset mật khẩu của ${a.username} về mặc định (Bus@Year)?')">
-                                                <input type="hidden" name="id" value="${a.accountID}">
-                                                <button type="submit" class="btn btn-sm btn-outline-warning" title="Reset mật khẩu">
-                                                    <i class="fas fa-key"></i>
-                                                </button>
-                                            </form>
-                                        </td>
-                                    </tr>
-                                </c:forEach>
-                            </tbody>
-                        </table>
-                        
-                        <c:if test="${empty accountList}">
-                            <div class="text-center py-5 text-muted">
-                                <i class="fas fa-search fa-3x mb-3 text-black-50"></i>
-                                <p class="mb-0">Không tìm thấy tài khoản nào khớp với điều kiện lọc.</p>
-                            </div>
-                        </c:if>
+                                            </td>
+                                            <td class="text-center">
+                                                <a href="${pageContext.request.contextPath}/admin/account/update?id=${a.accountID}" class="btn btn-sm btn-outline-primary" title="Sửa thông tin">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
+                                                
+                                                <form action="${pageContext.request.contextPath}/admin/accounts" method="POST" class="d-inline">
+                                                    <input type="hidden" name="id" value="${a.accountID}">
+                                                    <c:choose>
+                                                        <c:when test="${a.active}">
+                                                            <button name="action" value="lock" class="btn btn-sm btn-outline-danger" title="Khóa tài khoản" onclick="return confirm('Bạn có chắc chắn muốn KHÓA tài khoản ${a.username}?')">
+                                                                <i class="fas fa-lock"></i>
+                                                            </button>
+                                                        </c:when>
+                                                        <c:otherwise>
+                                                            <button name="action" value="unlock" class="btn btn-sm btn-outline-success" title="Mở khóa tài khoản">
+                                                                <i class="fas fa-unlock"></i>
+                                                            </button>
+                                                        </c:otherwise>
+                                                    </c:choose>
+                                                </form>
+            
+                                                <form action="${pageContext.request.contextPath}/admin/account/reset-password" method="POST" class="d-inline" onsubmit="return confirm('Reset mật khẩu của ${a.username} về mặc định (Bus@Year)?')">
+                                                    <input type="hidden" name="id" value="${a.accountID}">
+                                                    <button type="submit" class="btn btn-sm btn-outline-warning" title="Reset mật khẩu">
+                                                        <i class="fas fa-key"></i>
+                                                    </button>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                    </c:forEach>
+                                </tbody>
+                            </table>
+                            
+                            <c:if test="${empty accountList}">
+                                <div class="text-center py-5 text-muted">
+                                    <i class="fas fa-search fa-3x mb-3 text-black-50"></i>
+                                    <p class="mb-0">Không tìm thấy tài khoản nào khớp với điều kiện lọc.</p>
+                                </div>
+                            </c:if>
+                        </div>
+                        <%@ include file="../../common/pagination.jsp" %>
                     </div>
                 </div>
             </div>
