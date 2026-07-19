@@ -60,7 +60,6 @@
                             <div>
                                 <h2 class="fw-bold text-dark m-0">Báo cáo Doanh thu</h2>
                             </div>
-                            <button class="btn btn-outline-primary shadow-sm"><i class="fas fa-download me-2"></i>Xuất báo cáo Excel</button>
                         </div>
 
                         <form action="${pageContext.request.contextPath}/admin/revenue-report" method="GET" class="filter-bar mb-4">
@@ -77,9 +76,16 @@
                             <div class="col-md-4">
                                 <label class="form-label text-muted fw-bold fs-7">Phân loại theo Tuyến</label>
                                 <select name="routeId" class="form-select shadow-none">
-                                    <option value="ALL" ${selectedRoute == 'ALL' || empty selectedRoute ? 'selected' : ''}>Tất cả các tuyến</option>
+                                    <option value="ALL"
+                                            ${empty selectedRouteId ? 'selected' : ''}>
+                                        Tất cả các tuyến
+                                    </option>
+
                                     <c:forEach items="${routes}" var="r">
-                                        <option value="${r.routeID}" ${selectedRoute == ''.concat(r.routeID) ? 'selected' : ''}>Tuyến ${r.routeNumber}: ${r.routeName}</option>
+                                        <option value="${r.routeID}"
+                                                ${selectedRouteId == r.routeID ? 'selected' : ''}>
+                                            Tuyến ${r.routeNumber}: ${r.routeName}
+                                        </option>
                                     </c:forEach>
                                 </select>
                             </div>
@@ -105,7 +111,7 @@
                                 <h2 class="fw-bold mb-0">
                                     <fmt:formatNumber value="${not empty totalTicket ? totalTicket : 0}" pattern="#,##0" /> <span class="fs-5">VNĐ</span>
                                 </h2>
-                                <div class="mt-2 text-white-50 fs-7"><i class="fas fa-ticket-alt me-1"></i> Vé đã được sử dụng</div>
+                                <div class="mt-2 text-white-50 fs-7"><i class="fas fa-ticket-alt me-1"></i> Giao dịch thanh toán thành công</div>
                             </div>
                         </div>
                         <div class="col-md-4">
@@ -114,7 +120,24 @@
                                 <h2 class="fw-bold mb-0">
                                     <fmt:formatNumber value="${not empty totalPass ? totalPass : 0}" pattern="#,##0" /> <span class="fs-5">VNĐ</span>
                                 </h2>
-                                <div class="mt-2 text-white-50 fs-7"><i class="fas fa-calendar-check me-1"></i> Hồ sơ hợp lệ</div>
+                                <div class="mt-2 text-white-50 fs-7">
+                                    <i class="fas fa-calendar-check me-1"></i>
+
+                                    Một tuyến:
+                                    <fmt:formatNumber
+                                        value="${not empty totalRoutePass ? totalRoutePass : 0}"
+                                        pattern="#,##0" />
+                                    đ
+
+                                    &nbsp;|&nbsp;
+
+                                    Liên tuyến:
+                                    <fmt:formatNumber
+                                        value="${not empty totalInterRoutePass
+                                                 ? totalInterRoutePass : 0}"
+                                        pattern="#,##0" />
+                                    đ
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -203,18 +226,51 @@
             });
 
             // Lấy trực tiếp tổng doanh thu từ Servlet để vẽ biểu đồ tròn
-            const valTicket = ${not empty totalTicket ? totalTicket : 0};
-            const valPass = ${not empty totalPass ? totalPass : 0};
+            const valTicket =
+            ${not empty totalTicket ? totalTicket : 0};
+
+            const valRoutePass =
+            ${not empty totalRoutePass ? totalRoutePass : 0};
+
+            const valInterRoutePass =
+            ${not empty totalInterRoutePass
+              ? totalInterRoutePass : 0};
+
+            const totalRevenue =
+                    valTicket + valRoutePass + valInterRoutePass;
+
+            const hasRevenue = totalRevenue > 0;
 
             // 2. BIỂU ĐỒ TRÒN (Tỷ trọng nguồn thu)
             const propCtx = document.getElementById('proportionChart').getContext('2d');
             new Chart(propCtx, {
                 type: 'doughnut',
                 data: {
-                    labels: ['Vé Lẻ', 'Vé Tháng'],
+                    labels: hasRevenue
+                            ? [
+                                'Vé Lẻ',
+                                'Vé tháng một tuyến',
+                                'Vé tháng liên tuyến'
+                            ]
+                            : ['Chưa có dữ liệu'],
+
                     datasets: [{
-                            data: (valTicket === 0 && valPass === 0) ? [1] : [valTicket, valPass],
-                            backgroundColor: (valTicket === 0 && valPass === 0) ? ['#e2e8f0'] : ['#3b82f6', '#10b981'],
+                            data: hasRevenue
+                                    ? [
+                                        valTicket,
+                                        valRoutePass,
+                                        valInterRoutePass
+                                    ]
+                                    : [1],
+
+                            backgroundColor: hasRevenue
+                                    ? [
+                                        '#3b82f6',
+                                        '#10b981',
+                                        '#f59e0b'
+                                    ]
+                                    : ['#e2e8f0'],
+
                             borderWidth: 0
                         }]
                 },
@@ -224,17 +280,22 @@
                     cutout: '75%',
                     plugins: {
                         legend: {position: 'bottom'},
-                        tooltip: {
-                            callbacks: {
-                                label: function (context) {
-                                    if (valTicket === 0 && valPass === 0)
-                                        return 'Chưa có giao dịch';
-                                    let value = context.parsed;
-                                    let total = valTicket + valPass;
-                                    let percentage = Math.round((value / total) * 100);
-                                    return context.label + ': ' + value.toLocaleString('vi-VN') + ' đ (' + percentage + '%)';
-                                }
+                        label: function (context) {
+                            if (!hasRevenue) {
+                                return 'Chưa có giao dịch';
                             }
+
+                            const value = context.parsed;
+
+                            const percentage =
+                                    Math.round((value / totalRevenue) * 100);
+
+                            return context.label
+                                    + ': '
+                                    + value.toLocaleString('vi-VN')
+                                    + ' đ ('
+                                    + percentage
+                                    + '%)';
                         }
                     }
                 }

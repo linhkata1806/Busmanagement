@@ -19,33 +19,19 @@ public class RevenueReportServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        // 1. Đọc tham số lọc từ request
+        // 1. Đọc và xử lý tham số thời gian
         String period = request.getParameter("period");
+        period = period == null ? "this_month" : period.trim().toLowerCase();
 
-        period = period == null
-                ? "this_month"
-                : period.trim().toLowerCase();
-
-        if (!period.equals("today")
-                && !period.equals("this_month")
-                && !period.equals("last_month")
-                && !period.equals("this_year")) {
+        if (!period.equals("today") && !period.equals("this_month")
+                && !period.equals("last_month") && !period.equals("this_year")) {
             period = "this_month";
-        }
-
-        String routeIdParam = request.getParameter("routeId");
-
-        if (routeIdParam == null || routeIdParam.isBlank()) {
-            routeIdParam = "ALL";
-        } else {
-            routeIdParam = routeIdParam.trim();
         }
 
         LocalDate now = LocalDate.now();
         LocalDate start = now.withDayOfMonth(1);
         LocalDate end = now.withDayOfMonth(now.lengthOfMonth());
 
-        // 2. Tính toán khoảng ngày thực tế dựa trên lựa chọn
         if ("today".equals(period)) {
             start = now;
             end = now;
@@ -57,66 +43,80 @@ public class RevenueReportServlet extends HttpServlet {
             end = now;
         }
 
-        // 3. Gọi dữ liệu từ tầng DAO
-        DashboardDAO dashboardDAO = new DashboardDAO();
-        List<Map<String, Object>> data = dashboardDAO.getRevenueByRouteAndType(Date.valueOf(start), Date.valueOf(end));
+        // 2. Đọc và Validate tham số Tuyến xe (Làm TRƯỚC khi gọi DAO)
+        String routeIdParam = request.getParameter("routeId");
+        if (routeIdParam == null || routeIdParam.isBlank()) {
+            routeIdParam = "ALL";
+        } else {
+            routeIdParam = routeIdParam.trim();
+        }
 
-        // 4. Lấy thông tin Tuyến lọc (nếu có)
-        int selectedRouteId = -1;
-        String selectedRouteNumber = null;
         RouteDAO routeDAO = new RouteDAO();
-
         if (!"ALL".equalsIgnoreCase(routeIdParam)) {
             try {
-                selectedRouteId = Integer.parseInt(routeIdParam.trim());
-
+                int selectedRouteId = Integer.parseInt(routeIdParam);
                 if (selectedRouteId <= 0) {
                     throw new NumberFormatException();
                 }
 
                 Route selectedRoute = routeDAO.getRouteById(selectedRouteId);
-
-                if (selectedRoute != null) {
-                    selectedRouteNumber = selectedRoute.getRouteNumber();
-                    routeIdParam = String.valueOf(selectedRouteId);
-                } else {
-                    // ID la so nhung route khong ton tai
-                    routeIdParam = "ALL";
-                    selectedRouteId = -1;
-                    selectedRouteNumber = null;
+                if (selectedRoute == null) {
+                    routeIdParam = "ALL"; // Tuyến không tồn tại thì reset về ALL
                 }
-
             } catch (NumberFormatException e) {
-                // ID null, khong phai so, so am hoac bang 0
                 routeIdParam = "ALL";
-                selectedRouteId = -1;
-                selectedRouteNumber = null;
             }
         }
 
-        // 5. Xây dựng mảng chuỗi dữ liệu cho đồ thị Chart.js
+        // 3. Gọi dữ liệu từ tầng DAO (SỬA Ở ĐÂY: Truyền thêm routeIdParam vào hàm)
+        DashboardDAO dashboardDAO = new DashboardDAO();
+        List<Map<String, Object>> data = dashboardDAO.getRevenueByRouteAndType(
+                Date.valueOf(start),
+                Date.valueOf(end),
+                routeIdParam // Truyền tham số tuyến xuống SQL để lọc
+        );
+
+        // 4. Xây dựng mảng chuỗi dữ liệu cho đồ thị Chart.js
         StringBuilder labels = new StringBuilder("[");
         StringBuilder ticketData = new StringBuilder("[");
         StringBuilder passData = new StringBuilder("[");
         double totalTicket = 0;
-        double totalPass = 0;
-        boolean hasFilteredData = false;
+        double totalRoutePass = 0;
+        double totalInterRoutePass = 0;
 
         for (Map<String, Object> item : data) {
             String routeNumber = (String) item.get("route");
-            if (selectedRouteNumber != null && !selectedRouteNumber.equals(routeNumber)) {
-                continue; // Lọc bỏ tuyến không chọn
+
+            double ticketRevenue
+                    = ((Number) item.get("ticket")).doubleValue();
+
+            double passRevenue
+                    = ((Number) item.get("pass")).doubleValue();
+
+            String safeRouteNumber = routeNumber
+                    .replace("\\", "\\\\")
+                    .replace("'", "\\'");
+
+            labels.append("'")
+                    .append(safeRouteNumber)
+                    .append("',");
+
+            ticketData.append(ticketRevenue).append(",");
+            passData.append(passRevenue).append(",");
+
+            totalTicket += ticketRevenue;
+
+            if ("Liên Tuyến".equalsIgnoreCase(routeNumber)) {
+                totalInterRoutePass += passRevenue;
+            } else {
+                totalRoutePass += passRevenue;
             }
-            labels.append("'Tuyến ").append(routeNumber).append("',");
-            ticketData.append(item.get("ticket")).append(",");
-            passData.append(item.get("pass")).append(",");
-            totalTicket += (double) item.get("ticket");
-            totalPass += (double) item.get("pass");
-            hasFilteredData = true;
         }
 
-        // Loại bỏ dấu phẩy thừa ở cuối phần tử
-        if (hasFilteredData) {
+        double totalPass = totalRoutePass + totalInterRoutePass;
+
+        // 5. Loại bỏ dấu phẩy thừa ở cuối phần tử
+        if (!data.isEmpty()) {
             labels.setLength(labels.length() - 1);
             ticketData.setLength(ticketData.length() - 1);
             passData.setLength(passData.length() - 1);
@@ -125,16 +125,37 @@ public class RevenueReportServlet extends HttpServlet {
         ticketData.append("]");
         passData.append("]");
 
-        // 6. Đẩy toàn bộ dữ liệu thật sang giao diện hiển thị
+        // 6. Đẩy toàn bộ dữ liệu sang giao diện hiển thị
         request.setAttribute("labels", labels.toString());
         request.setAttribute("ticketData", ticketData.toString());
         request.setAttribute("passData", passData.toString());
+
         request.setAttribute("totalTicket", totalTicket);
+        request.setAttribute("totalRoutePass", totalRoutePass);
+        request.setAttribute(
+                "totalInterRoutePass",
+                totalInterRoutePass
+        );
         request.setAttribute("totalPass", totalPass);
-        request.setAttribute("totalAll", totalTicket + totalPass);
+        request.setAttribute(
+                "totalAll",
+                totalTicket + totalPass
+        );
+
         request.setAttribute("selectedPeriod", period);
         request.setAttribute("selectedRoute", routeIdParam);
-        request.setAttribute("routes", routeDAO.getAllActiveRoutes());
+
+        Integer selectedRouteId = null;
+
+        if (!"ALL".equalsIgnoreCase(routeIdParam)) {
+            selectedRouteId = Integer.valueOf(routeIdParam);
+        }
+
+        request.setAttribute("selectedRouteId", selectedRouteId);
+        request.setAttribute(
+                "routes",
+                routeDAO.getAllActiveRoutes()
+        );
 
         request.getRequestDispatcher("/view/admin/revenue-report.jsp").forward(request, response);
     }
