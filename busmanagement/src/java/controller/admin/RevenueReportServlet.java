@@ -21,17 +21,28 @@ public class RevenueReportServlet extends HttpServlet {
 
         // 1. Đọc tham số lọc từ request
         String period = request.getParameter("period");
-        if (period == null || period.isEmpty()) {
-            period = "this_month"; // Mặc định khi mới vào trang
+
+        period = period == null
+                ? "this_month"
+                : period.trim().toLowerCase();
+
+        if (!period.equals("today")
+                && !period.equals("this_month")
+                && !period.equals("last_month")
+                && !period.equals("this_year")) {
+            period = "this_month";
         }
-        
+
         String routeIdParam = request.getParameter("routeId");
-        if (routeIdParam == null || routeIdParam.isEmpty()) {
+
+        if (routeIdParam == null || routeIdParam.isBlank()) {
             routeIdParam = "ALL";
+        } else {
+            routeIdParam = routeIdParam.trim();
         }
 
         LocalDate now = LocalDate.now();
-        LocalDate start = now.withDayOfMonth(1); 
+        LocalDate start = now.withDayOfMonth(1);
         LocalDate end = now.withDayOfMonth(now.lengthOfMonth());
 
         // 2. Tính toán khoảng ngày thực tế dựa trên lựa chọn
@@ -54,15 +65,32 @@ public class RevenueReportServlet extends HttpServlet {
         int selectedRouteId = -1;
         String selectedRouteNumber = null;
         RouteDAO routeDAO = new RouteDAO();
-        if (!"ALL".equals(routeIdParam)) {
+
+        if (!"ALL".equalsIgnoreCase(routeIdParam)) {
             try {
-                selectedRouteId = Integer.parseInt(routeIdParam);
-                Route selRoute = routeDAO.getRouteById(selectedRouteId);
-                if (selRoute != null) {
-                    selectedRouteNumber = selRoute.getRouteNumber();
+                selectedRouteId = Integer.parseInt(routeIdParam.trim());
+
+                if (selectedRouteId <= 0) {
+                    throw new NumberFormatException();
                 }
+
+                Route selectedRoute = routeDAO.getRouteById(selectedRouteId);
+
+                if (selectedRoute != null) {
+                    selectedRouteNumber = selectedRoute.getRouteNumber();
+                    routeIdParam = String.valueOf(selectedRouteId);
+                } else {
+                    // ID la so nhung route khong ton tai
+                    routeIdParam = "ALL";
+                    selectedRouteId = -1;
+                    selectedRouteNumber = null;
+                }
+
             } catch (NumberFormatException e) {
-                // Ignore
+                // ID null, khong phai so, so am hoac bang 0
+                routeIdParam = "ALL";
+                selectedRouteId = -1;
+                selectedRouteNumber = null;
             }
         }
 

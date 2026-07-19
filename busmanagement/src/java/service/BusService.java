@@ -7,6 +7,7 @@ package service;
 import dal.BusDAO;
 import dal.TripDAO;
 import enums.BusStatus;
+import java.util.Arrays;
 import java.util.List;
 import model.Bus;
 
@@ -40,7 +41,7 @@ public class BusService {
 
         // tham số trên URL
         if (!status.equals("ALL") && !status.equals("ACTIVE")
-                && !status.equals("MAINTENANCE") && !status.equals("RETIRED")) {
+                && !status.equals("MAINTENANCE") && !status.equals("INACTIVE")) {
             status = "ALL";
         }
 
@@ -119,42 +120,62 @@ public class BusService {
         }
     }
 
-    public void updateBus(int busId, String busType, int capacity, String status) {
-        // 1. Validate dữ liệu đầu vào
-        if (busType == null || busType.trim().isEmpty()) {
-            throw new IllegalArgumentException("Loại phương tiện không được để trống.");
+    public void updateBus(
+            int busId,
+            String busType,
+            int capacity,
+            String status
+    ) {
+        List<String> validBusTypes = Arrays.asList(
+                "Bus Thường (Diesel)",
+                "VinBus (Điện)",
+                "BRT (Bus Nhanh)",
+                "Minibus (Cỡ nhỏ)"
+        );
+
+        busType = busType == null ? "" : busType.trim();
+
+        if (!validBusTypes.contains(busType)) {
+            throw new IllegalArgumentException(
+                    "Loại phương tiện không hợp lệ."
+            );
         }
+
         if (capacity <= 0) {
-            throw new IllegalArgumentException("Sức chứa phải là một số nguyên dương lớn hơn 0.");
+            throw new IllegalArgumentException(
+                    "Sức chứa phải là một số nguyên dương lớn hơn 0."
+            );
         }
 
-        // Ép kiểu chuỗi trạng thái (String) sang Enum BusStatus
-        enums.BusStatus busStatus;
+        BusStatus busStatus;
+
         try {
-            busStatus = enums.BusStatus.valueOf(status.trim().toUpperCase());
+            busStatus = BusStatus.valueOf(
+                    status.trim().toUpperCase()
+            );
         } catch (Exception e) {
-            throw new IllegalArgumentException("Trạng thái vận hành không hợp lệ.");
+            throw new IllegalArgumentException(
+                    "Trạng thái vận hành không hợp lệ."
+            );
         }
 
-        // 2. Kiểm tra xem xe buýt có thực sự tồn tại trong DB không
         Bus bus = getBusById(busId);
+
         if (bus == null) {
-            throw new IllegalArgumentException("Không tìm thấy phương tiện với ID " + busId + " để cập nhật.");
+            throw new IllegalArgumentException(
+                    "Không tìm thấy phương tiện với ID "
+                    + busId + " để cập nhật."
+            );
         }
 
-        // 3. Cập nhật dữ liệu mới vào đối tượng (Biển số xe giữ nguyên)
-        bus.setBusType(busType.trim());
+        bus.setBusType(busType);
         bus.setCapacity(capacity);
         bus.setStatus(busStatus);
 
-        // 4. Đẩy xuống DAO để lưu vào Database
-        try {
-            if (!busDAO.update(bus)) {
-                // Ném RuntimeException để Servlet bắt ở catch(Exception e)
-                throw new RuntimeException("Không thể cập nhật thông tin phương tiện vào cơ sở dữ liệu.");
-            }
-        } catch (Exception e) {
-            throw new RuntimeException("Lỗi hệ thống khi lưu: " + e.getMessage());
+        if (!busDAO.update(bus)) {
+            throw new RuntimeException(
+                    "Không thể cập nhật thông tin phương tiện vào cơ sở dữ liệu."
+            );
         }
     }
 

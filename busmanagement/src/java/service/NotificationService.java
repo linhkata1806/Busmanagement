@@ -24,25 +24,53 @@ public class NotificationService {
     }
 
     // quan ly cua staff
-    public boolean createNotification(int accountID, String type, String notiTitle, String notiContent) {
+    public boolean createNotification(
+            int accountID,
+            String type,
+            String notiTitle,
+            String notiContent
+    ) {
         try {
-            Notification noti = new Notification();
+            if (accountID <= 0) {
+                return false;
+            }
 
+            if (type == null || type.isBlank()) {
+                return false;
+            }
+
+            if (notiTitle == null || notiTitle.isBlank()) {
+                return false;
+            }
+
+            if (notiContent == null || notiContent.isBlank()) {
+                return false;
+            }
+
+            NotificationType notificationType;
+
+            try {
+                notificationType = NotificationType.valueOf(
+                        type.trim().toUpperCase()
+                );
+            } catch (IllegalArgumentException e) {
+                return false;
+            }
+
+            Notification noti = new Notification();
             noti.setAccountID(accountID);
-            noti.setNotificationType(NotificationType.valueOf(type.toUpperCase()));
-            noti.setTitle(notiTitle);
-            noti.setContent(notiContent);
+            noti.setNotificationType(notificationType);
+            noti.setTitle(notiTitle.trim());
+            noti.setContent(notiContent.trim());
             noti.setIsRead(false);
-            LocalDateTime now = LocalDateTime.now();
-            noti.setCreatedAt(now);
+            noti.setCreatedAt(LocalDateTime.now());
 
             return notificationDAO.insert(noti);
+
         } catch (Exception e) {
             System.out.println("Lỗi tạo thông báo: " + e.getMessage());
-            // 3. Nếu xảy ra lỗi, trả về false để Servlet báo lỗi ra màn hình
-
+            return false;
         }
-        return false;
     }
 
     public void setConnection(java.sql.Connection conn) {
@@ -106,7 +134,8 @@ public class NotificationService {
     }
 
     /**
-     * Dành cho Phụ xe: đếm thông báo chưa đọc đích danh + broadcast cho nhóm roleName.
+     * Dành cho Phụ xe: đếm thông báo chưa đọc đích danh + broadcast cho nhóm
+     * roleName.
      */
     public int countUnreadByAccountAndRole(int accountID, String roleName) {
         return notificationDAO.countUnreadByAccountAndRole(accountID, roleName);
